@@ -24,9 +24,10 @@ Managair is a [Django](https://www.djangoproject.com/) web application atop a [P
 2. Clone the present repository onto your local machine. In the following, we assume that the _managair_ repository is available at `<home>/codebase/managair`. Change into this project root folder.
 3. A default user and password for the DBMS is set in the compose file `dev-stack.yaml` via the environment variables `POSTGRES_USER` and `POSTGRES_PASSWORD`. Change them if you want to. Similarly, the default user (`PGADMIN_DEFAULT_EMAIL`) and password (`PGADMIN_DEFAULT_PASSWORD`) for logging into `pgAdmin` can be changed here.
 4. Run `docker-compose -f dev-stack.yaml up -d --build` to get started.
-5. Open the source code in your editor of choice. The code in your root folder is bind-mounted into the application's docker container for quick edit-debug cycles.
-6. Open `localhost:8888/dashboard` to see the application's web view.
-7. Open `localhost:8889` to access the `pgAdmin` UI.
+5. Create the [named volume](https://docs.docker.com/storage/volumes/) to store the database: `docker volume create managair-data`
+6. Open the source code in your editor of choice. The code in your root folder is bind-mounted into the application's docker container for quick edit-debug cycles.
+7. Open `localhost:8888/dashboard` to see the application's web view.
+8. Open `localhost:8889` to access the `pgAdmin` UI.
 
 ### Preparing for first launch
 
