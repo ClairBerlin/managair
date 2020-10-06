@@ -1,0 +1,104 @@
+[
+    {
+        "model": "device_manager.quantity",
+        "pk": 1,
+        "fields": {
+            "quantity": "CO2",
+            "base_unit": "PPM"
+        }
+    },
+    {
+        "model": "device_manager.quantity",
+        "pk": 2,
+        "fields": {
+            "quantity": "Temperature",
+            "base_unit": "°C"
+        }
+    },
+    {
+        "model": "device_manager.quantity",
+        "pk": 3,
+        "fields": {
+            "quantity": "Relative Humidity",
+            "base_unit": "%"
+        }
+    },
+    {
+        "model": "device_manager.nodeprotocol",
+        "pk": 1,
+        "fields": {
+            "identifier": "CLAIRCHENPROT_V01",
+            "num_uplink_msgs": 1,
+            "num_downlink_msgs": 0
+        }
+    },
+    {
+        "model": "device_manager.nodeprotocol",
+        "pk": 2,
+        "fields": {
+            "identifier": "ELSYSERSPROT_V01",
+            "num_uplink_msgs": 1,
+            "num_downlink_msgs": 0
+        }
+    },
+    {
+        "model": "device_manager.nodemodel",
+        "pk": 1,
+        "fields": {
+            "name": "CLAIRCHEN_PROTOTYPE_01",
+            "trade_name": "Clairchen Mark 1",
+            "manufacturer": "Clairchen Enterprises",
+            "sensor_type": "Sensirion SCD30",
+            "quantities": [
+                1,
+                2,
+                3
+            ]
+        }
+    },
+    {
+        "model": "device_manager.nodemodel",
+        "pk": 2,
+        "fields": {
+            "name": "ELSYS_ERS_CO2",
+            "trade_name": "ElSys ERS CO2",
+            "manufacturer": "Elektroniksystem i Umeå AB",
+            "sensor_type": "Sensair LP8",
+            "quantities": [
+                1,
+                2,
+                3
+            ]
+        }
+    },
+    {
+        "model": "device_manager.node",
+        "pk": "10e06ed7-922b-33ff-bb37-41cbc33bc7c8",
+        "fields": {
+            "device_id": "A81758FFFE052B0F",
+            "alias": "ERS Test-Node",
+            "protocol": 2,
+            "model": 2
+        }
+    },
+    {
+        "model": "device_manager.node",
+        "pk": "19251485-09ad-82f7-4321-c52f8b9a2c39",
+        "fields": {
+            "device_id": "9876B600001193E0",
+            "alias": "Clairchen Rot",
+            "protocol": 1,
+            "model": 1
+        }
+    },
+    {
+        "model": "device_manager.node",
+        "pk": "58ac186f-b485-fb57-3e26-060f83316108",
+        "fields": {
+            "device_id": "003CB7EA62A7DCBB",
+            "alias": "Clairchen Schawarz",
+            "protocol": 1,
+            "model": 1
+        }
+    }
+]

@@ -4,17 +4,17 @@
 
 ### User-Facing Services
 
-- Register a new user, update a user's profile.
-- Register a sensor node, remove a sensor node.
-- Add a location, associate sensor nodes with a location, update location information.
-- Inspect and analyze measurement time-series and derived data.
-- GDPR transparency: export personal data, delete an account and all associated data.
+- Register a new user, update a user's profile [rough sketch available].
+- Register a sensor node, remove a sensor node [open].
+- Add a location, associate sensor nodes with a location, update location information [open].
+- Inspect and analyze measurement time-series and derived data [open].
+- GDPR transparency: export personal data, delete an account and all associated data [open].
 
 ### Administrative Services
 
 - User management: Register and update users. Change user permissions.
-- Device management: Add and update node types.
-- System administration
+- Device management: Add and update node types [Available via the Django admin UI].
+- System administration [Django admin UI]
 
 ## Development Setup
 
@@ -45,6 +45,10 @@ The `managair` application is running in development mode, with automatic reload
 To inspect the application logs, use `docker logs managair_server -f`. This will follow the log as it is being written.
 
 Because the application runs inside the container, all Django management commands must be executed _inside_ the container - like the commands shown above. That is, to execute `python3 manage.py <command>`, you need to pass the command though docker exec as `docker exec -it managair_server python3 manage.py <command>`.
+
+### Data fixtures
+
+To start development work right away, it would be convenient if important data was preloaded into the DB already. This is what [Django fixtures](https://docs.djangoproject.com/en/3.1/howto/initial-data/) are for. Fixture files are JSON files that contain data in a format that can be directly importet into the DB via the command `docker exec -it managair_server python3 manage.py loaddata <fixturename>`. Fixture files are available for the individual applications in the `fixture` folder.
 
 ### Resources
 
