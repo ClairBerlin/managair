@@ -14,7 +14,6 @@ fi
 doMigrate=${DB_MIGRATE:-false}
 if [ "$doMigrate" = true ] ;
 then
-  python manage.py flush --no-input
   python manage.py migrate
 fi
 
