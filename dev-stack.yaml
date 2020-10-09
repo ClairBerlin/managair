@@ -44,8 +44,8 @@ services:
       - target: 8888
         published: 8888
       # To attach to the debugger
-      - target: 5679
-        published: 5679
+      - target: 3000
+        published: 3000
     depends_on:
       - db
     env_file:
