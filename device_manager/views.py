@@ -1,6 +1,7 @@
 from device_manager.models import Quantity, NodeProtocol, NodeModel, Node
 from device_manager.serializers import QuantitySerializer, NodeProtocolSerializer, NodeModelSerializer, NodeSerializer
-from rest_framework import viewsets, permissions
+from rest_framework_json_api.views import viewsets
+from rest_framework import permissions
 
 class QuantityViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]

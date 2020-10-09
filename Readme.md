@@ -49,7 +49,12 @@ Because the application runs inside the container, all Django management command
 
 ### Data fixtures
 
-To start development work right away, it would be convenient if important data was preloaded into the DB already. This is what [Django fixtures](https://docs.djangoproject.com/en/3.1/howto/initial-data/) are for. Fixture files are JSON files that contain data in a format that can be directly importet into the DB via the command `docker exec -it managair_server python3 manage.py loaddata <fixturename>`. Fixture files are available for the individual applications in the `fixture` folder.
+To start development work right away, it would be convenient if important data was preloaded into the DB already. This is what [Django fixtures](https://docs.djangoproject.com/en/3.1/howto/initial-data/) are for. Fixture files are JSON files that contain data in a format that can be directly importet into the DB. They are available for the individual applications in their `fixture` folders. To set up the the application for development, load the fixtures as follows:
+
+- `docker exec -it managair_server python3 manage.py loaddata device_manager/fixtures/device-fixtures.json`
+- `docker exec -it managair_server python3 manage.py loaddata ts_manager/fixtures/sample-fixtures.json`
+
+Make sure to respect the order because of foreign-key constraints.
 
 ### Resources
 
