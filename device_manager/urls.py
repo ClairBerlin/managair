@@ -1,5 +1,6 @@
 from django.urls import include, path
 from rest_framework import routers
+
 from device_manager import views
 
 router = routers.DefaultRouter()

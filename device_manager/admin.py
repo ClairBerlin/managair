@@ -14,10 +14,10 @@ class NodesInline(admin.TabularInline):
 
 @admin.register(NodeModel)
 class NodeModelAdmin(admin.ModelAdmin):
-    list_display = ('name', 'manufacturer', 'sensor_type')
+    list_display = ['name', 'manufacturer', 'sensor_type']
     inlines = [NodesInline]
 
 @admin.register(Node)
 class NodeAdmin(admin.ModelAdmin):
-    list_display = ('alias', 'id', 'device_id', 'model')
+    list_display = ['alias', 'id', 'device_id', 'model']
     list_filter = ['model']

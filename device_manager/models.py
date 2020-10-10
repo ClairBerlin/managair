@@ -1,6 +1,6 @@
 from django.db import models
+from datetime import datetime
 
-# Create your models here.
 
 class Quantity(models.Model):
     quantity = models.CharField(max_length=30, blank=False, unique=True)
@@ -42,3 +42,11 @@ class Node(models.Model):
     def __str__(self):
         """String for representing the Model object."""
         return f'{self.alias}: {self.id}'
+
+    @classmethod
+    def get_user_nodes(cls, user, query_time=round(datetime.now().timestamp())):
+        """Return a queryset with all nodes attributed to the given user"""
+        return cls.objects.filter(
+            node_installations__site__responsible=user,
+            node_installations__from_timestamp__lte=query_time,
+            node_installations__to_timestamp__gte=query_time)

@@ -34,14 +34,20 @@ class SampleViewSet(viewsets.ReadOnlyModelViewSet):
         """
         Optionally restricts the returned samples to a given time slice and node. 
         """
-        queryset = Sample.objects.all()
+        # Restrict to nodes commanded by the currently logged-in user.
+        nodes = Node.get_user_nodes(self.request.user)
+        # Further restrict to node given as query parameter
         node_id = self.request.query_params.get('filter[node_ref]', None)
+        if node_id is not None:
+            query_node = Node.objects.get(pk=node_id)
+            nodes = nodes.union(query_node)
+        # Time-slicing query parameter
         from_limit = self.request.query_params.get('filter[from]', 0)
         to_limit = self.request.query_params.get(
                 'filter[to]', round(datetime.now().timestamp()))
-        if node_id is not None:
-            queryset = queryset.filter(node_ref__exact=UUID(node_id))
-        
+
+        queryset = super(SampleViewSet, self).get_queryset()
+        queryset = queryset.filter(node_ref__in=nodes)
         queryset = queryset.filter(
                 timestamp_s__gte=from_limit,
                 timestamp_s__lte=to_limit)
@@ -57,15 +63,20 @@ class TimeseriesViewSet(viewsets.ReadOnlyModelViewSet):
     WARNING: There is no default page size. A query without any paramter may, therefore, return a very large resource.
     TODO: Provide some query limit to prevent DOS attacks.
     """
-    queryset = Node.objects.all()
+    queryset = Sample.objects.all() # Not used but necessary to get links right.
     serializer_class = SimpleSampleSerializer # TODO: Cleanup
 
+    def get_queryset(self):
+        """Restrict to logged-in user"""
+        return Node.objects.filter(node_installations__site__responsible=self.request.user)
+
     def list(self, request):
+        queryset = self.get_queryset()
         ts_info = [ TimeseriesViewModel(
                         pk=node.pk,
                         alias=node.alias,
                         sample_count=node.samples.count())
-                    for node in Node.objects.all()]
+                    for node in queryset]
         serializer = TimeseriesSerializer(ts_info, many=True)
         return Response(serializer.data)
     
@@ -73,11 +84,13 @@ class TimeseriesViewSet(viewsets.ReadOnlyModelViewSet):
     def retrieve(self, request, pk=None):
         """Return the time series of a given node."""
 
+        queryset = self.get_queryset()
+
         # Prepare a sample-query and filter for the requested time slice.
         from_limit = self.request.query_params.get('filter[from]', 0)
         to_limit = self.request.query_params.get(
             'filter[to]', round(datetime.now().timestamp()))
-        node = Node.objects.get(pk=pk)
+        node = queryset.get(pk=pk)
         queryset = node.samples.filter(
             timestamp_s__gte=from_limit,
             timestamp_s__lte=to_limit)
