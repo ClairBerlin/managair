@@ -67,6 +67,9 @@ class TimeseriesViewSet(LoginRequiredMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Sample.objects.all() # Not used but necessary to get links right.
     serializer_class = SimpleSampleSerializer # TODO: Cleanup
 
+    class JSONAPIMeta:
+        resource_name = "node-timeseries"
+
     def get_queryset(self):
         """Restrict to logged-in user"""
         return Node.objects.filter(node_installations__site__responsible=self.request.user)

@@ -24,6 +24,7 @@ class TimeseriesSerializer(serializers.Serializer):
     
     class Meta:
         model = TimeseriesViewModel
+        fields = ['url']
 
 
 class SimpleSampleSerializer(serializers.ModelSerializer):
@@ -40,3 +41,6 @@ class SampleListSerializer(serializers.Serializer):
     samples = serializers.ListField(
         child=SimpleSampleSerializer(),
         read_only=True)
+    
+    class Meta:
+        fields = ['url']
