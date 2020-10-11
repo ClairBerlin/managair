@@ -1,0 +1,86 @@
+[
+    {
+        "model": "site_manager.address",
+        "pk": 1,
+        "fields": {
+            "street1": "Teststraße 1",
+            "street2": null,
+            "zip": "12345",
+            "city": "Teststadt"
+        }
+    },
+    {
+        "model": "site_manager.address",
+        "pk": 2,
+        "fields": {
+            "street1": "Versuchsweg 7",
+            "street2": null,
+            "zip": "98765",
+            "city": "Versuchsdorf"
+        }
+    },
+    {
+        "model": "site_manager.site",
+        "pk": 1,
+        "fields": {
+            "name": "Test-Site",
+            "description": "",
+            "address": 1,
+            "responsible": 2
+        }
+    },
+    {
+        "model": "site_manager.site",
+        "pk": 2,
+        "fields": {
+            "name": "Versuchs-Site",
+            "description": "",
+            "address": 2,
+            "responsible": 3
+        }
+    },
+    {
+        "model": "site_manager.nodeinstallation",
+        "pk": 1,
+        "fields": {
+            "node": "10e06ed7-922b-33ff-bb37-41cbc33bc7c8",
+            "site": 1,
+            "from_timestamp": 1601510400,
+            "to_timestamp": 2147483647,
+            "description": "von 2020-10-01T00:00:00Z bis offen"
+        }
+    },
+    {
+        "model": "site_manager.nodeinstallation",
+        "pk": 2,
+        "fields": {
+            "node": "19251485-09ad-82f7-4321-c52f8b9a2c39",
+            "site": 2,
+            "from_timestamp": 1599696000,
+            "to_timestamp": 2147483647,
+            "description": "von 2020-09-10T00:00:00Z bis offen"
+        }
+    },
+    {
+        "model": "site_manager.nodeinstallation",
+        "pk": 3,
+        "fields": {
+            "node": "58ac186f-b485-fb57-3e26-060f83316108",
+            "site": 1,
+            "from_timestamp": 1599696000,
+            "to_timestamp": 1601856000,
+            "description": "Von 2020-09-10T00:00:00Z bis 2020-10-05T00:00:00Z"
+        }
+    },
+    {
+        "model": "site_manager.nodeinstallation",
+        "pk": 4,
+        "fields": {
+            "node": "58ac186f-b485-fb57-3e26-060f83316108",
+            "site": 2,
+            "from_timestamp": 1601856001,
+            "to_timestamp": 2147483647,
+            "description": "Von 2020-10-05T00:00:01 bis offen"
+        }
+    }
+]
