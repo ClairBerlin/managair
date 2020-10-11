@@ -1,11 +1,12 @@
 from rest_framework import permissions
 from rest_framework_json_api.views import viewsets
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from site_manager.models import Address, NodeInstallation, Site
 from site_manager.serializers import AddressSerializer, NodeInstallationSerializer, SiteSerializer
 
 
-class AddressViewSet(viewsets.ModelViewSet):
+class AddressViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
     permissions = [permissions.IsAuthenticated]
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
@@ -16,7 +17,7 @@ class AddressViewSet(viewsets.ModelViewSet):
         return queryset.filter(sites__responsible=self.request.user)
 
 
-class SiteViewSet(viewsets.ModelViewSet):
+class SiteViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
     permissions = [permissions.IsAuthenticated]
     queryset = Site.objects.all()
     serializer_class = SiteSerializer
@@ -26,7 +27,7 @@ class SiteViewSet(viewsets.ModelViewSet):
         queryset = super(SiteViewSet, self).get_queryset()
         return queryset.filter(responsible=self.request.user)
 
-class NodeInstallationViewSet(viewsets.ModelViewSet):
+class NodeInstallationViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = NodeInstallation.objects.all()
     serializer_class = NodeInstallationSerializer

@@ -6,6 +6,7 @@ from rest_framework import permissions, generics, views, filters
 from rest_framework.settings import api_settings
 from rest_framework.response import Response
 from rest_framework.request import Request
+from django.contrib.auth.mixins import LoginRequiredMixin
 from datetime import datetime
 from uuid import UUID
 
@@ -19,7 +20,7 @@ class PagesizeLimitedPagination(JsonApiPageNumberPagination):
     page_size = 100
     
 
-class SampleViewSet(viewsets.ReadOnlyModelViewSet):
+class SampleViewSet(LoginRequiredMixin, viewsets.ReadOnlyModelViewSet):
     """
     Retrieve individual samples and lists of samples.
 
@@ -54,7 +55,7 @@ class SampleViewSet(viewsets.ReadOnlyModelViewSet):
         return queryset
 
 
-class TimeseriesViewSet(viewsets.ReadOnlyModelViewSet):
+class TimeseriesViewSet(LoginRequiredMixin, viewsets.ReadOnlyModelViewSet):
     """
     Provides optimized time-series resources.
 
