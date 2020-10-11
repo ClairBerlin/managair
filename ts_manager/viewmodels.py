@@ -12,6 +12,9 @@ class TimeseriesViewModel:
         self.from_timestamp = from_timestamp
         self.to_timestamp = to_timestamp
         self.sample_count = sample_count
+    
+    class JSONAPIMeta:
+        resource_name = "node-timeseries"
 
 class SamplePageViewModel:
     def __init__(self, pk,
