@@ -15,6 +15,17 @@ class SampleSerializer(serializers.HyperlinkedModelSerializer):
             'url'
             )
 
+class SampleIngestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sample
+        fields = (
+            'node_ref',
+            'timestamp_s',
+            'co2_ppm',
+            'temperature_celsius',
+            'rel_humidity_percent',
+            )
+
 class TimeseriesSerializer(serializers.Serializer):
     alias = serializers.CharField(max_length=30)
     query_timestamp = serializers.IntegerField()

@@ -28,7 +28,7 @@ class Sample(models.Model):
         null=False,
         blank=False,
         choices=MEASUREMENT_STATUS,
-        default=MEASUREMENT_STATUS)
+        default=MEASUREMENT)
 
     class Meta:
         constraints = [

@@ -12,13 +12,17 @@ from uuid import UUID
 
 from ts_manager.models import Sample
 from ts_manager.viewmodels import TimeseriesViewModel, SamplePageViewModel
-from ts_manager.serializers import SampleSerializer, TimeseriesSerializer, SimpleSampleSerializer, SampleListSerializer
+from ts_manager.serializers import SampleSerializer, TimeseriesSerializer, SimpleSampleSerializer, SampleListSerializer, SampleIngestSerializer
 from device_manager.models import Node
 
 class PagesizeLimitedPagination(JsonApiPageNumberPagination):
     """Enforce pagination with a given page size. Can be override in a query."""
     page_size = 100
     
+class InternalSampleView(generics.ListCreateAPIView):
+    """View for data ingestion. Must not be exposed externally"""
+    queryset = Sample.objects.all()
+    serializer_class = SampleIngestSerializer
 
 class SampleViewSet(LoginRequiredMixin, viewsets.ReadOnlyModelViewSet):
     """

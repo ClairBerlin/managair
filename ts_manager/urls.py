@@ -9,5 +9,6 @@ router.register(r'samples', views.SampleViewSet)
 router.register(r'timeseries', views.TimeseriesViewSet)
 
 urlpatterns = [
+    path('ingest/', views.InternalSampleView.as_view(), name='ingest'),
     path('', include(router.urls)),
 ]
