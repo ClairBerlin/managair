@@ -3,4 +3,5 @@ psycopg2-binary
 djangorestframework<3.12
 djangorestframework-jsonapi
 django-filter
+sentry-sdk
 ptvsd
