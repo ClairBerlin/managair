@@ -16,8 +16,11 @@ COPY ./user_manager /code/user_manager
 COPY ./device_manager /code/device_manager
 COPY ./site_manager /code/site_manager
 COPY ./ts_manager /code/ts_manager
+COPY schema.yaml .
 COPY ./manage.py .
 COPY ./entrypoint.sh .
+
+ENV SWAGGER_JSON=./schema.yaml
 
 # run entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]

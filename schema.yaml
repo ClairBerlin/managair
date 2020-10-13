@@ -1,0 +1,2193 @@
+openapi: 3.0.3
+info:
+  title: ''
+  version: 0.0.0
+paths:
+  /api/data/v1/ingest/:
+    get:
+      operationId: api_data_v1_ingest_list
+      description: View for data ingestion. Must not be exposed externally
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSampleIngestList'
+          description: ''
+    post:
+      operationId: api_data_v1_ingest_create
+      description: View for data ingestion. Must not be exposed externally
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/SampleIngest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SampleIngest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SampleIngest'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/SampleIngest'
+          description: ''
+  /api/data/v1/samples/:
+    get:
+      operationId: api_data_v1_samples_list
+      description: |-
+        Retrieve individual samples and lists of samples.
+
+        Filtering is possible by time-slice and node-id.
+        Samples are returned in a verbose JSON:API format, with a maximum page size of 100 entries by default.
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSampleList'
+          description: ''
+  /api/data/v1/samples/{id}/:
+    get:
+      operationId: api_data_v1_samples_retrieve
+      description: |-
+        Retrieve individual samples and lists of samples.
+
+        Filtering is possible by time-slice and node-id.
+        Samples are returned in a verbose JSON:API format, with a maximum page size of 100 entries by default.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sample.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Sample'
+          description: ''
+  /api/data/v1/timeseries/:
+    get:
+      operationId: api_data_v1_timeseries_list
+      description: |-
+        Provides optimized time-series resources.
+
+        The overview resource lists the sample count for each node.
+        The detail resource contains a list of samples for a given node. This list can be restricted via `filter[from]` and `filter[to]` query parameters, and it can be paged.
+        WARNING: There is no default page size. A query without any paramter may, therefore, return a very large resource.
+        TODO: Provide some query limit to prevent DOS attacks.
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSimpleSampleList'
+          description: ''
+  /api/data/v1/timeseries/{id}/:
+    get:
+      operationId: api_data_v1_timeseries_retrieve
+      description: Return the time series of a given node.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sample.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/SimpleSample'
+          description: ''
+  /api/devices/v1/models/:
+    get:
+      operationId: api_devices_v1_models_list
+      description: Verify that the current user is authenticated.
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNodeModelList'
+          description: ''
+    post:
+      operationId: api_devices_v1_models_create
+      description: Verify that the current user is authenticated.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/NodeModel'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NodeModel'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NodeModel'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeModel'
+          description: ''
+  /api/devices/v1/models/{id}/:
+    get:
+      operationId: api_devices_v1_models_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node model.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeModel'
+          description: ''
+    put:
+      operationId: api_devices_v1_models_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node model.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/NodeModel'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NodeModel'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NodeModel'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeModel'
+          description: ''
+    patch:
+      operationId: api_devices_v1_models_partial_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node model.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PatchedNodeModel'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedNodeModel'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedNodeModel'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeModel'
+          description: ''
+    delete:
+      operationId: api_devices_v1_models_destroy
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node model.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/devices/v1/nodes/:
+    get:
+      operationId: api_devices_v1_nodes_list
+      description: Verify that the current user is authenticated.
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNodeList'
+          description: ''
+    post:
+      operationId: api_devices_v1_nodes_create
+      description: Verify that the current user is authenticated.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Node'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Node'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Node'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Node'
+          description: ''
+  /api/devices/v1/nodes/{id}/:
+    get:
+      operationId: api_devices_v1_nodes_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this node.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Node'
+          description: ''
+    put:
+      operationId: api_devices_v1_nodes_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this node.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Node'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Node'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Node'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Node'
+          description: ''
+    patch:
+      operationId: api_devices_v1_nodes_partial_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this node.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PatchedNode'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedNode'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedNode'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Node'
+          description: ''
+    delete:
+      operationId: api_devices_v1_nodes_destroy
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this node.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/devices/v1/protocols/:
+    get:
+      operationId: api_devices_v1_protocols_list
+      description: Verify that the current user is authenticated.
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNodeProtocolList'
+          description: ''
+    post:
+      operationId: api_devices_v1_protocols_create
+      description: Verify that the current user is authenticated.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/NodeProtocol'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NodeProtocol'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NodeProtocol'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeProtocol'
+          description: ''
+  /api/devices/v1/protocols/{id}/:
+    get:
+      operationId: api_devices_v1_protocols_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node protocol.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeProtocol'
+          description: ''
+    put:
+      operationId: api_devices_v1_protocols_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node protocol.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/NodeProtocol'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NodeProtocol'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NodeProtocol'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeProtocol'
+          description: ''
+    patch:
+      operationId: api_devices_v1_protocols_partial_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node protocol.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PatchedNodeProtocol'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedNodeProtocol'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedNodeProtocol'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeProtocol'
+          description: ''
+    delete:
+      operationId: api_devices_v1_protocols_destroy
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node protocol.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/devices/v1/quantities/:
+    get:
+      operationId: api_devices_v1_quantities_list
+      description: Verify that the current user is authenticated.
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedQuantityList'
+          description: ''
+    post:
+      operationId: api_devices_v1_quantities_create
+      description: Verify that the current user is authenticated.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Quantity'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Quantity'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Quantity'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Quantity'
+          description: ''
+  /api/devices/v1/quantities/{id}/:
+    get:
+      operationId: api_devices_v1_quantities_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this quantity.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Quantity'
+          description: ''
+    put:
+      operationId: api_devices_v1_quantities_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this quantity.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Quantity'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Quantity'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Quantity'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Quantity'
+          description: ''
+    patch:
+      operationId: api_devices_v1_quantities_partial_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this quantity.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PatchedQuantity'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedQuantity'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedQuantity'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Quantity'
+          description: ''
+    delete:
+      operationId: api_devices_v1_quantities_destroy
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this quantity.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/sites/v1/address/:
+    get:
+      operationId: api_sites_v1_address_list
+      description: Verify that the current user is authenticated.
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAddressList'
+          description: ''
+    post:
+      operationId: api_sites_v1_address_create
+      description: Verify that the current user is authenticated.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Address'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Address'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Address'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Address'
+          description: ''
+  /api/sites/v1/address/{id}/:
+    get:
+      operationId: api_sites_v1_address_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this address.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Address'
+          description: ''
+    put:
+      operationId: api_sites_v1_address_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this address.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Address'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Address'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Address'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Address'
+          description: ''
+    patch:
+      operationId: api_sites_v1_address_partial_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this address.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PatchedAddress'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAddress'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAddress'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Address'
+          description: ''
+    delete:
+      operationId: api_sites_v1_address_destroy
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this address.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/sites/v1/installation/:
+    get:
+      operationId: api_sites_v1_installation_list
+      description: Verify that the current user is authenticated.
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNodeInstallationList'
+          description: ''
+    post:
+      operationId: api_sites_v1_installation_create
+      description: Verify that the current user is authenticated.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/NodeInstallation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NodeInstallation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NodeInstallation'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeInstallation'
+          description: ''
+  /api/sites/v1/installation/{id}/:
+    get:
+      operationId: api_sites_v1_installation_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node installation.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeInstallation'
+          description: ''
+    put:
+      operationId: api_sites_v1_installation_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node installation.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/NodeInstallation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NodeInstallation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NodeInstallation'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeInstallation'
+          description: ''
+    patch:
+      operationId: api_sites_v1_installation_partial_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node installation.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PatchedNodeInstallation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedNodeInstallation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedNodeInstallation'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeInstallation'
+          description: ''
+    delete:
+      operationId: api_sites_v1_installation_destroy
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node installation.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/sites/v1/sites/:
+    get:
+      operationId: api_sites_v1_sites_list
+      description: Verify that the current user is authenticated.
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSiteList'
+          description: ''
+    post:
+      operationId: api_sites_v1_sites_create
+      description: Verify that the current user is authenticated.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Site'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Site'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Site'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Site'
+          description: ''
+  /api/sites/v1/sites/{id}/:
+    get:
+      operationId: api_sites_v1_sites_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Site'
+          description: ''
+    put:
+      operationId: api_sites_v1_sites_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Site'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Site'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Site'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Site'
+          description: ''
+    patch:
+      operationId: api_sites_v1_sites_partial_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PatchedSite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSite'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Site'
+          description: ''
+    delete:
+      operationId: api_sites_v1_sites_destroy
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    Address:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        street1:
+          type: string
+          maxLength: 50
+        street2:
+          type: string
+          nullable: true
+          maxLength: 50
+        zip:
+          type: string
+          maxLength: 5
+        city:
+          type: string
+          maxLength: 50
+        url:
+          type: string
+          format: uri
+          readOnly: true
+      required:
+      - city
+      - street1
+      - url
+      - zip
+    MeasurementStatusEnum:
+      enum:
+      - M
+      - R
+      - E
+      type: string
+    Node:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        id:
+          type: string
+          format: uuid
+        device_id:
+          type: string
+          maxLength: 32
+        alias:
+          type: string
+          maxLength: 30
+        protocol:
+          type: string
+          format: uri
+        model:
+          type: string
+          format: uri
+        url:
+          type: string
+          format: uri
+          readOnly: true
+      required:
+      - alias
+      - device_id
+      - id
+      - model
+      - protocol
+      - url
+    NodeInstallation:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        site:
+          type: string
+          format: uri
+        node:
+          type: string
+          format: uri
+        from_timestamp:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        to_timestamp:
+          type: integer
+          maximum: 2147483647
+          nullable: true
+          minimum: 0
+        description:
+          type: string
+          nullable: true
+        url:
+          type: string
+          format: uri
+          readOnly: true
+      required:
+      - from_timestamp
+      - node
+      - site
+      - url
+    NodeModel:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        name:
+          type: string
+          maxLength: 30
+        trade_name:
+          type: string
+          maxLength: 30
+        manufacturer:
+          type: string
+          maxLength: 30
+        sensor_type:
+          type: string
+          maxLength: 100
+        quantities:
+          type: array
+          items:
+            type: string
+            format: uri
+        url:
+          type: string
+          format: uri
+          readOnly: true
+      required:
+      - manufacturer
+      - name
+      - quantities
+      - sensor_type
+      - trade_name
+      - url
+    NodeProtocol:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        identifier:
+          type: string
+          maxLength: 30
+        num_uplink_msgs:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        num_downlink_msgs:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        url:
+          type: string
+          format: uri
+          readOnly: true
+      required:
+      - identifier
+      - url
+    PaginatedAddressList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+    PaginatedNodeInstallationList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/NodeInstallation'
+    PaginatedNodeList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Node'
+    PaginatedNodeModelList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/NodeModel'
+    PaginatedNodeProtocolList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/NodeProtocol'
+    PaginatedQuantityList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Quantity'
+    PaginatedSampleIngestList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SampleIngest'
+    PaginatedSampleList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sample'
+    PaginatedSimpleSampleList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SimpleSample'
+    PaginatedSiteList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Site'
+    PatchedAddress:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        street1:
+          type: string
+          maxLength: 50
+        street2:
+          type: string
+          nullable: true
+          maxLength: 50
+        zip:
+          type: string
+          maxLength: 5
+        city:
+          type: string
+          maxLength: 50
+        url:
+          type: string
+          format: uri
+          readOnly: true
+    PatchedNode:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        id:
+          type: string
+          format: uuid
+        device_id:
+          type: string
+          maxLength: 32
+        alias:
+          type: string
+          maxLength: 30
+        protocol:
+          type: string
+          format: uri
+        model:
+          type: string
+          format: uri
+        url:
+          type: string
+          format: uri
+          readOnly: true
+    PatchedNodeInstallation:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        site:
+          type: string
+          format: uri
+        node:
+          type: string
+          format: uri
+        from_timestamp:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        to_timestamp:
+          type: integer
+          maximum: 2147483647
+          nullable: true
+          minimum: 0
+        description:
+          type: string
+          nullable: true
+        url:
+          type: string
+          format: uri
+          readOnly: true
+    PatchedNodeModel:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        name:
+          type: string
+          maxLength: 30
+        trade_name:
+          type: string
+          maxLength: 30
+        manufacturer:
+          type: string
+          maxLength: 30
+        sensor_type:
+          type: string
+          maxLength: 100
+        quantities:
+          type: array
+          items:
+            type: string
+            format: uri
+        url:
+          type: string
+          format: uri
+          readOnly: true
+    PatchedNodeProtocol:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        identifier:
+          type: string
+          maxLength: 30
+        num_uplink_msgs:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        num_downlink_msgs:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        url:
+          type: string
+          format: uri
+          readOnly: true
+    PatchedQuantity:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        quantity:
+          type: string
+          maxLength: 30
+        base_unit:
+          type: string
+          maxLength: 30
+        url:
+          type: string
+          format: uri
+          readOnly: true
+    PatchedSite:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        name:
+          type: string
+          maxLength: 50
+        description:
+          type: string
+          nullable: true
+        address:
+          type: string
+          format: uri
+        nodes:
+          type: array
+          items:
+            type: string
+            format: uri
+          readOnly: true
+        url:
+          type: string
+          format: uri
+          readOnly: true
+    Quantity:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        quantity:
+          type: string
+          maxLength: 30
+        base_unit:
+          type: string
+          maxLength: 30
+        url:
+          type: string
+          format: uri
+          readOnly: true
+      required:
+      - base_unit
+      - quantity
+      - url
+    Sample:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        node_ref:
+          type: string
+          format: uri
+        timestamp_s:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        co2_ppm:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        temperature_celsius:
+          type: string
+          format: decimal
+          maximum: 100
+          minimum: -100
+          nullable: true
+        rel_humidity_percent:
+          type: integer
+          maximum: 32767
+          nullable: true
+          minimum: 0
+        url:
+          type: string
+          format: uri
+          readOnly: true
+      required:
+      - co2_ppm
+      - node_ref
+      - timestamp_s
+      - url
+    SampleIngest:
+      type: object
+      description: |-
+        A `ModelSerializer` is just a regular `Serializer`, except that:
+
+        * A set of default fields are automatically populated.
+        * A set of default validators are automatically populated.
+        * Default `.create()` and `.update()` implementations are provided.
+
+        The process of automatically determining a set of serializer fields
+        based on the model fields is reasonably complex, but you almost certainly
+        don't need to dig into the implementation.
+
+        If the `ModelSerializer` class *doesn't* generate the set of fields that
+        you need you should either declare the extra/differing fields explicitly on
+        the serializer class, or simply use a `Serializer` class.
+
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        node_ref:
+          type: string
+          format: uuid
+        timestamp_s:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        co2_ppm:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        temperature_celsius:
+          type: string
+          format: decimal
+          maximum: 100
+          minimum: -100
+          nullable: true
+        rel_humidity_percent:
+          type: integer
+          maximum: 32767
+          nullable: true
+          minimum: 0
+      required:
+      - co2_ppm
+      - node_ref
+      - timestamp_s
+    SimpleSample:
+      type: object
+      description: |-
+        A `ModelSerializer` is just a regular `Serializer`, except that:
+
+        * A set of default fields are automatically populated.
+        * A set of default validators are automatically populated.
+        * Default `.create()` and `.update()` implementations are provided.
+
+        The process of automatically determining a set of serializer fields
+        based on the model fields is reasonably complex, but you almost certainly
+        don't need to dig into the implementation.
+
+        If the `ModelSerializer` class *doesn't* generate the set of fields that
+        you need you should either declare the extra/differing fields explicitly on
+        the serializer class, or simply use a `Serializer` class.
+
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        timestamp_s:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        co2_ppm:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        temperature_celsius:
+          type: string
+          format: decimal
+          maximum: 100
+          minimum: -100
+          nullable: true
+        rel_humidity_percent:
+          type: integer
+          maximum: 32767
+          nullable: true
+          minimum: 0
+        measurement_status:
+          $ref: '#/components/schemas/MeasurementStatusEnum'
+      required:
+      - co2_ppm
+      - timestamp_s
+    Site:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        name:
+          type: string
+          maxLength: 50
+        description:
+          type: string
+          nullable: true
+        address:
+          type: string
+          format: uri
+        nodes:
+          type: array
+          items:
+            type: string
+            format: uri
+          readOnly: true
+        url:
+          type: string
+          format: uri
+          readOnly: true
+      required:
+      - address
+      - name
+      - nodes
+      - url
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: Session

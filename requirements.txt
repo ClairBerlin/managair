@@ -1,7 +1,8 @@
-Django<3.1
+Django==3.1
 psycopg2-binary
-djangorestframework<3.12
-djangorestframework-jsonapi
+djangorestframework==3.12
+djangorestframework-jsonapi==3.2.0
+drf-spectacular
 django-filter
 sentry-sdk
 ptvsd

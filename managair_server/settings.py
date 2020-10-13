@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'drf_spectacular',
     'user_manager',
     'device_manager',
     'site_manager',
@@ -93,6 +94,8 @@ TEMPLATES = [
 ]
 
 REST_FRAMEWORK = {
+    # OpenAPI schema (for DRF-Spectaclar)
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     # Enable pagination but do not enforce a page size limit.
     'PAGE_SIZE': maxsize,
     'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',

@@ -32,3 +32,17 @@ To start development work right away, it would be convenient if important data w
 - `docker exec -it managair_server python3 manage.py loaddata ts_manager/fixtures/sample-fixtures.json`
 
 Make sure to respect the order because of foreign-key constraints.
+
+## OpenAPI Schema
+
+Documentation of the Managair ReST API is available
+
+- for download as an OpenAPI 3.0 YAML document at `/api/schema`
+- as a [Swagger-UI](https://swagger.io/tools/swagger-ui/) web page at `/api/schema/swagger-ui`
+- and as a [ReDoc](https://github.com/Redocly/redoc) web page at `/api/schema/redoc`
+
+If you make changes to the API, you need to re-generate the corresponding OpenAPI description file. To do so, execute `python3 manage.py spectacular --file schema.yaml`, or - if you run the docer development stack inside docker swarm: 
+
+`docker exec $(docker ps -q -f name=managair_server) python3 manage.py spectacular --file schema.yaml`
+
+The `schema.yaml` should end up in the project's root folder, from where `docker build` will correctly package it.
