@@ -43,7 +43,7 @@
         "model": "site_manager.nodeinstallation",
         "pk": 1,
         "fields": {
-            "node": "10e06ed7-922b-33ff-bb37-41cbc33bc7c8",
+            "node": "9d02faee-4260-1377-22ec-936428b572ee",
             "site": 1,
             "from_timestamp": 1601510400,
             "to_timestamp": 2147483647,
@@ -54,7 +54,7 @@
         "model": "site_manager.nodeinstallation",
         "pk": 2,
         "fields": {
-            "node": "19251485-09ad-82f7-4321-c52f8b9a2c39",
+            "node": "c727b2f8-8377-d4cb-0e95-ac03200b8c93",
             "site": 2,
             "from_timestamp": 1599696000,
             "to_timestamp": 2147483647,
@@ -65,7 +65,7 @@
         "model": "site_manager.nodeinstallation",
         "pk": 3,
         "fields": {
-            "node": "58ac186f-b485-fb57-3e26-060f83316108",
+            "node": "3b95a1b2-74e7-9e98-52c4-4acae441f0ae",
             "site": 1,
             "from_timestamp": 1599696000,
             "to_timestamp": 1601856000,
@@ -76,7 +76,7 @@
         "model": "site_manager.nodeinstallation",
         "pk": 4,
         "fields": {
-            "node": "58ac186f-b485-fb57-3e26-060f83316108",
+            "node": "3b95a1b2-74e7-9e98-52c4-4acae441f0ae",
             "site": 2,
             "from_timestamp": 1601856001,
             "to_timestamp": 2147483647,

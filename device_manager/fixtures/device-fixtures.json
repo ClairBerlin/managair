@@ -73,7 +73,7 @@
     },
     {
         "model": "device_manager.node",
-        "pk": "10e06ed7-922b-33ff-bb37-41cbc33bc7c8",
+        "pk": "9d02faee-4260-1377-22ec-936428b572ee",
         "fields": {
             "device_id": "A81758FFFE052B0F",
             "alias": "ERS Test-Node",
@@ -83,7 +83,7 @@
     },
     {
         "model": "device_manager.node",
-        "pk": "19251485-09ad-82f7-4321-c52f8b9a2c39",
+        "pk": "c727b2f8-8377-d4cb-0e95-ac03200b8c93",
         "fields": {
             "device_id": "9876B600001193E0",
             "alias": "Clairchen Rot",
@@ -93,7 +93,7 @@
     },
     {
         "model": "device_manager.node",
-        "pk": "58ac186f-b485-fb57-3e26-060f83316108",
+        "pk": "3b95a1b2-74e7-9e98-52c4-4acae441f0ae",
         "fields": {
             "device_id": "003CB7EA62A7DCBB",
             "alias": "Clairchen Schwarz",
