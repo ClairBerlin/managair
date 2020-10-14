@@ -15,9 +15,6 @@ COPY ./managair_server /code/managair_server
 COPY ./user_manager /code/user_manager
 COPY ./core /code/core
 COPY ./ingest /code/ingest
-COPY ./device_manager /code/device_manager
-COPY ./site_manager /code/site_manager
-COPY ./ts_manager /code/ts_manager
 COPY schema.yaml .
 COPY ./manage.py .
 COPY ./entrypoint.sh .
