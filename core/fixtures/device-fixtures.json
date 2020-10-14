@@ -1,0 +1,104 @@
+[
+    {
+        "model": "core.quantity",
+        "pk": 1,
+        "fields": {
+            "quantity": "CO2",
+            "base_unit": "PPM"
+        }
+    },
+    {
+        "model": "core.quantity",
+        "pk": 2,
+        "fields": {
+            "quantity": "Temperature",
+            "base_unit": "°C"
+        }
+    },
+    {
+        "model": "core.quantity",
+        "pk": 3,
+        "fields": {
+            "quantity": "Relative Humidity",
+            "base_unit": "%"
+        }
+    },
+    {
+        "model": "core.nodeprotocol",
+        "pk": 1,
+        "fields": {
+            "identifier": "CLAIRCHENPROT_V01",
+            "num_uplink_msgs": 1,
+            "num_downlink_msgs": 0
+        }
+    },
+    {
+        "model": "core.nodeprotocol",
+        "pk": 2,
+        "fields": {
+            "identifier": "ELSYSERSPROT_V01",
+            "num_uplink_msgs": 1,
+            "num_downlink_msgs": 0
+        }
+    },
+    {
+        "model": "core.nodemodel",
+        "pk": 1,
+        "fields": {
+            "name": "CLAIRCHEN_PROTOTYPE_01",
+            "trade_name": "Clairchen Mark 1",
+            "manufacturer": "Clairchen Enterprises",
+            "sensor_type": "Sensirion SCD30",
+            "quantities": [
+                1,
+                2,
+                3
+            ]
+        }
+    },
+    {
+        "model": "core.nodemodel",
+        "pk": 2,
+        "fields": {
+            "name": "ELSYS_ERS_CO2",
+            "trade_name": "ElSys ERS CO2",
+            "manufacturer": "Elektroniksystem i Umeå AB",
+            "sensor_type": "Sensair LP8",
+            "quantities": [
+                1,
+                2,
+                3
+            ]
+        }
+    },
+    {
+        "model": "core.node",
+        "pk": "9d02faee-4260-1377-22ec-936428b572ee",
+        "fields": {
+            "device_id": "A81758FFFE052B0F",
+            "alias": "ERS Test-Node",
+            "protocol": 2,
+            "model": 2
+        }
+    },
+    {
+        "model": "core.node",
+        "pk": "c727b2f8-8377-d4cb-0e95-ac03200b8c93",
+        "fields": {
+            "device_id": "9876B600001193E0",
+            "alias": "Clairchen Rot",
+            "protocol": 1,
+            "model": 1
+        }
+    },
+    {
+        "model": "core.node",
+        "pk": "3b95a1b2-74e7-9e98-52c4-4acae441f0ae",
+        "fields": {
+            "device_id": "003CB7EA62A7DCBB",
+            "alias": "Clairchen Schwarz",
+            "protocol": 1,
+            "model": 1
+        }
+    }
+]

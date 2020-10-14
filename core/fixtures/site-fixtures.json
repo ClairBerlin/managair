@@ -1,0 +1,86 @@
+[
+    {
+        "model": "core.address",
+        "pk": 1,
+        "fields": {
+            "street1": "Teststraße 1",
+            "street2": null,
+            "zip": "12345",
+            "city": "Teststadt"
+        }
+    },
+    {
+        "model": "core.address",
+        "pk": 2,
+        "fields": {
+            "street1": "Versuchsweg 7",
+            "street2": null,
+            "zip": "98765",
+            "city": "Versuchsdorf"
+        }
+    },
+    {
+        "model": "core.site",
+        "pk": 1,
+        "fields": {
+            "name": "Test-Site",
+            "description": "",
+            "address": 1,
+            "responsible": 2
+        }
+    },
+    {
+        "model": "core.site",
+        "pk": 2,
+        "fields": {
+            "name": "Versuchs-Site",
+            "description": "",
+            "address": 2,
+            "responsible": 3
+        }
+    },
+    {
+        "model": "core.nodeinstallation",
+        "pk": 1,
+        "fields": {
+            "node": "9d02faee-4260-1377-22ec-936428b572ee",
+            "site": 1,
+            "from_timestamp": 1601510400,
+            "to_timestamp": 2147483647,
+            "description": "von 2020-10-01T00:00:00Z bis offen"
+        }
+    },
+    {
+        "model": "core.nodeinstallation",
+        "pk": 2,
+        "fields": {
+            "node": "c727b2f8-8377-d4cb-0e95-ac03200b8c93",
+            "site": 2,
+            "from_timestamp": 1599696000,
+            "to_timestamp": 2147483647,
+            "description": "von 2020-09-10T00:00:00Z bis offen"
+        }
+    },
+    {
+        "model": "core.nodeinstallation",
+        "pk": 3,
+        "fields": {
+            "node": "3b95a1b2-74e7-9e98-52c4-4acae441f0ae",
+            "site": 1,
+            "from_timestamp": 1599696000,
+            "to_timestamp": 1601856000,
+            "description": "Von 2020-09-10T00:00:00Z bis 2020-10-05T00:00:00Z"
+        }
+    },
+    {
+        "model": "core.nodeinstallation",
+        "pk": 4,
+        "fields": {
+            "node": "3b95a1b2-74e7-9e98-52c4-4acae441f0ae",
+            "site": 2,
+            "from_timestamp": 1601856001,
+            "to_timestamp": 2147483647,
+            "description": "Von 2020-10-05T00:00:01 bis offen"
+        }
+    }
+]

@@ -21,15 +21,14 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, Sp
 urlpatterns = [
     url(r"^", include("user_manager.urls")),
     path('api/auth/', include('rest_framework.urls')),
-    url('api/devices/v1/', include("device_manager.urls")),
-    url('api/sites/v1/', include("site_manager.urls")),
-    url('api/data/v1/', include("ts_manager.urls")),
+    url('api/v1/', include("core.urls")),
+    url('ingest/v1/', include("ingest.urls")),
     path('admin/', admin.site.urls),
     
     # OpenAPI
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(
+    path('api/v1/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/v1/schema/swagger-ui/', SpectacularSwaggerView.as_view(
         url_name='schema'), name='swagger-ui'),
-    path('api/schema/redoc/', SpectacularRedocView.as_view(
+    path('api/v1/schema/redoc/', SpectacularRedocView.as_view(
         url_name='schema'), name='redoc'),
 ]

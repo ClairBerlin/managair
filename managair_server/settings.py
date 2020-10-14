@@ -60,9 +60,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_spectacular',
     'user_manager',
-    'device_manager',
-    'site_manager',
-    'ts_manager',
+    'core',
+    'ingest',
 ]
 
 MIDDLEWARE = [
