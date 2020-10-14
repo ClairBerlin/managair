@@ -1,5 +1,6 @@
 from rest_framework_json_api import serializers
 from ts_manager.models import Sample
+from device_manager.models import Node
 from ts_manager.viewmodels import TimeseriesViewModel
 
 
@@ -55,3 +56,8 @@ class SampleListSerializer(serializers.Serializer):
     
     class Meta:
         fields = ['url']
+
+class NodeSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Node
+        fields = ('id', 'device_id', 'alias', 'protocol', 'model', 'url')

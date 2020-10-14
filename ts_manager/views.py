@@ -12,7 +12,7 @@ from uuid import UUID
 
 from ts_manager.models import Sample
 from ts_manager.viewmodels import TimeseriesViewModel, SamplePageViewModel
-from ts_manager.serializers import SampleSerializer, TimeseriesSerializer, SimpleSampleSerializer, SampleListSerializer, SampleIngestSerializer
+from ts_manager.serializers import SampleSerializer, TimeseriesSerializer, SimpleSampleSerializer, SampleListSerializer, SampleIngestSerializer, NodeSerializer
 from device_manager.models import Node
 
 class PagesizeLimitedPagination(JsonApiPageNumberPagination):
@@ -124,4 +124,17 @@ class TimeseriesViewSet(LoginRequiredMixin, viewsets.ReadOnlyModelViewSet):
             serializer = self.get_serializer(
                 queryset, context=context, many=True)
             return Response(serializer.data)
+
     
+class NodeViewSet(LoginRequiredMixin, viewsets.ReadOnlyModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Node.objects.all()
+    serializer_class = NodeSerializer
+
+    def get_queryset(self):
+        """Restrict to logged-in user.
+        
+        TODO: rework access policies to cover logged-in users and nodes marked as public.
+        """
+        queryset = super(NodeViewSet, self).get_queryset()
+        return queryset.filter(node_installations__site__responsible=self.request.user)
