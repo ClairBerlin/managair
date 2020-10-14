@@ -3,10 +3,10 @@ info:
   title: ''
   version: 0.0.0
 paths:
-  /api/data/v1/ingest/:
+  /api/v1/address/:
     get:
-      operationId: api_data_v1_ingest_list
-      description: View for data ingestion. Must not be exposed externally
+      operationId: api_v1_address_list
+      description: Verify that the current user is authenticated.
       parameters:
       - name: page[number]
         required: false
@@ -31,24 +31,24 @@ paths:
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/PaginatedSampleIngestList'
+                $ref: '#/components/schemas/PaginatedAddressList'
           description: ''
     post:
-      operationId: api_data_v1_ingest_create
-      description: View for data ingestion. Must not be exposed externally
+      operationId: api_v1_address_create
+      description: Verify that the current user is authenticated.
       tags:
       - api
       requestBody:
         content:
           application/vnd.api+json:
             schema:
-              $ref: '#/components/schemas/SampleIngest'
+              $ref: '#/components/schemas/Address'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/SampleIngest'
+              $ref: '#/components/schemas/Address'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/SampleIngest'
+              $ref: '#/components/schemas/Address'
         required: true
       security:
       - cookieAuth: []
@@ -59,11 +59,956 @@ paths:
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/SampleIngest'
+                $ref: '#/components/schemas/Address'
           description: ''
-  /api/data/v1/samples/:
+  /api/v1/address/{id}/:
     get:
-      operationId: api_data_v1_samples_list
+      operationId: api_v1_address_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this address.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Address'
+          description: ''
+    put:
+      operationId: api_v1_address_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this address.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Address'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Address'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Address'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Address'
+          description: ''
+    patch:
+      operationId: api_v1_address_partial_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this address.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PatchedAddress'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAddress'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAddress'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Address'
+          description: ''
+    delete:
+      operationId: api_v1_address_destroy
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this address.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/installation/:
+    get:
+      operationId: api_v1_installation_list
+      description: Verify that the current user is authenticated.
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNodeInstallationList'
+          description: ''
+    post:
+      operationId: api_v1_installation_create
+      description: Verify that the current user is authenticated.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/NodeInstallation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NodeInstallation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NodeInstallation'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeInstallation'
+          description: ''
+  /api/v1/installation/{id}/:
+    get:
+      operationId: api_v1_installation_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node installation.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeInstallation'
+          description: ''
+    put:
+      operationId: api_v1_installation_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node installation.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/NodeInstallation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NodeInstallation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NodeInstallation'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeInstallation'
+          description: ''
+    patch:
+      operationId: api_v1_installation_partial_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node installation.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PatchedNodeInstallation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedNodeInstallation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedNodeInstallation'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeInstallation'
+          description: ''
+    delete:
+      operationId: api_v1_installation_destroy
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node installation.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/models/:
+    get:
+      operationId: api_v1_models_list
+      description: Verify that the current user is authenticated.
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNodeModelList'
+          description: ''
+    post:
+      operationId: api_v1_models_create
+      description: Verify that the current user is authenticated.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/NodeModel'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NodeModel'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NodeModel'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeModel'
+          description: ''
+  /api/v1/models/{id}/:
+    get:
+      operationId: api_v1_models_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node model.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeModel'
+          description: ''
+    put:
+      operationId: api_v1_models_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node model.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/NodeModel'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NodeModel'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NodeModel'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeModel'
+          description: ''
+    patch:
+      operationId: api_v1_models_partial_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node model.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PatchedNodeModel'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedNodeModel'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedNodeModel'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeModel'
+          description: ''
+    delete:
+      operationId: api_v1_models_destroy
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node model.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/nodes/:
+    get:
+      operationId: api_v1_nodes_list
+      description: Verify that the current user is authenticated.
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNodeList'
+          description: ''
+    post:
+      operationId: api_v1_nodes_create
+      description: Verify that the current user is authenticated.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Node'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Node'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Node'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Node'
+          description: ''
+  /api/v1/nodes/{id}/:
+    get:
+      operationId: api_v1_nodes_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this node.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Node'
+          description: ''
+    put:
+      operationId: api_v1_nodes_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this node.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Node'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Node'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Node'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Node'
+          description: ''
+    patch:
+      operationId: api_v1_nodes_partial_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this node.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PatchedNode'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedNode'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedNode'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Node'
+          description: ''
+    delete:
+      operationId: api_v1_nodes_destroy
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this node.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/protocols/:
+    get:
+      operationId: api_v1_protocols_list
+      description: Verify that the current user is authenticated.
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNodeProtocolList'
+          description: ''
+    post:
+      operationId: api_v1_protocols_create
+      description: Verify that the current user is authenticated.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/NodeProtocol'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NodeProtocol'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NodeProtocol'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeProtocol'
+          description: ''
+  /api/v1/protocols/{id}/:
+    get:
+      operationId: api_v1_protocols_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node protocol.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeProtocol'
+          description: ''
+    put:
+      operationId: api_v1_protocols_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node protocol.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/NodeProtocol'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NodeProtocol'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NodeProtocol'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeProtocol'
+          description: ''
+    patch:
+      operationId: api_v1_protocols_partial_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node protocol.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PatchedNodeProtocol'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedNodeProtocol'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedNodeProtocol'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeProtocol'
+          description: ''
+    delete:
+      operationId: api_v1_protocols_destroy
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this node protocol.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/quantities/:
+    get:
+      operationId: api_v1_quantities_list
+      description: Verify that the current user is authenticated.
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedQuantityList'
+          description: ''
+    post:
+      operationId: api_v1_quantities_create
+      description: Verify that the current user is authenticated.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Quantity'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Quantity'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Quantity'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Quantity'
+          description: ''
+  /api/v1/quantities/{id}/:
+    get:
+      operationId: api_v1_quantities_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this quantity.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Quantity'
+          description: ''
+    put:
+      operationId: api_v1_quantities_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this quantity.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Quantity'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Quantity'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Quantity'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Quantity'
+          description: ''
+    patch:
+      operationId: api_v1_quantities_partial_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this quantity.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PatchedQuantity'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedQuantity'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedQuantity'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Quantity'
+          description: ''
+    delete:
+      operationId: api_v1_quantities_destroy
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this quantity.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/samples/:
+    get:
+      operationId: api_v1_samples_list
       description: |-
         Retrieve individual samples and lists of samples.
 
@@ -95,9 +1040,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/PaginatedSampleList'
           description: ''
-  /api/data/v1/samples/{id}/:
+  /api/v1/samples/{id}/:
     get:
-      operationId: api_data_v1_samples_retrieve
+      operationId: api_v1_samples_retrieve
       description: |-
         Retrieve individual samples and lists of samples.
 
@@ -123,9 +1068,322 @@ paths:
               schema:
                 $ref: '#/components/schemas/Sample'
           description: ''
-  /api/data/v1/timeseries/:
+  /api/v1/schema/:
     get:
-      operationId: api_data_v1_timeseries_list
+      operationId: api_v1_schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/sites/:
+    get:
+      operationId: api_v1_sites_list
+      description: Verify that the current user is authenticated.
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSiteList'
+          description: ''
+    post:
+      operationId: api_v1_sites_create
+      description: Verify that the current user is authenticated.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Site'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Site'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Site'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Site'
+          description: ''
+  /api/v1/sites/{id}/:
+    get:
+      operationId: api_v1_sites_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Site'
+          description: ''
+    put:
+      operationId: api_v1_sites_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Site'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Site'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Site'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Site'
+          description: ''
+    patch:
+      operationId: api_v1_sites_partial_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PatchedSite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSite'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Site'
+          description: ''
+    delete:
+      operationId: api_v1_sites_destroy
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/timeseries/:
+    get:
+      operationId: api_v1_timeseries_list
       description: |-
         Provides optimized time-series resources.
 
@@ -159,9 +1417,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/PaginatedSimpleSampleList'
           description: ''
-  /api/data/v1/timeseries/{id}/:
+  /api/v1/timeseries/{id}/:
     get:
-      operationId: api_data_v1_timeseries_retrieve
+      operationId: api_v1_timeseries_retrieve
       description: Return the time series of a given node.
       parameters:
       - in: path
@@ -183,10 +1441,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/SimpleSample'
           description: ''
-  /api/devices/v1/models/:
+  /ingest/v1/ingest/:
     get:
-      operationId: api_devices_v1_models_list
-      description: Verify that the current user is authenticated.
+      operationId: ingest_v1_ingest_list
+      description: View for data ingestion. Must not be exposed externally
       parameters:
       - name: page[number]
         required: false
@@ -201,7 +1459,7 @@ paths:
         schema:
           type: integer
       tags:
-      - api
+      - ingest
       security:
       - cookieAuth: []
       - basicAuth: []
@@ -211,693 +1469,24 @@ paths:
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/PaginatedNodeModelList'
+                $ref: '#/components/schemas/PaginatedSampleIngestList'
           description: ''
     post:
-      operationId: api_devices_v1_models_create
-      description: Verify that the current user is authenticated.
+      operationId: ingest_v1_ingest_create
+      description: View for data ingestion. Must not be exposed externally
       tags:
-      - api
+      - ingest
       requestBody:
         content:
           application/vnd.api+json:
             schema:
-              $ref: '#/components/schemas/NodeModel'
+              $ref: '#/components/schemas/SampleIngest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/NodeModel'
+              $ref: '#/components/schemas/SampleIngest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/NodeModel'
-        required: true
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/NodeModel'
-          description: ''
-  /api/devices/v1/models/{id}/:
-    get:
-      operationId: api_devices_v1_models_retrieve
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this node model.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/NodeModel'
-          description: ''
-    put:
-      operationId: api_devices_v1_models_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this node model.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/NodeModel'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/NodeModel'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/NodeModel'
-        required: true
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/NodeModel'
-          description: ''
-    patch:
-      operationId: api_devices_v1_models_partial_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this node model.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/PatchedNodeModel'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedNodeModel'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedNodeModel'
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/NodeModel'
-          description: ''
-    delete:
-      operationId: api_devices_v1_models_destroy
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this node model.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '204':
-          description: No response body
-  /api/devices/v1/nodes/:
-    get:
-      operationId: api_devices_v1_nodes_list
-      description: Verify that the current user is authenticated.
-      parameters:
-      - name: page[number]
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      - name: page[size]
-        required: false
-        in: query
-        description: Number of results to return per page.
-        schema:
-          type: integer
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/PaginatedNodeList'
-          description: ''
-    post:
-      operationId: api_devices_v1_nodes_create
-      description: Verify that the current user is authenticated.
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/Node'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Node'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Node'
-        required: true
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Node'
-          description: ''
-  /api/devices/v1/nodes/{id}/:
-    get:
-      operationId: api_devices_v1_nodes_retrieve
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        description: A UUID string identifying this node.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Node'
-          description: ''
-    put:
-      operationId: api_devices_v1_nodes_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        description: A UUID string identifying this node.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/Node'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Node'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Node'
-        required: true
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Node'
-          description: ''
-    patch:
-      operationId: api_devices_v1_nodes_partial_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        description: A UUID string identifying this node.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/PatchedNode'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedNode'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedNode'
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Node'
-          description: ''
-    delete:
-      operationId: api_devices_v1_nodes_destroy
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        description: A UUID string identifying this node.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '204':
-          description: No response body
-  /api/devices/v1/protocols/:
-    get:
-      operationId: api_devices_v1_protocols_list
-      description: Verify that the current user is authenticated.
-      parameters:
-      - name: page[number]
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      - name: page[size]
-        required: false
-        in: query
-        description: Number of results to return per page.
-        schema:
-          type: integer
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/PaginatedNodeProtocolList'
-          description: ''
-    post:
-      operationId: api_devices_v1_protocols_create
-      description: Verify that the current user is authenticated.
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/NodeProtocol'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/NodeProtocol'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/NodeProtocol'
-        required: true
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/NodeProtocol'
-          description: ''
-  /api/devices/v1/protocols/{id}/:
-    get:
-      operationId: api_devices_v1_protocols_retrieve
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this node protocol.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/NodeProtocol'
-          description: ''
-    put:
-      operationId: api_devices_v1_protocols_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this node protocol.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/NodeProtocol'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/NodeProtocol'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/NodeProtocol'
-        required: true
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/NodeProtocol'
-          description: ''
-    patch:
-      operationId: api_devices_v1_protocols_partial_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this node protocol.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/PatchedNodeProtocol'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedNodeProtocol'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedNodeProtocol'
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/NodeProtocol'
-          description: ''
-    delete:
-      operationId: api_devices_v1_protocols_destroy
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this node protocol.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '204':
-          description: No response body
-  /api/devices/v1/quantities/:
-    get:
-      operationId: api_devices_v1_quantities_list
-      description: Verify that the current user is authenticated.
-      parameters:
-      - name: page[number]
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      - name: page[size]
-        required: false
-        in: query
-        description: Number of results to return per page.
-        schema:
-          type: integer
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/PaginatedQuantityList'
-          description: ''
-    post:
-      operationId: api_devices_v1_quantities_create
-      description: Verify that the current user is authenticated.
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/Quantity'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Quantity'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Quantity'
-        required: true
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Quantity'
-          description: ''
-  /api/devices/v1/quantities/{id}/:
-    get:
-      operationId: api_devices_v1_quantities_retrieve
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this quantity.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Quantity'
-          description: ''
-    put:
-      operationId: api_devices_v1_quantities_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this quantity.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/Quantity'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Quantity'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Quantity'
-        required: true
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Quantity'
-          description: ''
-    patch:
-      operationId: api_devices_v1_quantities_partial_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this quantity.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/PatchedQuantity'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedQuantity'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedQuantity'
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Quantity'
-          description: ''
-    delete:
-      operationId: api_devices_v1_quantities_destroy
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this quantity.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '204':
-          description: No response body
-  /api/sites/v1/address/:
-    get:
-      operationId: api_sites_v1_address_list
-      description: Verify that the current user is authenticated.
-      parameters:
-      - name: page[number]
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      - name: page[size]
-        required: false
-        in: query
-        description: Number of results to return per page.
-        schema:
-          type: integer
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/PaginatedAddressList'
-          description: ''
-    post:
-      operationId: api_sites_v1_address_create
-      description: Verify that the current user is authenticated.
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/Address'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Address'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Address'
+              $ref: '#/components/schemas/SampleIngest'
         required: true
       security:
       - cookieAuth: []
@@ -908,454 +1497,8 @@ paths:
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/Address'
+                $ref: '#/components/schemas/SampleIngest'
           description: ''
-  /api/sites/v1/address/{id}/:
-    get:
-      operationId: api_sites_v1_address_retrieve
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this address.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Address'
-          description: ''
-    put:
-      operationId: api_sites_v1_address_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this address.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/Address'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Address'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Address'
-        required: true
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Address'
-          description: ''
-    patch:
-      operationId: api_sites_v1_address_partial_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this address.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/PatchedAddress'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedAddress'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedAddress'
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Address'
-          description: ''
-    delete:
-      operationId: api_sites_v1_address_destroy
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this address.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '204':
-          description: No response body
-  /api/sites/v1/installation/:
-    get:
-      operationId: api_sites_v1_installation_list
-      description: Verify that the current user is authenticated.
-      parameters:
-      - name: page[number]
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      - name: page[size]
-        required: false
-        in: query
-        description: Number of results to return per page.
-        schema:
-          type: integer
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/PaginatedNodeInstallationList'
-          description: ''
-    post:
-      operationId: api_sites_v1_installation_create
-      description: Verify that the current user is authenticated.
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/NodeInstallation'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/NodeInstallation'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/NodeInstallation'
-        required: true
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/NodeInstallation'
-          description: ''
-  /api/sites/v1/installation/{id}/:
-    get:
-      operationId: api_sites_v1_installation_retrieve
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this node installation.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/NodeInstallation'
-          description: ''
-    put:
-      operationId: api_sites_v1_installation_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this node installation.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/NodeInstallation'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/NodeInstallation'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/NodeInstallation'
-        required: true
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/NodeInstallation'
-          description: ''
-    patch:
-      operationId: api_sites_v1_installation_partial_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this node installation.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/PatchedNodeInstallation'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedNodeInstallation'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedNodeInstallation'
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/NodeInstallation'
-          description: ''
-    delete:
-      operationId: api_sites_v1_installation_destroy
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this node installation.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '204':
-          description: No response body
-  /api/sites/v1/sites/:
-    get:
-      operationId: api_sites_v1_sites_list
-      description: Verify that the current user is authenticated.
-      parameters:
-      - name: page[number]
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      - name: page[size]
-        required: false
-        in: query
-        description: Number of results to return per page.
-        schema:
-          type: integer
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/PaginatedSiteList'
-          description: ''
-    post:
-      operationId: api_sites_v1_sites_create
-      description: Verify that the current user is authenticated.
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/Site'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Site'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Site'
-        required: true
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Site'
-          description: ''
-  /api/sites/v1/sites/{id}/:
-    get:
-      operationId: api_sites_v1_sites_retrieve
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this site.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Site'
-          description: ''
-    put:
-      operationId: api_sites_v1_sites_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this site.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/Site'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Site'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Site'
-        required: true
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Site'
-          description: ''
-    patch:
-      operationId: api_sites_v1_sites_partial_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this site.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/PatchedSite'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedSite'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedSite'
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Site'
-          description: ''
-    delete:
-      operationId: api_sites_v1_sites_destroy
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this site.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '204':
-          description: No response body
 components:
   schemas:
     Address:
@@ -2018,7 +2161,7 @@ components:
         * A mixin class to enable sparse fieldsets is included
         * A mixin class to enable validation of included resources is included
       properties:
-        node_ref:
+        node_ref_id:
           type: string
           format: uri
         timestamp_s:
@@ -2046,7 +2189,7 @@ components:
           readOnly: true
       required:
       - co2_ppm
-      - node_ref
+      - node_ref_id
       - timestamp_s
       - url
     SampleIngest:
@@ -2072,7 +2215,7 @@ components:
         * A mixin class to enable sparse fieldsets is included
         * A mixin class to enable validation of included resources is included
       properties:
-        node_ref:
+        node_ref_id:
           type: string
           format: uuid
         timestamp_s:
@@ -2096,7 +2239,7 @@ components:
           minimum: 0
       required:
       - co2_ppm
-      - node_ref
+      - node_ref_id
       - timestamp_s
     SimpleSample:
       type: object

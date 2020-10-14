@@ -28,8 +28,10 @@ When run in DEBUG mode, the `managair_server` has the [Python Tools for Visual S
 
 To start development work right away, it would be convenient if important data was preloaded into the DB already. This is what [Django fixtures](https://docs.djangoproject.com/en/3.1/howto/initial-data/) are for. Fixture files are JSON files that contain data in a format that can be directly importet into the DB. They are available for the individual applications in their `fixture` folders. To set up the the application for development, load the fixtures as follows:
 
-- `docker exec -it managair_server python3 manage.py loaddata device_manager/fixtures/device-fixtures.json`
-- `docker exec -it managair_server python3 manage.py loaddata ts_manager/fixtures/sample-fixtures.json`
+- `docker exec -it managair_server python3 manage.py loaddata user_manager/fixtures/user-fixtures.json`
+- `docker exec -it managair_server python3 manage.py loaddata core/fixtures/device-fixtures.json`
+- `docker exec -it managair_server python3 manage.py loaddata core/fixtures/site-fixtures.json`
+- `docker exec -it managair_server python3 manage.py loaddata core/fixtures/data-fixtures.json`
 
 Make sure to respect the order because of foreign-key constraints.
 
@@ -37,9 +39,9 @@ Make sure to respect the order because of foreign-key constraints.
 
 Documentation of the Managair ReST API is available
 
-- for download as an OpenAPI 3.0 YAML document at `/api/schema`
-- as a [Swagger-UI](https://swagger.io/tools/swagger-ui/) web page at `/api/schema/swagger-ui`
-- and as a [ReDoc](https://github.com/Redocly/redoc) web page at `/api/schema/redoc`
+- for download as an OpenAPI 3.0 YAML document at `/api/v1/schema`
+- as a [Swagger-UI](https://swagger.io/tools/swagger-ui/) web page at `/api/v1/schema/swagger-ui`
+- and as a [ReDoc](https://github.com/Redocly/redoc) web page at `/api/v1/schema/redoc`
 
 If you make changes to the API, you need to re-generate the corresponding OpenAPI description file. To do so, execute `python3 manage.py spectacular --file schema.yaml`, or - if you run the docer development stack inside docker swarm: 
 
