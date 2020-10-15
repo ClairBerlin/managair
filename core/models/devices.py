@@ -51,3 +51,37 @@ class Node(models.Model):
             node_installations__site__responsible=user,
             node_installations__from_timestamp__lte=query_time,
             node_installations__to_timestamp__gte=query_time)
+            
+
+class NodeFidelity(models.Model):
+    """Maintain results of the node fidelity check."""
+    UNKNOWN = 'U'
+    ALIVE = 'E'
+    MISSING = 'M'
+    DEAD = 'D'
+    FIDELITY_STATUS = [
+        (UNKNOWN, 'node has never reported data'),
+        (ALIVE, 'node did report data recently'),
+        (MISSING, 'node has nod reported data recently'),
+        (DEAD, 'node has not reported data for some time')
+    ]
+    node = models.OneToOneField(
+        Node, on_delete=models.CASCADE, primary_key=True)
+    fidelity = models.CharField(
+        max_length=1,
+        null=False,
+        blank=False,
+        choices=FIDELITY_STATUS,
+        default=UNKNOWN)
+    last_contact_s = models.PositiveIntegerField(null=True)
+    last_check_s = models.PositiveIntegerField(null=False, blank=False)
+
+    def __str__(self):
+        """String for representing the Model object."""
+        return f'{self.node} --- Status: {self.fidelity}; Last seen: {datetime.fromtimestamp(self.last_contact_s)}; Last checked: {datetime.fromtimestamp(self.last_check_s)}'
+    
+    def last_contact_iso(self):
+        return datetime.fromtimestamp(self.last_contact_s)
+
+    def last_check_iso(self):
+        return datetime.fromtimestamp(self.last_check_s)

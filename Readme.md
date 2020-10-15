@@ -5,9 +5,10 @@
 ### User-Facing Services
 
 - Register a new user, update a user's profile [rough sketch available].
-- Register a sensor node, remove a sensor node [open].
-- Add a location, associate sensor nodes with a location, update location information [open].
-- Inspect and analyze measurement time-series and derived data [open].
+- Register a sensor node, remove a sensor node [API and admin-UI].
+- Add a location, associate sensor nodes with a location, update location information [rough sketch via API and admin-UI].
+- Inspect and measurement time-series [API].
+- Analyze measurement time-series and derived data [open].
 - GDPR transparency: export personal data, delete an account and all associated data [open].
 
 ### Administrative Services
@@ -15,6 +16,7 @@
 - User management: Register and update users. Change user permissions.
 - Device management: Add and update node types [Available via the Django admin UI].
 - System administration [Django admin UI]
+- Fidelity check for all registered nodes: Warn if no messages have been received lately [adnin UI].
 
 ## Development Setup
 
@@ -48,3 +50,15 @@ If you make changes to the API, you need to re-generate the corresponding OpenAP
 `docker exec $(docker ps -q -f name=managair_server) python3 manage.py spectacular --file schema.yaml`
 
 The `schema.yaml` should end up in the project's root folder, from where `docker build` will correctly package it.
+
+## Node Status Fidelity Check
+
+The Managair contains a background service that periodically checks for all registered nodes if a message has been received recently, within the last two hours (configurable). If so, Managair marks the node's _fidelity_ as _ALIVE_. If the most recent sample is not older than twice this period (four hours), the node is marked _MISSING_. A node that has been quiet for longer is declared _DEAD_, while a node from which no messages have ever been received is _UNKNOWN_.
+
+The periodic fidelity check is performed by means of the background task scheduler [Django_Q](https://django-q.readthedocs.io/en/latest/index.html). Once the entire application stack has booted, you currently need to start its job queue by hand, via the command:
+
+`docker exec -it $(docker ps -q -f name=managair_server) python3 manage.py qcluster`
+
+Then, open up the admin-UI and schedule a Live-Node Check at an interval of your choice. The function to call is `core.tasks.check_node_fidelity`.
+
+Results of the fidelity check are available at the API resource `api/v1/fidelity`, or via the admin UI.

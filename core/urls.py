@@ -10,6 +10,7 @@ router.register(r'quantities', devices.QuantityViewSet)
 router.register(r'protocols', devices.NodeProtocolViewSet)
 router.register(r'models', devices.NodeModelViewSet)
 router.register(r'nodes', devices.NodeViewSet)
+router.register(r'fidelity', devices.NodeFidelityViewSet)
 # Site management views
 router.register(r'sites', sites.SiteViewSet)
 router.register(r'address', sites.AddressViewSet)
