@@ -55,7 +55,9 @@ The `schema.yaml` should end up in the project's root folder, from where `docker
 
 The Managair contains a background service that periodically checks for all registered nodes if a message has been received recently, within the last two hours (configurable). If so, Managair marks the node's _fidelity_ as _ALIVE_. If the most recent sample is not older than twice this period (four hours), the node is marked _MISSING_. A node that has been quiet for longer is declared _DEAD_, while a node from which no messages have ever been received is _UNKNOWN_.
 
-The periodic fidelity check is performed by means of the background task scheduler [Django_Q](https://django-q.readthedocs.io/en/latest/index.html). Once the entire application stack has booted, you currently need to start its job queue by hand, via the command:
+The periodic fidelity check is performed by means of the background task scheduler [Django_Q](https://django-q.readthedocs.io/en/latest/index.html). It is active if the environment variable `NODE_FIDELITY` is set (=1).
+
+Once the entire application stack has booted, you currently need to start its job queue by hand, via the command:
 
 `docker exec -it $(docker ps -q -f name=managair_server) python3 manage.py qcluster`
 
