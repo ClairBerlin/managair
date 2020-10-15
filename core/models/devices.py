@@ -61,10 +61,10 @@ class Node(models.Model):
         if latest_sample == None:
             fidelity['fidelity'] = NodeFidelity.UNKNOWN
             fidelity['last_contact_s'] = None
-        elif (check_time_s - latest_sample.timestamp_s) <= lookback_s:
+        elif (check_time_s - latest_sample.timestamp_s) <= lookback_interval_s:
             fidelity['fidelity'] = NodeFidelity.ALIVE
             fidelity['last_contact_s'] = latest_sample.timestamp_s
-        elif ((check_time_s - latest_sample.timestamp_s) <= 2*lookback_s):
+        elif ((check_time_s - latest_sample.timestamp_s) <= 2*lookback_interval_s):
             fidelity['fidelity'] = NodeFidelity.MISSING
             fidelity['last_contact_s'] = latest_sample.timestamp_s
         else:
