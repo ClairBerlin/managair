@@ -32,7 +32,9 @@ To start development work right away, it would be convenient if important data w
 
 - `docker exec -it managair_server python3 manage.py loaddata user_manager/fixtures/user-fixtures.json`
 - `docker exec -it managair_server python3 manage.py loaddata core/fixtures/device-fixtures.json`
-- `docker exec -it managair_server python3 manage.py loaddata core/fixtures/site-fixtures.json`
+- `docker exec -it managair_server python3 manage.py loaddata core/fixtures
+/inventory
+-fixtures.json`
 - `docker exec -it managair_server python3 manage.py loaddata core/fixtures/data-fixtures.json`
 
 Make sure to respect the order because of foreign-key constraints.
