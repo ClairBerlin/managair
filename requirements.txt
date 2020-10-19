@@ -2,6 +2,9 @@ Django==3.1
 psycopg2-binary
 djangorestframework==3.12
 djangorestframework-jsonapi==3.2.0
+dj-rest-auth[with_social]
+django-allauth
+django-cors-headers
 drf-spectacular
 django-filter
 sentry-sdk
