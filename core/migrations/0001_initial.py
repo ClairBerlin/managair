@@ -67,7 +67,7 @@ class Migration(migrations.Migration):
             name='NodeFidelity',
             fields=[
                 ('node', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False, to='core.node')),
-                ('fidelity', models.CharField(choices=[('U', 'node has never reported data'), ('E', 'node did report data recently'), ('M', 'node has nod reported data recently'), ('D', 'node has not reported data for some time')], default='U', max_length=1)),
+                ('fidelity', models.CharField(choices=[('U', 'node has never reported data'), ('E', 'node did report data recently'), ('M', 'node has not reported data recently'), ('D', 'node has not reported data for some time')], default='U', max_length=1)),
                 ('last_contact_s', models.PositiveIntegerField(null=True)),
                 ('last_check_s', models.PositiveIntegerField()),
             ],
