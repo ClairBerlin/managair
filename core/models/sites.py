@@ -74,3 +74,9 @@ class NodeInstallation(models.Model):
     def __str__(self):
         """For representation in the Admin UI."""
         return f'Node: {self.node}, from: {datetime.utcfromtimestamp(self.from_timestamp)} To: {datetime.utcfromtimestamp(self.to_timestamp) if self.to_timestamp != None else "ongoing"}'
+
+    def from_iso(self):
+        return datetime.fromtimestamp(self.from_timestamp)
+
+    def to_iso(self):
+        return datetime.fromtimestamp(self.to_timestamp)

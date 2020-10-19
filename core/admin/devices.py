@@ -1,5 +1,9 @@
+from datetime import datetime
+
 from django.contrib import admin
-from core.models import Quantity, NodeModel, NodeProtocol, Node
+
+from core.models import Quantity, NodeModel, NodeProtocol, Node, NodeFidelity
+
 
 @admin.register(Quantity)
 class QuantityAdmin(admin.ModelAdmin):
@@ -21,3 +25,8 @@ class NodeModelAdmin(admin.ModelAdmin):
 class NodeAdmin(admin.ModelAdmin):
     list_display = ['alias', 'id', 'device_id', 'model']
     list_filter = ['model']
+
+@admin.register(NodeFidelity)
+class NodeFidelityAdmin(admin.ModelAdmin):
+    list_display = ['node', 'fidelity', 'last_contact_iso', 'last_check_iso']
+

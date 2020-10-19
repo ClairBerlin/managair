@@ -7,7 +7,7 @@ class SampleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Sample
         fields = (
-            'node_ref_id',
+            'node',
             'timestamp_s',
             'co2_ppm',
             'temperature_celsius',
@@ -30,7 +30,7 @@ class TimeseriesSerializer(serializers.Serializer):
 class SimpleSampleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sample
-        exclude = ['node_ref_id', 'id']
+        exclude = ['node', 'id']
 
 
 class SampleListSerializer(serializers.Serializer):
