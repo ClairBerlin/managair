@@ -83,7 +83,7 @@ class NodeFidelity(models.Model):
     FIDELITY_STATUS = [
         (UNKNOWN, 'node has never reported data'),
         (ALIVE, 'node did report data recently'),
-        (MISSING, 'node has nod reported data recently'),
+        (MISSING, 'node has not reported data recently'),
         (DEAD, 'node has not reported data for some time')
     ]
     node = models.OneToOneField(
