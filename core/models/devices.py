@@ -51,3 +51,58 @@ class Node(models.Model):
             node_installations__site__responsible=user,
             node_installations__from_timestamp__lte=query_time,
             node_installations__to_timestamp__gte=query_time)
+            
+    def check_fidelity(self, lookback_interval_s: int):
+        """Check if a message was received within the lookback interval."""
+        check_time_s = round(datetime.now().timestamp())
+        fidelity = {'node' : self,
+                    'last_check_s': check_time_s}
+        latest_sample = self.samples.latest()
+        if latest_sample == None:
+            fidelity['fidelity'] = NodeFidelity.UNKNOWN
+            fidelity['last_contact_s'] = None
+        elif (check_time_s - latest_sample.timestamp_s) <= lookback_interval_s:
+            fidelity['fidelity'] = NodeFidelity.ALIVE
+            fidelity['last_contact_s'] = latest_sample.timestamp_s
+        elif ((check_time_s - latest_sample.timestamp_s) <= 2*lookback_interval_s):
+            fidelity['fidelity'] = NodeFidelity.MISSING
+            fidelity['last_contact_s'] = latest_sample.timestamp_s
+        else:
+            fidelity['fidelity'] = NodeFidelity.DEAD
+            fidelity['last_contact_s'] = latest_sample.timestamp_s
+        return NodeFidelity.objects.update_or_create(
+            node=fidelity['node'], defaults={**fidelity})
+
+
+class NodeFidelity(models.Model):
+    """Maintain results of the node fidelity check."""
+    UNKNOWN = 'U'
+    ALIVE = 'E'
+    MISSING = 'M'
+    DEAD = 'D'
+    FIDELITY_STATUS = [
+        (UNKNOWN, 'node has never reported data'),
+        (ALIVE, 'node did report data recently'),
+        (MISSING, 'node has not reported data recently'),
+        (DEAD, 'node has not reported data for some time')
+    ]
+    node = models.OneToOneField(
+        Node, on_delete=models.CASCADE, primary_key=True)
+    fidelity = models.CharField(
+        max_length=1,
+        null=False,
+        blank=False,
+        choices=FIDELITY_STATUS,
+        default=UNKNOWN)
+    last_contact_s = models.PositiveIntegerField(null=True)
+    last_check_s = models.PositiveIntegerField(null=False, blank=False)        
+
+    def __str__(self):
+        """String for representing the Model object."""
+        return f'{self.node} --- Status: {self.fidelity}; Last seen: {datetime.fromtimestamp(self.last_contact_s)}; Last checked: {datetime.fromtimestamp(self.last_check_s)}'
+    
+    def last_contact_iso(self):
+        return datetime.fromtimestamp(self.last_contact_s)
+
+    def last_check_iso(self):
+        return datetime.fromtimestamp(self.last_check_s)

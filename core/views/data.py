@@ -35,7 +35,7 @@ class SampleViewSet(LoginRequiredMixin, viewsets.ReadOnlyModelViewSet):
         # Restrict to nodes commanded by the currently logged-in user.
         nodes = Node.get_user_nodes(self.request.user)
         # Further restrict to node given as query parameter
-        node_id = self.request.query_params.get('filter[node_ref]', None)
+        node_id = self.request.query_params.get('filter[node]', None)
         if node_id is not None:
             query_node = Node.objects.get(pk=node_id)
             nodes = nodes.union(query_node)
@@ -45,7 +45,7 @@ class SampleViewSet(LoginRequiredMixin, viewsets.ReadOnlyModelViewSet):
                 'filter[to]', round(datetime.now().timestamp()))
 
         queryset = super(SampleViewSet, self).get_queryset()
-        queryset = queryset.filter(node_ref__in=nodes)
+        queryset = queryset.filter(node__in=nodes)
         queryset = queryset.filter(
                 timestamp_s__gte=from_limit,
                 timestamp_s__lte=to_limit)

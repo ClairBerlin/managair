@@ -14,4 +14,4 @@ class SiteAdmin(admin.ModelAdmin):
 
 @admin.register(NodeInstallation)
 class NodeInstallationAdmin(admin.ModelAdmin):
-    list_display = ['node', 'site', 'from_timestamp', 'to_timestamp']
+    list_display = ['node', 'site', 'from_iso', 'to_iso']

@@ -32,6 +32,9 @@ DEBUG = int(os.environ.get("DEBUG", default=0))
 # Do not use Sentry reporting with local development stacks.
 SENTRY = int(os.environ.get("SENTRY", default=0))
 
+# Enable or disable periodic node fidelity check.
+NODE_FIDELITY = int(os.environ.get("NODE_FIDELITY", default=0))
+
 # 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space
 # between each. For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
@@ -57,6 +60,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.sites',
     'django.contrib.staticfiles',
+    'django_q',
     'rest_framework',
     'rest_framework.authtoken',
     'allauth',
@@ -158,8 +162,8 @@ WSGI_APPLICATION = 'managair_server.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, \
-            "db.sqlite3")),
+        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR,
+                                                            "db.sqlite3")),
         "USER": os.environ.get("SQL_USER", "user"),
         "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
         "HOST": os.environ.get("SQL_HOST", "localhost"),
@@ -167,6 +171,25 @@ DATABASES = {
     }
 }
 
+if NODE_FIDELITY:
+    # Redis used as broker for the Django_Q task scheduler.
+    Q_CLUSTER = {
+        'name': 'node_check',
+        'recycle': 50,
+        'timeout': 300,  # 5 minutes to check all nodes.
+        'save_limit': 250,
+        'cpu_affinity': 1,
+        'label': 'Live-Node Check',
+        'redis': {
+            'host': 'redis',
+            'port': 6379,
+            'db': 0,
+            'password': None,
+            'socket_timeout': None,
+            'charset': 'utf-8',
+            'errors': 'strict',
+            'unix_socket_path': None}
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators

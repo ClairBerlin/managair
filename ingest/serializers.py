@@ -6,7 +6,7 @@ class SampleIngestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sample
         fields = (
-            'node_ref_id',
+            'node',
             'timestamp_s',
             'co2_ppm',
             'temperature_celsius',

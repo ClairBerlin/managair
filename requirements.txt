@@ -7,5 +7,7 @@ django-allauth
 django-cors-headers
 drf-spectacular
 django-filter
+django_q
+redis
 sentry-sdk
 ptvsd

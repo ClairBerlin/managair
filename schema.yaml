@@ -2692,7 +2692,7 @@ components:
         * A mixin class to enable sparse fieldsets is included
         * A mixin class to enable validation of included resources is included
       properties:
-        node_ref_id:
+        node:
           type: string
           format: uri
         timestamp_s:
@@ -2720,7 +2720,7 @@ components:
           readOnly: true
       required:
       - co2_ppm
-      - node_ref_id
+      - node
       - timestamp_s
       - url
     SampleIngest:
@@ -2746,7 +2746,7 @@ components:
         * A mixin class to enable sparse fieldsets is included
         * A mixin class to enable validation of included resources is included
       properties:
-        node_ref_id:
+        node:
           type: string
           format: uuid
         timestamp_s:
@@ -2770,7 +2770,7 @@ components:
           minimum: 0
       required:
       - co2_ppm
-      - node_ref_id
+      - node
       - timestamp_s
     SimpleSample:
       type: object
