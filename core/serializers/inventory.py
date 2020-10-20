@@ -1,5 +1,12 @@
 from rest_framework_json_api import serializers
-from core.models import Address, NodeInstallation, Site
+from rest_framework_json_api.relations import ResourceRelatedField
+
+from dj_rest_auth.serializers import UserDetailsSerializer
+
+from django.contrib.auth.models import User
+
+from core.models import Address, NodeInstallation, Site, Organization, \
+    Membership
 from core.serializers import NodeSerializer
 
 class AddressSerializer(serializers.HyperlinkedModelSerializer):
@@ -33,3 +40,25 @@ class NodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
 
     class JSONAPIMeta:
         included_resources = ['node']
+
+
+class OrganizationSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Organization
+        fields = ('name', 'description', 'url')
+
+
+class MembershipSerializer(serializers.HyperlinkedModelSerializer):
+    included_serializers = {
+        'organization': OrganizationSerializer,
+    }
+
+    user = UserDetailsSerializer()
+    # TODO: Add user hyperlinks.
+
+    class Meta:
+        model = Membership
+        fields = ('organization', 'user', 'url')
+    
+    class JSONAPIMeta:
+        included_resources = ['organization', 'user']

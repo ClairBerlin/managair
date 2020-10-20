@@ -31,9 +31,7 @@ When run in DEBUG mode, the `managair_server` has the [Python Tools for Visual S
 To start development work right away, it would be convenient if important data was preloaded into the DB already. This is what [Django fixtures](https://docs.djangoproject.com/en/3.1/howto/initial-data/) are for. Fixture files are JSON files that contain data in a format that can be directly importet into the DB. They are available for the individual applications in their `fixture` folders. To set up the the application for development, load the fixtures as follows:
 
 - `docker exec -it managair_server python3 manage.py loaddata user_manager/fixtures/user-fixtures.json`
-- `docker exec -it managair_server python3 manage.py loaddata core/fixtures/device-fixtures.json`
-- `docker exec -it managair_server python3 manage.py loaddata core/fixtures
-/inventory
+- `docker exec -it managair_server python3 manage.py loaddata core/fixtures/inventory
 -fixtures.json`
 - `docker exec -it managair_server python3 manage.py loaddata core/fixtures/data-fixtures.json`
 

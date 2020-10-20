@@ -15,6 +15,9 @@ router.register(r'fidelity', devices.NodeFidelityViewSet)
 router.register(r'sites', inventory.SiteViewSet)
 router.register(r'address', inventory.AddressViewSet)
 router.register(r'installation', inventory.NodeInstallationViewSet)
+router.register(r'organization', inventory.OrganizationViewSet)
+router.register(r'membership', inventory.MembershipViewSet)
+
 # Data views
 router.register(r'samples', data.SampleViewSet)
 router.register(r'timeseries', data.TimeseriesViewSet)
