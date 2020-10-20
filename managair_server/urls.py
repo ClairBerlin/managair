@@ -24,6 +24,8 @@ urlpatterns = [
     url('api/v1/', include("core.urls")),
     url('ingest/v1/', include("ingest.urls")),
     path('admin/', admin.site.urls),
+    path('auth/', include('dj_rest_auth.urls')),
+    path('auth/registration/', include('dj_rest_auth.registration.urls')),
     
     # OpenAPI
     path('api/v1/schema/', SpectacularAPIView.as_view(), name='schema'),
