@@ -22,11 +22,11 @@
 
 Managair is a [Django](https://www.djangoproject.com/) web application atop a [PostgreSQL](https://www.postgresql.org) DBMS. It is meant to be run as part of the Clair backend stack. To start up your development environment, consult the stack's Readme-file.
 
-## Debugging
+### Debugging
 
 When run in DEBUG mode, the `managair_server` has the [Python Tools for Visual Studio Debug Server](https://github.com/microsoft/ptvsd) (PTVSD) included. It allows to attach a Python debugger from within Visual Studio Code to the application running inside to container. To get started, copy `dev_utils/launch.json` into your project-local `.vscode` folder. Details on setup and usage can be found in this [blog post](https://testdriven.io/blog/django-debugging-vs-code/).
 
-## Data fixtures
+### Data fixtures
 
 To start development work right away, it would be convenient if important data was preloaded into the DB already. This is what [Django fixtures](https://docs.djangoproject.com/en/3.1/howto/initial-data/) are for. Fixture files are JSON files that contain data in a format that can be directly importet into the DB. They are available for the individual applications in their `fixture` folders. To set up the the application for development, load the fixtures as follows:
 
@@ -50,6 +50,24 @@ If you make changes to the API, you need to re-generate the corresponding OpenAP
 `docker exec $(docker ps -q -f name=managair_server) python3 manage.py spectacular --file schema.yaml`
 
 The `schema.yaml` should end up in the project's root folder, from where `docker build` will correctly package it.
+
+## User Registration and Authentication
+
+The Managair uses [dj-rest-auth](https://dj-rest-auth.readthedocs.io/en/latest/index.html) for user authentication, in combination with the registration functionality from [django-alauth](https://django-allauth.readthedocs.io/en/latest/index.html). Authentication and registration is available at the `/auth/` endpoint; individual resources follow the [dj-rest-auth documentation](https://dj-rest-auth.readthedocs.io/en/latest/api_endpoints.html).
+
+Like for the operational API, authentication and registration resources must be JSON:API documents with Content-Type `application/vnd.api+json`. For example, the body of a login request must look as follows:
+
+```json
+{
+    "data": {
+        "type": "LoginView",
+        "attributes": {
+            "username": "maxMustermann",
+            "password": "mustermann"
+        }
+    }
+}
+```
 
 ## Node Status Fidelity Check
 
