@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import get_user_model
 
 from rest_framework import permissions
 from rest_framework_json_api.views import viewsets
@@ -6,8 +7,15 @@ from rest_framework_json_api.views import viewsets
 from core.models import Address, NodeInstallation, Site, Organization, \
     Membership
 from core.serializers import AddressSerializer, NodeInstallationSerializer, \
-    SiteSerializer, OrganizationSerializer, MembershipSerializer
+    SiteSerializer, OrganizationSerializer, MembershipSerializer, UserSerializer
 
+User = get_user_model()
+
+class UserViewSet(LoginRequiredMixin, viewsets.ReadOnlyModelViewSet):
+    permissions = [permissions.IsAuthenticated]
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    
 
 class AddressViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
     permissions = [permissions.IsAuthenticated]
