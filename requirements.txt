@@ -11,3 +11,4 @@ django_q
 redis
 sentry-sdk
 ptvsd
+django-debug-toolbar
