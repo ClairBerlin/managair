@@ -81,21 +81,3 @@ Once the entire application stack has booted, you currently need to start its jo
 Then, open up the admin-UI and schedule a Live-Node Check at an interval of your choice. The function to call is `core.tasks.check_node_fidelity`.
 
 Results of the fidelity check are available at the API resource `api/v1/fidelity`, or via the admin UI.
-
-## User Registration and Authentication
-
-The Managair uses [dj-rest-auth](https://dj-rest-auth.readthedocs.io/en/latest/index.html) for user authentication, in combination with the registration functionality from [django-alauth](https://django-allauth.readthedocs.io/en/latest/index.html). Authentication and registration is available at the `/auth/` endpoint; individual resources follow the [dj-rest-auth documentation](https://dj-rest-auth.readthedocs.io/en/latest/api_endpoints.html).
-
-Like for the operational API, authentication and registration resources must be JSON:API documents with Content-Type `application/vnd.api+json`. For example, the body of a login request must look as follows:
-
-```json
-{
-    "data": {
-        "type": "LoginView",
-        "attributes": {
-            "username": "maxMustermann",
-            "password": "mustermann"
-        }
-    }
-}
-```
