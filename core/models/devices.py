@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.db import models
 
+from .inventory import Organization
 
 class Quantity(models.Model):
     quantity = models.CharField(max_length=30, blank=False, unique=True)
@@ -37,20 +38,32 @@ class Node(models.Model):
     id = models.UUIDField(primary_key=True)
     device_id = models.CharField(max_length=32, blank=False, unique=True)
     alias = models.CharField(max_length=30)
-    protocol = models.ForeignKey(NodeProtocol, on_delete=models.CASCADE)
-    model = models.ForeignKey(NodeModel, on_delete=models.CASCADE)
+    protocol = models.ForeignKey(NodeProtocol,
+        on_delete=models.CASCADE,
+        related_name='nodes')
+    model = models.ForeignKey(
+        NodeModel,
+        null=False,
+        on_delete=models.CASCADE,
+        related_name='nodes')
+    owner = models.ForeignKey(
+        Organization,
+        null=False,
+        on_delete=models.CASCADE,
+        related_name='nodes')
+
 
     def __str__(self):
         """String for representing the Model object."""
         return f'{self.alias}: {self.id}'
 
-    @classmethod
-    def get_user_nodes(cls, user, query_time=round(datetime.now().timestamp())):
-        """Return a queryset with all nodes attributed to the given user"""
-        return cls.objects.filter(
-            node_installations__site__responsible=user,
-            node_installations__from_timestamp__lte=query_time,
-            node_installations__to_timestamp__gte=query_time)
+    # @classmethod
+    # def get_user_nodes(cls, user, query_time=round(datetime.now().timestamp())):
+    #     """Return a queryset with all nodes attributed to the given user"""
+    #     return cls.objects.filter(
+    #         node_installations__site__responsible=user,
+    #         node_installations__from_timestamp__lte=query_time,
+    #         node_installations__to_timestamp__gte=query_time)
             
     def check_fidelity(self, lookback_interval_s: int):
         """Check if a message was received within the lookback interval."""

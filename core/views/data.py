@@ -69,7 +69,7 @@ class TimeseriesViewSet(LoginRequiredMixin, viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         """Restrict to logged-in user"""
-        return Node.objects.filter(node_installations__site__responsible=self.request.user)
+        return Node.objects.filter(node_installations__site__operated_by__user_membership__user=self.request.user)
 
     def list(self, request):
         queryset = self.get_queryset()

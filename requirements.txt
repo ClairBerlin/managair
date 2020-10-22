@@ -1,6 +1,6 @@
-Django==3.1
+Django==3.1.2
 psycopg2-binary
-djangorestframework==3.12
+djangorestframework==3.12.1
 djangorestframework-jsonapi==3.2.0
 dj-rest-auth[with_social]
 django-allauth

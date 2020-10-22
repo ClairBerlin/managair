@@ -1,3 +1,6 @@
-from .devices import QuantitySerializer, NodeProtocolSerializer, NodeModelSerializer, NodeSerializer, NodeFidelitySerializer
-from .sites import AddressSerializer, SiteSerializer, NodeInstallationSerializer
+from .devices import QuantitySerializer, NodeProtocolSerializer, \
+    NodeModelSerializer, NodeSerializer, NodeFidelitySerializer
+from .inventory import AddressSerializer, SiteSerializer, \
+    NodeInstallationSerializer, OrganizationSerializer, MembershipSerializer, \
+    UserSerializer
 from .data import SampleSerializer, TimeseriesSerializer, SimpleSampleSerializer, SampleListSerializer

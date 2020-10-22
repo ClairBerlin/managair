@@ -504,19 +504,623 @@
         }
     },
     {
+        "model": "auth.permission",
+        "pk": 57,
+        "fields": {
+            "name": "Can add node installation",
+            "content_type": 15,
+            "codename": "add_nodeinstallation"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 58,
+        "fields": {
+            "name": "Can change node installation",
+            "content_type": 15,
+            "codename": "change_nodeinstallation"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 59,
+        "fields": {
+            "name": "Can delete node installation",
+            "content_type": 15,
+            "codename": "delete_nodeinstallation"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 60,
+        "fields": {
+            "name": "Can view node installation",
+            "content_type": 15,
+            "codename": "view_nodeinstallation"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 61,
+        "fields": {
+            "name": "Can add node protocol",
+            "content_type": 16,
+            "codename": "add_nodeprotocol"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 62,
+        "fields": {
+            "name": "Can change node protocol",
+            "content_type": 16,
+            "codename": "change_nodeprotocol"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 63,
+        "fields": {
+            "name": "Can delete node protocol",
+            "content_type": 16,
+            "codename": "delete_nodeprotocol"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 64,
+        "fields": {
+            "name": "Can view node protocol",
+            "content_type": 16,
+            "codename": "view_nodeprotocol"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 65,
+        "fields": {
+            "name": "Can add organization",
+            "content_type": 17,
+            "codename": "add_organization"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 66,
+        "fields": {
+            "name": "Can change organization",
+            "content_type": 17,
+            "codename": "change_organization"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 67,
+        "fields": {
+            "name": "Can delete organization",
+            "content_type": 17,
+            "codename": "delete_organization"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 68,
+        "fields": {
+            "name": "Can view organization",
+            "content_type": 17,
+            "codename": "view_organization"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 69,
+        "fields": {
+            "name": "Can add quantity",
+            "content_type": 18,
+            "codename": "add_quantity"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 70,
+        "fields": {
+            "name": "Can change quantity",
+            "content_type": 18,
+            "codename": "change_quantity"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 71,
+        "fields": {
+            "name": "Can delete quantity",
+            "content_type": 18,
+            "codename": "delete_quantity"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 72,
+        "fields": {
+            "name": "Can view quantity",
+            "content_type": 18,
+            "codename": "view_quantity"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 73,
+        "fields": {
+            "name": "Can add node fidelity",
+            "content_type": 19,
+            "codename": "add_nodefidelity"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 74,
+        "fields": {
+            "name": "Can change node fidelity",
+            "content_type": 19,
+            "codename": "change_nodefidelity"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 75,
+        "fields": {
+            "name": "Can delete node fidelity",
+            "content_type": 19,
+            "codename": "delete_nodefidelity"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 76,
+        "fields": {
+            "name": "Can view node fidelity",
+            "content_type": 19,
+            "codename": "view_nodefidelity"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 77,
+        "fields": {
+            "name": "Can add site",
+            "content_type": 20,
+            "codename": "add_site"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 78,
+        "fields": {
+            "name": "Can change site",
+            "content_type": 20,
+            "codename": "change_site"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 79,
+        "fields": {
+            "name": "Can delete site",
+            "content_type": 20,
+            "codename": "delete_site"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 80,
+        "fields": {
+            "name": "Can view site",
+            "content_type": 20,
+            "codename": "view_site"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 81,
+        "fields": {
+            "name": "Can add sample",
+            "content_type": 21,
+            "codename": "add_sample"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 82,
+        "fields": {
+            "name": "Can change sample",
+            "content_type": 21,
+            "codename": "change_sample"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 83,
+        "fields": {
+            "name": "Can delete sample",
+            "content_type": 21,
+            "codename": "delete_sample"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 84,
+        "fields": {
+            "name": "Can view sample",
+            "content_type": 21,
+            "codename": "view_sample"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 85,
+        "fields": {
+            "name": "Can add profile",
+            "content_type": 22,
+            "codename": "add_profile"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 86,
+        "fields": {
+            "name": "Can change profile",
+            "content_type": 22,
+            "codename": "change_profile"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 87,
+        "fields": {
+            "name": "Can delete profile",
+            "content_type": 22,
+            "codename": "delete_profile"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 88,
+        "fields": {
+            "name": "Can view profile",
+            "content_type": 22,
+            "codename": "view_profile"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 89,
+        "fields": {
+            "name": "Can add node model",
+            "content_type": 23,
+            "codename": "add_nodemodel"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 90,
+        "fields": {
+            "name": "Can change node model",
+            "content_type": 23,
+            "codename": "change_nodemodel"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 91,
+        "fields": {
+            "name": "Can delete node model",
+            "content_type": 23,
+            "codename": "delete_nodemodel"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 92,
+        "fields": {
+            "name": "Can view node model",
+            "content_type": 23,
+            "codename": "view_nodemodel"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 93,
+        "fields": {
+            "name": "Can add Scheduled task",
+            "content_type": 7,
+            "codename": "add_schedule"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 94,
+        "fields": {
+            "name": "Can change Scheduled task",
+            "content_type": 7,
+            "codename": "change_schedule"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 95,
+        "fields": {
+            "name": "Can delete Scheduled task",
+            "content_type": 7,
+            "codename": "delete_schedule"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 96,
+        "fields": {
+            "name": "Can view Scheduled task",
+            "content_type": 7,
+            "codename": "view_schedule"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 97,
+        "fields": {
+            "name": "Can add task",
+            "content_type": 8,
+            "codename": "add_task"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 98,
+        "fields": {
+            "name": "Can change task",
+            "content_type": 8,
+            "codename": "change_task"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 99,
+        "fields": {
+            "name": "Can delete task",
+            "content_type": 8,
+            "codename": "delete_task"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 100,
+        "fields": {
+            "name": "Can view task",
+            "content_type": 8,
+            "codename": "view_task"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 101,
+        "fields": {
+            "name": "Can add Failed task",
+            "content_type": 9,
+            "codename": "add_failure"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 102,
+        "fields": {
+            "name": "Can change Failed task",
+            "content_type": 9,
+            "codename": "change_failure"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 103,
+        "fields": {
+            "name": "Can delete Failed task",
+            "content_type": 9,
+            "codename": "delete_failure"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 104,
+        "fields": {
+            "name": "Can view Failed task",
+            "content_type": 9,
+            "codename": "view_failure"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 105,
+        "fields": {
+            "name": "Can add Successful task",
+            "content_type": 10,
+            "codename": "add_success"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 106,
+        "fields": {
+            "name": "Can change Successful task",
+            "content_type": 10,
+            "codename": "change_success"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 107,
+        "fields": {
+            "name": "Can delete Successful task",
+            "content_type": 10,
+            "codename": "delete_success"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 108,
+        "fields": {
+            "name": "Can view Successful task",
+            "content_type": 10,
+            "codename": "view_success"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 109,
+        "fields": {
+            "name": "Can add Queued task",
+            "content_type": 11,
+            "codename": "add_ormq"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 110,
+        "fields": {
+            "name": "Can change Queued task",
+            "content_type": 11,
+            "codename": "change_ormq"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 111,
+        "fields": {
+            "name": "Can delete Queued task",
+            "content_type": 11,
+            "codename": "delete_ormq"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 112,
+        "fields": {
+            "name": "Can view Queued task",
+            "content_type": 11,
+            "codename": "view_ormq"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 113,
+        "fields": {
+            "name": "Can add address",
+            "content_type": 12,
+            "codename": "add_address"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 114,
+        "fields": {
+            "name": "Can change address",
+            "content_type": 12,
+            "codename": "change_address"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 115,
+        "fields": {
+            "name": "Can delete address",
+            "content_type": 12,
+            "codename": "delete_address"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 116,
+        "fields": {
+            "name": "Can view address",
+            "content_type": 12,
+            "codename": "view_address"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 117,
+        "fields": {
+            "name": "Can add membership",
+            "content_type": 13,
+            "codename": "add_membership"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 118,
+        "fields": {
+            "name": "Can change membership",
+            "content_type": 13,
+            "codename": "change_membership"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 119,
+        "fields": {
+            "name": "Can delete membership",
+            "content_type": 13,
+            "codename": "delete_membership"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 120,
+        "fields": {
+            "name": "Can view membership",
+            "content_type": 13,
+            "codename": "view_membership"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 121,
+        "fields": {
+            "name": "Can add node",
+            "content_type": 14,
+            "codename": "add_node"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 122,
+        "fields": {
+            "name": "Can change node",
+            "content_type": 14,
+            "codename": "change_node"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 123,
+        "fields": {
+            "name": "Can delete node",
+            "content_type": 14,
+            "codename": "delete_node"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 124,
+        "fields": {
+            "name": "Can view node",
+            "content_type": 14,
+            "codename": "view_node"
+        }
+    },
+    {
         "model": "auth.group",
         "pk": 1,
         "fields": {
             "name": "site_operators",
             "permissions": [
-                37,
-                38,
-                39,
-                40,
-                41,
-                42,
-                43,
-                44,
                 45,
                 46,
                 47,
@@ -525,7 +1129,15 @@
                 50,
                 51,
                 52,
-                56
+                56,
+                41,
+                42,
+                43,
+                44,
+                37,
+                38,
+                39,
+                40
             ]
         }
     },
@@ -533,8 +1145,8 @@
         "model": "auth.user",
         "pk": 1,
         "fields": {
-            "password": "pbkdf2_sha256$180000$0QtXXwRysJxc$klU6lvIwUzvtq6oOL40fYtRObN5jgOB5+ktxww0NjBw=",
-            "last_login": "2020-10-11T19:49:57.301Z",
+            "password": "pbkdf2_sha256$216000$mYzrVXAoSvy9$bKIk5us46JWunifjotmunlWLAieUXY3Lt4e7V67fy4E=",
+            "last_login": "2020-10-20T15:42:14.485Z",
             "is_superuser": true,
             "username": "admin",
             "first_name": "",
@@ -552,7 +1164,7 @@
         "pk": 2,
         "fields": {
             "password": "pbkdf2_sha256$180000$71AK9WPwVE8i$UyG5KCi2lLOyf0dx/lE+IVwqNKvQU4F7qceH7KZm1ag=",
-            "last_login": "2020-10-11T20:43:44.617Z",
+            "last_login": "2020-10-11T20:43:44Z",
             "is_superuser": false,
             "username": "tomTester",
             "first_name": "Tom",
@@ -584,6 +1196,78 @@
             "groups": [
                 1
             ],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 4,
+        "fields": {
+            "password": "pbkdf2_sha256$216000$Ae3569sE7M7F$3OUSmJBuA1BVBorj5oNKcmQIQrTueVgPLEhwDqjKOUU=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "horstHilfsarbeiter",
+            "first_name": "Horst",
+            "last_name": "Hilfsarbeiter",
+            "email": "horst@hilfsarbeiter.de",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2020-10-20T16:22:22Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 5,
+        "fields": {
+            "password": "pbkdf2_sha256$216000$Q3TKNokPgcxN$zxcRM/6zOJFj7PZtM8wi3APBpUVWxDpUkunXN0zerKs=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "annaAngestellte",
+            "first_name": "Anna",
+            "last_name": "Angestellte",
+            "email": "anna@angestellte.de",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2020-10-20T16:23:29Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 6,
+        "fields": {
+            "password": "pbkdf2_sha256$216000$nrjjELoJxcln$/YEtJSFhOOPgz+tL/o6Lj8aEC7BeWn8fhRE3PZLacd8=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "ingoInspekteur",
+            "first_name": "Ingo",
+            "last_name": "Inspekteur",
+            "email": "ingo@inspekteur.de",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2020-10-20T16:24:49Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 7,
+        "fields": {
+            "password": "pbkdf2_sha256$216000$sRMQNlmivVWA$bJLiUeVVdfX0BSNHWFAy4twDAPIQgaSVEvT3RGwLSng=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "priskaPrueferin",
+            "first_name": "Priska",
+            "last_name": "Prüferin",
+            "email": "priska@prueferin.de",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2020-10-20T16:33:47Z",
+            "groups": [],
             "user_permissions": []
         }
     }

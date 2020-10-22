@@ -31,8 +31,8 @@ When run in DEBUG mode, the `managair_server` has the [Python Tools for Visual S
 To start development work right away, it would be convenient if important data was preloaded into the DB already. This is what [Django fixtures](https://docs.djangoproject.com/en/3.1/howto/initial-data/) are for. Fixture files are JSON files that contain data in a format that can be directly importet into the DB. They are available for the individual applications in their `fixture` folders. To set up the the application for development, load the fixtures as follows:
 
 - `docker exec -it managair_server python3 manage.py loaddata user_manager/fixtures/user-fixtures.json`
-- `docker exec -it managair_server python3 manage.py loaddata core/fixtures/device-fixtures.json`
-- `docker exec -it managair_server python3 manage.py loaddata core/fixtures/site-fixtures.json`
+- `docker exec -it managair_server python3 manage.py loaddata core/fixtures/inventory
+-fixtures.json`
 - `docker exec -it managair_server python3 manage.py loaddata core/fixtures/data-fixtures.json`
 
 Make sure to respect the order because of foreign-key constraints.
@@ -82,3 +82,21 @@ Once the entire application stack has booted, you currently need to start its jo
 Then, open up the admin-UI and schedule a Live-Node Check at an interval of your choice. The function to call is `core.tasks.check_node_fidelity`.
 
 Results of the fidelity check are available at the API resource `api/v1/fidelity`, or via the admin UI.
+
+## User Registration and Authentication
+
+The Managair uses [dj-rest-auth](https://dj-rest-auth.readthedocs.io/en/latest/index.html) for user authentication, in combination with the registration functionality from [django-alauth](https://django-allauth.readthedocs.io/en/latest/index.html). Authentication and registration is available at the `/auth/` endpoint; individual resources follow the [dj-rest-auth documentation](https://dj-rest-auth.readthedocs.io/en/latest/api_endpoints.html).
+
+Like for the operational API, authentication and registration resources must be JSON:API documents with Content-Type `application/vnd.api+json`. For example, the body of a login request must look as follows:
+
+```json
+{
+    "data": {
+        "type": "LoginView",
+        "attributes": {
+            "username": "maxMustermann",
+            "password": "mustermann"
+        }
+    }
+}
+```
