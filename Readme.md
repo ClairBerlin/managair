@@ -48,9 +48,7 @@ Documentation of the Managair ReST API is available
 - as a [Swagger-UI](https://swagger.io/tools/swagger-ui/) web page at `/api/v1/schema/swagger-ui`
 - and as a [ReDoc](https://github.com/Redocly/redoc) web page at `/api/v1/schema/redoc`
 
-If you make changes to the API, you need to re-generate the corresponding OpenAPI description file. To do so, execute `python3 manage.py spectacular --file schema.yaml`, or - if you run the _Clair Stack_ atop inside docker swarm: 
-
-`manage-py.sh spectacular --file schema.yaml`
+If you make changes to the API, you need to re-generate the corresponding OpenAPI description file. To do so, execute `python3 manage.py spectacular --file schema.yaml`, or - if you run the _Clair Stack_ atop inside docker swarm: `manage-py.sh <env> spectacular --file schema.yaml`.
 
 The `schema.yaml` should end up in the project's root folder, from where `docker build` will correctly package it.
 
@@ -78,7 +76,7 @@ The Managair contains a background service that periodically checks for all regi
 
 The periodic fidelity check is performed by means of the background task scheduler [Django_Q](https://django-q.readthedocs.io/en/latest/index.html). It is active if the environment variable `NODE_FIDELITY` is set (=1).
 
-Once the entire application stack has booted, you currently need to start its job queue by hand, via the command. `python3 manage.py qcluster`; or, on the _Clair Stack_, `manage-py.sh qcluster`.
+Once the entire application stack has booted, you currently need to start its job queue by hand, via the command. `python3 manage.py qcluster`; or, on the _Clair Stack_, `manage-py.sh <env> qcluster`.
 
 Then, open up the admin-UI and schedule a Live-Node Check at an interval of your choice. The function to call is `core.tasks.check_node_fidelity`.
 
