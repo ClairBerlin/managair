@@ -51,6 +51,24 @@ If you make changes to the API, you need to re-generate the corresponding OpenAP
 
 The `schema.yaml` should end up in the project's root folder, from where `docker build` will correctly package it.
 
+## User Registration and Authentication
+
+The Managair uses [dj-rest-auth](https://dj-rest-auth.readthedocs.io/en/latest/index.html) for user authentication, in combination with the registration functionality from [django-alauth](https://django-allauth.readthedocs.io/en/latest/index.html). Authentication and registration is available at the `/auth/` endpoint; individual resources follow the [dj-rest-auth documentation](https://dj-rest-auth.readthedocs.io/en/latest/api_endpoints.html).
+
+Like for the operational API, authentication and registration resources must be JSON:API documents with Content-Type `application/vnd.api+json`. For example, the body of a login request must look as follows:
+
+```json
+{
+    "data": {
+        "type": "LoginView",
+        "attributes": {
+            "username": "maxMustermann",
+            "password": "mustermann"
+        }
+    }
+}
+```
+
 ## Node Status Fidelity Check
 
 The Managair contains a background service that periodically checks for all registered nodes if a message has been received recently, within the last two hours (configurable). If so, Managair marks the node's _fidelity_ as _ALIVE_. If the most recent sample is not older than twice this period (four hours), the node is marked _MISSING_. A node that has been quiet for longer is declared _DEAD_, while a node from which no messages have ever been received is _UNKNOWN_.
