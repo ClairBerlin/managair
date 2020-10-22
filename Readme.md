@@ -34,12 +34,11 @@ When the debug mode is activated via the environment variable `DEBUG=1`, the [Dj
 
 To start development work right away, it would be convenient if important data was preloaded into the DB already. This is what [Django fixtures](https://docs.djangoproject.com/en/3.1/howto/initial-data/) are for. Fixture files are JSON files that contain data in a format that can be directly importet into the DB. They are available for the individual applications in their `fixture` folders. To set up the the application for development, load the fixtures as follows:
 
-- `docker exec -it managair_server python3 manage.py loaddata user_manager/fixtures/user-fixtures.json`
-- `docker exec -it managair_server python3 manage.py loaddata core/fixtures/inventory
--fixtures.json`
-- `docker exec -it managair_server python3 manage.py loaddata core/fixtures/data-fixtures.json`
+- `python3 manage.py loaddata user_manager/fixtures/user-fixtures.json`
+- `python3 manage.py loaddata core/fixtures/inventory-fixtures.json`
+- `python3 manage.py loaddata core/fixtures/data-fixtures.json`
 
-Make sure to respect the order because of foreign-key constraints.
+Make sure to respect the order because of foreign-key constraints. When Managair is executed in a docker container, the above commends must be executed inside the container; e.g., via `docker exec`. If you run _Clair Stack_, which is built atop docker swarm, you can use the `manage-py.sh` shell script to execute your Django management command inside the correct container.
 
 ## OpenAPI Schema
 
@@ -49,9 +48,9 @@ Documentation of the Managair ReST API is available
 - as a [Swagger-UI](https://swagger.io/tools/swagger-ui/) web page at `/api/v1/schema/swagger-ui`
 - and as a [ReDoc](https://github.com/Redocly/redoc) web page at `/api/v1/schema/redoc`
 
-If you make changes to the API, you need to re-generate the corresponding OpenAPI description file. To do so, execute `python3 manage.py spectacular --file schema.yaml`, or - if you run the docer development stack inside docker swarm: 
+If you make changes to the API, you need to re-generate the corresponding OpenAPI description file. To do so, execute `python3 manage.py spectacular --file schema.yaml`, or - if you run the _Clair Stack_ atop inside docker swarm: 
 
-`docker exec $(docker ps -q -f name=managair_server) python3 manage.py spectacular --file schema.yaml`
+`manage-py.sh spectacular --file schema.yaml`
 
 The `schema.yaml` should end up in the project's root folder, from where `docker build` will correctly package it.
 
@@ -61,9 +60,7 @@ The Managair contains a background service that periodically checks for all regi
 
 The periodic fidelity check is performed by means of the background task scheduler [Django_Q](https://django-q.readthedocs.io/en/latest/index.html). It is active if the environment variable `NODE_FIDELITY` is set (=1).
 
-Once the entire application stack has booted, you currently need to start its job queue by hand, via the command:
-
-`docker exec -it $(docker ps -q -f name=managair_server) python3 manage.py qcluster`
+Once the entire application stack has booted, you currently need to start its job queue by hand, via the command. `python3 manage.py qcluster`; or, on the _Clair Stack_, `manage-py.sh qcluster`.
 
 Then, open up the admin-UI and schedule a Live-Node Check at an interval of your choice. The function to call is `core.tasks.check_node_fidelity`.
 

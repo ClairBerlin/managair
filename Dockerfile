@@ -3,6 +3,10 @@ RUN apt-get update && \
     apt-get -y dist-upgrade && \
     apt-get -y install apt-utils netcat
 
+# Docker defaults to sh, but the 'source' command is only available in bash.
+SHELL ["/bin/bash", "-c"] 
+RUN python3 -m venv env && source env/bin/activate
+
 RUN mkdir /code
 WORKDIR /code
 # install dependencies

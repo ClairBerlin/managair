@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/bin/bash
+
+source env/bin/activate
 
 if [ "$DATABASE" = "postgresql" ]
 then
