@@ -10,10 +10,7 @@ def dashboard(request):
 
 def register(request):
     if request.method == "GET":
-        return render(
-            request, "users/register.html",
-            {"form": CustomUserCreationForm}
-        )
+        return render(request, "users/register.html", {"form": CustomUserCreationForm})
     elif request.method == "POST":
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():

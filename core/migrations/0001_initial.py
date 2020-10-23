@@ -10,193 +10,410 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('auth', '0012_alter_user_first_name_max_length'),
+        ("auth", "0012_alter_user_first_name_max_length"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Address',
+            name="Address",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('street1', models.CharField(max_length=50)),
-                ('street2', models.CharField(blank=True, max_length=50, null=True)),
-                ('zip', models.CharField(max_length=5)),
-                ('city', models.CharField(max_length=50)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("street1", models.CharField(max_length=50)),
+                ("street2", models.CharField(blank=True, max_length=50, null=True)),
+                ("zip", models.CharField(max_length=5)),
+                ("city", models.CharField(max_length=50)),
             ],
         ),
         migrations.CreateModel(
-            name='Membership',
+            name="Membership",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('role', models.CharField(choices=[('O', 'User has full control of the organization and its inventory.'), ('A', 'User can perform a restricted set of tasks in the organization.'), ('I', "User can inspect the organization's inventory.")], default='I', max_length=1)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "role",
+                    models.CharField(
+                        choices=[
+                            (
+                                "O",
+                                "User has full control of the organization and its inventory.",
+                            ),
+                            (
+                                "A",
+                                "User can perform a restricted set of tasks in the organization.",
+                            ),
+                            ("I", "User can inspect the organization's inventory."),
+                        ],
+                        default="I",
+                        max_length=1,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Node',
+            name="Node",
             fields=[
-                ('id', models.UUIDField(primary_key=True, serialize=False)),
-                ('device_id', models.CharField(max_length=32, unique=True)),
-                ('alias', models.CharField(max_length=30)),
+                ("id", models.UUIDField(primary_key=True, serialize=False)),
+                ("device_id", models.CharField(max_length=32, unique=True)),
+                ("alias", models.CharField(max_length=30)),
             ],
         ),
         migrations.CreateModel(
-            name='NodeInstallation',
+            name="NodeInstallation",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('from_timestamp', models.PositiveIntegerField()),
-                ('to_timestamp', models.PositiveIntegerField(null=True)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('node', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='node_installations', to='core.node')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("from_timestamp", models.PositiveIntegerField()),
+                ("to_timestamp", models.PositiveIntegerField(null=True)),
+                ("description", models.TextField(blank=True, null=True)),
+                (
+                    "node",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="node_installations",
+                        to="core.node",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-from_timestamp'],
-                'get_latest_by': 'from_timestamp',
+                "ordering": ["-from_timestamp"],
+                "get_latest_by": "from_timestamp",
             },
         ),
         migrations.CreateModel(
-            name='NodeProtocol',
+            name="NodeProtocol",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('identifier', models.CharField(max_length=30, unique=True)),
-                ('num_uplink_msgs', models.PositiveIntegerField(default=1)),
-                ('num_downlink_msgs', models.PositiveIntegerField(default=1)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("identifier", models.CharField(max_length=30, unique=True)),
+                ("num_uplink_msgs", models.PositiveIntegerField(default=1)),
+                ("num_downlink_msgs", models.PositiveIntegerField(default=1)),
             ],
         ),
         migrations.CreateModel(
-            name='Organization',
+            name="Organization",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('users', models.ManyToManyField(through='core.Membership', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50)),
+                ("description", models.TextField(blank=True, null=True)),
+                (
+                    "users",
+                    models.ManyToManyField(
+                        through="core.Membership", to=settings.AUTH_USER_MODEL
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Profile',
+            name="Profile",
             fields=[
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False, to='auth.user')),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        primary_key=True,
+                        serialize=False,
+                        to="auth.user",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Quantity',
+            name="Quantity",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('quantity', models.CharField(max_length=30, unique=True)),
-                ('base_unit', models.CharField(max_length=30)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("quantity", models.CharField(max_length=30, unique=True)),
+                ("base_unit", models.CharField(max_length=30)),
             ],
         ),
         migrations.CreateModel(
-            name='NodeFidelity',
+            name="NodeFidelity",
             fields=[
-                ('node', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False, to='core.node')),
-                ('fidelity', models.CharField(choices=[('U', 'node has never reported data'), ('E', 'node did report data recently'), ('M', 'node has not reported data recently'), ('D', 'node has not reported data for some time')], default='U', max_length=1)),
-                ('last_contact_s', models.PositiveIntegerField(null=True)),
-                ('last_check_s', models.PositiveIntegerField()),
+                (
+                    "node",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        primary_key=True,
+                        serialize=False,
+                        to="core.node",
+                    ),
+                ),
+                (
+                    "fidelity",
+                    models.CharField(
+                        choices=[
+                            ("U", "node has never reported data"),
+                            ("E", "node did report data recently"),
+                            ("M", "node has not reported data recently"),
+                            ("D", "node has not reported data for some time"),
+                        ],
+                        default="U",
+                        max_length=1,
+                    ),
+                ),
+                ("last_contact_s", models.PositiveIntegerField(null=True)),
+                ("last_check_s", models.PositiveIntegerField()),
             ],
         ),
         migrations.CreateModel(
-            name='Site',
+            name="Site",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('address', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='sites', to='core.address')),
-                ('nodes', models.ManyToManyField(through='core.NodeInstallation', to='core.Node')),
-                ('operated_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sites', to='core.organization')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50)),
+                ("description", models.TextField(blank=True, null=True)),
+                (
+                    "address",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="sites",
+                        to="core.address",
+                    ),
+                ),
+                (
+                    "nodes",
+                    models.ManyToManyField(
+                        through="core.NodeInstallation", to="core.Node"
+                    ),
+                ),
+                (
+                    "operated_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="sites",
+                        to="core.organization",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Sample',
+            name="Sample",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('timestamp_s', models.PositiveIntegerField()),
-                ('co2_ppm', models.PositiveSmallIntegerField()),
-                ('temperature_celsius', models.DecimalField(decimal_places=1, max_digits=3, null=True)),
-                ('rel_humidity_percent', models.PositiveSmallIntegerField(null=True)),
-                ('measurement_status', models.CharField(choices=[('M', 'measured value'), ('R', 'replacement value'), ('E', 'measurement error')], default='M', max_length=1)),
-                ('node', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='samples', to='core.node')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("timestamp_s", models.PositiveIntegerField()),
+                ("co2_ppm", models.PositiveSmallIntegerField()),
+                (
+                    "temperature_celsius",
+                    models.DecimalField(decimal_places=1, max_digits=3, null=True),
+                ),
+                ("rel_humidity_percent", models.PositiveSmallIntegerField(null=True)),
+                (
+                    "measurement_status",
+                    models.CharField(
+                        choices=[
+                            ("M", "measured value"),
+                            ("R", "replacement value"),
+                            ("E", "measurement error"),
+                        ],
+                        default="M",
+                        max_length=1,
+                    ),
+                ),
+                (
+                    "node",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="samples",
+                        to="core.node",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-timestamp_s'],
-                'get_latest_by': 'timestamp_s',
+                "ordering": ["-timestamp_s"],
+                "get_latest_by": "timestamp_s",
             },
         ),
         migrations.CreateModel(
-            name='NodeModel',
+            name="NodeModel",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=30, unique=True)),
-                ('trade_name', models.CharField(max_length=30)),
-                ('manufacturer', models.CharField(max_length=30)),
-                ('sensor_type', models.CharField(max_length=100)),
-                ('quantities', models.ManyToManyField(related_name='node_models', to='core.Quantity')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=30, unique=True)),
+                ("trade_name", models.CharField(max_length=30)),
+                ("manufacturer", models.CharField(max_length=30)),
+                ("sensor_type", models.CharField(max_length=100)),
+                (
+                    "quantities",
+                    models.ManyToManyField(
+                        related_name="node_models", to="core.Quantity"
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='nodeinstallation',
-            name='site',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='node_installations', to='core.site'),
+            model_name="nodeinstallation",
+            name="site",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="node_installations",
+                to="core.site",
+            ),
         ),
         migrations.AddField(
-            model_name='node',
-            name='model',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='nodes', to='core.nodemodel'),
+            model_name="node",
+            name="model",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="nodes",
+                to="core.nodemodel",
+            ),
         ),
         migrations.AddField(
-            model_name='node',
-            name='owner',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='nodes', to='core.organization'),
+            model_name="node",
+            name="owner",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="nodes",
+                to="core.organization",
+            ),
         ),
         migrations.AddField(
-            model_name='node',
-            name='protocol',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='nodes', to='core.nodeprotocol'),
+            model_name="node",
+            name="protocol",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="nodes",
+                to="core.nodeprotocol",
+            ),
         ),
         migrations.AddField(
-            model_name='membership',
-            name='organization',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='user_membership', to='core.organization'),
+            model_name="membership",
+            name="organization",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="user_membership",
+                to="core.organization",
+            ),
         ),
         migrations.AddField(
-            model_name='membership',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='organization_membership', to=settings.AUTH_USER_MODEL),
+            model_name="membership",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="organization_membership",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddConstraint(
-            model_name='address',
-            constraint=models.UniqueConstraint(fields=('street1', 'street2', 'zip', 'city'), name='unique_address'),
+            model_name="address",
+            constraint=models.UniqueConstraint(
+                fields=("street1", "street2", "zip", "city"), name="unique_address"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='site',
-            constraint=models.UniqueConstraint(fields=('name', 'operated_by'), name='unique_site_per_organization'),
+            model_name="site",
+            constraint=models.UniqueConstraint(
+                fields=("name", "operated_by"), name="unique_site_per_organization"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='sample',
-            constraint=models.UniqueConstraint(fields=('node', 'timestamp_s'), name='unique_sampling_times_per_node'),
+            model_name="sample",
+            constraint=models.UniqueConstraint(
+                fields=("node", "timestamp_s"), name="unique_sampling_times_per_node"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='sample',
-            constraint=models.CheckConstraint(check=models.Q(rel_humidity_percent__lte=100), name='rel_humidity_percent'),
+            model_name="sample",
+            constraint=models.CheckConstraint(
+                check=models.Q(rel_humidity_percent__lte=100),
+                name="rel_humidity_percent",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='sample',
-            constraint=models.CheckConstraint(check=models.Q(temperature_celsius__gte=-20), name='not_too_cold'),
+            model_name="sample",
+            constraint=models.CheckConstraint(
+                check=models.Q(temperature_celsius__gte=-20), name="not_too_cold"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='sample',
-            constraint=models.CheckConstraint(check=models.Q(temperature_celsius__lte=40), name='not_too_hot'),
+            model_name="sample",
+            constraint=models.CheckConstraint(
+                check=models.Q(temperature_celsius__lte=40), name="not_too_hot"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='sample',
-            constraint=models.CheckConstraint(check=models.Q(co2_ppm__lte=10000), name='co2_upper_limit'),
+            model_name="sample",
+            constraint=models.CheckConstraint(
+                check=models.Q(co2_ppm__lte=10000), name="co2_upper_limit"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='nodeinstallation',
-            constraint=models.UniqueConstraint(fields=('node', 'from_timestamp'), name='unique_node_attribution'),
+            model_name="nodeinstallation",
+            constraint=models.UniqueConstraint(
+                fields=("node", "from_timestamp"), name="unique_node_attribution"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='membership',
-            constraint=models.UniqueConstraint(fields=('user', 'organization'), name='unique-membership'),
+            model_name="membership",
+            constraint=models.UniqueConstraint(
+                fields=("user", "organization"), name="unique-membership"
+            ),
         ),
     ]
