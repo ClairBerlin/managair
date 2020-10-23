@@ -1,4 +1,3 @@
-
 from django.conf.urls import include, url
 from user_manager.views import dashboard, register
 
