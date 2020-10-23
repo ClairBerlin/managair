@@ -1,4 +1,8 @@
 {
-    "python.linting.pylintEnabled": true,
-    "python.linting.enabled": true
+    "python.linting.pylintEnabled": false,
+    "python.linting.enabled": true,
+    "python.formatting.provider": "black",
+    "editor.wordWrapColumn": 88,
+    "editor.wordWrap": "wordWrapColumn",
+    "python.linting.prospectorEnabled": true
 }

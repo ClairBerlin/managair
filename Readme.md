@@ -40,6 +40,12 @@ To start development work right away, it would be convenient if important data w
 
 Make sure to respect the order because of foreign-key constraints. When Managair is executed in a docker container, the above commends must be executed inside the container; e.g., via `docker exec`. If you run _Clair Stack_, which is built atop docker swarm, you can use the `manage-py.sh` shell script to execute your Django management command inside the correct container.
 
+### Tools and Conventions
+
+- [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+- Linting: [PyLint](https://www.pylint.org)
+
+
 ## OpenAPI Schema
 
 Documentation of the Managair ReST API is available
