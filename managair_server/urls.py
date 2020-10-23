@@ -23,7 +23,7 @@ from drf_spectacular.views import (
 )
 
 urlpatterns = [
-    path(r"", include("user_manager.urls")),
+    path("", include("user_manager.urls")),
     # path('api/auth/', include('rest_framework.urls')),
     path("api/v1/", include("core.urls")),
     path("ingest/v1/", include("ingest.urls")),
