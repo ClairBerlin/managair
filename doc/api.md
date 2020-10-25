@@ -1,6 +1,6 @@
 # The Managair REST API
 
-This is a first draft of Managair's API endpoints. It's a design document that describesthe intended API endpoints. It does not describe the API as it is currently implemented.
+This is a first draft of Managair's API endpoints. It's a design document that describes the intended API endpoints. It does not describe the API as it is currently implemented.
 
 ## API Root and API Structure
 
@@ -31,56 +31,64 @@ Most of the user-management endpoints are provided by the [dj-rest-auth library]
 
 ## Inventory
 
-The inventory is organized according to organizations that have one or more rooms with installed sensor nodes. All inventory resources require the user to be logged in. Data is organizaed according to the nodes that reported them. Data resources for a given organization are available only for the time-period when the node was owned by the organization.
+The inventory is organized according to organizations that have one or more rooms with installed sensor nodes. All inventory resources require the user to be logged in. Data is organizaed according to the nodes that reported them. Data resources for a given organization are available only for the time-period when the node is or was owned by the organization.
 
-- `/api/v1/organizations/` Collection-resource for all organizations.
-  - [GET] Users do see only those organizations, including all sub-resources, of which they are a member.
-  - [POST] Register a new organization with the logged-in user as owner.
+- `/api/v1/organizations/` Collection-resource of all organizations visible to the logged-in user.
+  - [GET] List the organizations.
+  - [POST] Register a new organization, with the logged-in user as owner.
 - `/api/v1/organizations/<organization_id>/` Details-resource of the organization with ID `organization_id`.
-  - [GET] Only available if the logged-in user is a member of this organization.
-  - [PUT, PATCH] Replace resp. update organization data.
-  - [DELETE] Remove the organization and all assets and data it owns - sites, rooms, nodes, and node time series.
+  - [GET] Details about the organization. Only available if the logged-in user is a member of this organization.
+  - [PUT, PATCH] Replace resp. update organization data. Only available for users that have the OWNER role for the organization.
+  - [DELETE] Remove the organization and all assets and data it owns - sites, rooms, nodes, and node time series. Only available for users that have the OWNER role for the organization.
 - `/api/v1/organizations/<organization_id>/members/` Collection-resource for the organizations members; that is, the users that are part of the organization.
-  - [GET] List the members.
+  - [GET] List the members, with individual links to the membership detail resouces at `/api/v1/members/<user_id>/`.
   - [POST] Add an already existing user to the organization in one of the available roles. The logged-in user must be an OWNER of the organization to perform this task.
-- `/api/v1/organizations/<organization_id>/members/<user_id>` Detail resource for a user's membership in the organization.
-  - [GET] Retrieve user details. Redirects to `/api/v1/auth/user/`.
+- `/api/v1/organizations/<organization_id>/nodes/` Collection-resource of all nodes that belong to the specified organization.
+  - [GET] List all nodes owned by the organization, with individual links to node detail resources at `/api/v1/nodes/<node_id>`.
+  - [POST] Register a new node that is currently unknown to the Managair. This new node will be attributed to the goven organization.
+- `/api/v1/organizations/<organization_id>/sites/` Collection-resource of all sites that belong to the organization `organization_id`.
+  - [GET] List the sites, with individual links to the detail-resource at `/api/v1/sites/<site_id>`.
+  - [POST] Create a new site operated by the organization.
+- `/api/v1/members/` Collection resource of all organization members visible to the logged-in user.
+  - [GET] List the memberships. Filter to see memberships of one specific organization only via the filter `filter[organization]=<organization_id>`.
+- `/api/v1/members/<user_id>/` Detail resource for a user's membership in the organization.
+  - [GET] Retrieve membership details. The membership contains the user's role and relations, and a nested `/api/v1/auth/user/<user_id>` resource.
   - [PUT, PATCH] Replace resp. update membership details. The logged-in user must be an OWNER of the organization to perform this task.
   - [DELETE] Revoke membership of a user. This action does not delete the user account, only the organization membership is affected. The logged-in user must be an OWNER of the organization to perform this task.
-- `/api/v1/organizations/<organization_id>/nodes/` Collection-resource of all nodes that belong to the specified organization.
-  - [GET] Retrieve all nodes owned by the organization.
-  - [POST] Register a new node that is currently unknown to the Managair. This new node will be attributed to the goven organization.
-- `/api/v1/organizations/<organization_id>/nodes/timeseries/` Overview of the timeseries reported by the organization's nodes.
-  - [GET] Retrieve time range, number of samples, quantities reported for each node. Data is only aggregated for the time slice where the node was owned by the specified organization.
-- `/api/v1/organizations/<organization_id>/nodes/fidelity/`
-  - [GET] Status list ("fidelity") for all nodes of the organization. The status is updated periodically and indicates if a given node regularly transmits data. In the future, additional information might be added, like battery status or error reports.
-- `/api/v1/organizations/<organization_id>/nodes/<node_id>/` Details-resource of the specified node.
+- `/api/v1/nodes/` Collection-resource of the nodes visible to the logged-in user.
+  - [GET] List the nodes. Filter to see nodes of one specific organization only via the filter `filter[organization]=<organization_id>`.
+- `/api/v1/nodes/timeseries/` Overview of the timeseries reported by all nodes visible to the logged-in user.
+  - [GET] Retrieve time range, number of samples, quantities reported for each node. Filter to see time series of the nodes that belong to one specific organization only via the filter `filter[organization]=<organization_id>`; filter for nodes of a given site via `filter[site]=<site_id>`, and in a given room via `filter[room]=<room_id>`. Data is only aggregated for the time slice where the node was owned by the specified organization.
+- `/api/v1/nodes/fidelity/` Status list ("fidelity") for all nodes visible to the logged-in user.
+  - [GET] The status is updated periodically and indicates if a given node regularly transmits data. Filter to see nodes of one specific organization only via the filter `filter[organization]=<organization_id>`; filter for nodes of a given site via `filter[site]=<site_id>`, and in a given room via `filter[room]=<room_id>`. In the future, additional information might be added, like battery status or error reports.
+- `/api/v1/nodes/<node_id>/` Details-resource of the specified node. Only accessible if the node is visible to the logged-in user.
   - [GET] Retrieve information about the node. Might include fidelity information.
   - [PUT, PATCH] Update node master data; e.g., node alias or tags (feature request).
   - [DELETE] Remove the node and all samples reported by this node.
-- `/api/v1/organizations/<organization_id>/nodes/<node_id>/timeseries/` Detail resource for the time-series reported by the specified node.
-  - [GET] Returns the time series for the time period when the node was owned by the specified organization. Supports querying for time slices.
-- `/api/v1/organizations/<organization_id>/sites/` Collection-resource of all sites that belong to the organization `organization_id`.
-  - [GET] Retrieve the collection.
-  - [POST] Create a new site operated by the organization.
-- `/api/v1/organizations/<organization_id>/sites/<site_id>/` Details-resource of the specified site.
+- `/api/v1/nodes/<node_id>/timeseries/` Detail resource for the time-series reported by the specified node.
+  - [GET] Returns the time series reported by the given node. **Question: How to restrict the time slice to math the attribution between node and organization?** Supports querying for time slices.
+- `/api/v1/sites/` Collection-resource of all sites visible to a logged-in user.
+  - [GET] List the sites. Filter to see sites of one specific organization only via the filter `filter[organization]=<organization_id>`.
+- `/api/v1/sites/<site_id>/` Details-resource of the specified site.
   - [GET] Rertieve the site resource.
   - [PUT, PATCH] Replace resp. update site master data.
   - [DELETE] Remove the site and all rooms within the site. Does not delete nodes attributed to the site or any of its rooms.
-- `/api/v1/organizations/<organization_id>/sites/<site_id>/rooms/` Collection-resource of all rooms of a given site.
-  - [GET] Retrieve the collection.
+- `/api/v1/sites/<site_id>/rooms/` Collection-resource of all rooms of the given site.
+  - [GET] List the rooms, with individual links to the detail-resource at `/api/v1/rooms/<room_id>`.
   - [POST] Create a new room that is part of the given site.
-- `/api/v1/organizations/<organization_id>/sites/<site_id>/rooms/<room_id>/` Details-resource of the specifified room.
+- `/api/v1/rooms/` Collection-resource of all rooms visible to a logged-in user.
+  - [GET] List the rooms. Filter to see sites of one specific organization only via the filter `filter[organization]=<organization_id>`, and the rooms within one specific site via the filter `filter[site]=<site_id>`.
+- `/api/v1/rooms/<room_id>/` Details-resource of the specified room.
   - [GET] Retrieve the room resource.
   - [PUT, PATCH] Replace resp. update the room resouce.
-  - [DELETE] Remove the room resource. Does not delete nodes attributed to the room.
-- `/api/v1/organizations/<organization_id>/sites/<site_id>/rooms/<room_id>/timeseries/` A resource for the aggregated time series of the room.
-  - [GET] If the room is equipped with several nodes, this aggregation must represent combine the available data meaningfully into a virtual "super-node"; i.e., it should be rather like an average than a sum. If the room is equipped with a single node only, the time series must be exactly equal to this node's time series.
-- `/api/v1/organizations/<organization_id>/sites/<site_id>/rooms/<room_id>/nodes/` Collection-resource of all node installations in the given room.
-  - [GET] Shows current and past installations, as long as the installed sensor is still owned by the given organization.
+  - [DELETE] Remove the room resource and the node-installation it might contain. Does not delete the node resources themselves.
+- `/api/v1/rooms/<room_id>/node-instalations/` Collection-resource of all node installations in the given room.
+  - [GET] List current and past installations, with individual links to the detail-resource at `/api/v1/node-installations/<installation_id>`.
   - [POST] Associates an already registered node with the room. A node to be associated with a room must not be associated with another room for an overlapping time period.
-- `/api/v1/organizations/<organization_id>/sites/<site_id>/rooms/<room_id>/nodes/<node_id>/` Details-resource of the specified node.
-  - [GET] Redirects to `/api/v1/organizations/<organization_id>/nodes/<node_id>/`.
+- `/api/v1/node-installations/` Collection-resource for the all node installation visible to the logged-in user.
+  - [GET] List the installations. Filter to see onstallations of one specific organization with the filter `filter[organization]=<organization_id>`, for one specific site with the filter `filter[site]=<site_id>`, for one specific room via the filter `filter[room]=<room_id>`, and for all installations of a specific node via the filter `filter[node]=<node_id>`.
+- `/api/v1/node-installations/<installation_id>/` Details-resource for the installation of the identified node.
+  - [GET] Provide details about the installation - time slice, photo, and additional installation information.
   - [PUT, POST] Replace resp. updates the association with the room. To end the association with a room, update it with an end date; this preserves the association history.
   - [DELETE] Removes the association with the room. This removes the association history, as if the node was never associated with the room.
 
