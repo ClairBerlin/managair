@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from django.contrib import admin
 
 from core.models import Quantity, NodeModel, NodeProtocol, Node, NodeFidelity

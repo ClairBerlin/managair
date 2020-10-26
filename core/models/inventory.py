@@ -2,8 +2,6 @@ from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 
 class Organization(models.Model):
@@ -89,7 +87,6 @@ class Site(models.Model):
     operated_by = models.ForeignKey(
         Organization, null=False, on_delete=models.CASCADE, related_name="sites"
     )
-    nodes = models.ManyToManyField("core.Node", through="NodeInstallation")
 
     class Meta:
         constraints = [
@@ -104,15 +101,37 @@ class Site(models.Model):
         return f"{self.name} {self.address.street1}, {self.address.zip}"
 
 
-class NodeInstallation(models.Model):
+class Room(models.Model):
+    name = models.CharField(max_length=50, null=False, blank=False)
+    description = models.TextField(null=True, blank=True)
+    size_sqm = models.DecimalField(max_digits=5, decimal_places=1, null=True)
+    height_m = models.DecimalField(max_digits=3, decimal_places=1, null=True)
+    max_occupancy = models.IntegerField(null=True)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name="rooms")
+    nodes = models.ManyToManyField("core.Node", through="RoomNodeInstallation")
+
+    class Meta:
+        constraints = [
+            # The rooms within a given site must be unique.
+            models.UniqueConstraint(
+                fields=["name", "site"], name="unique_room_per_site"
+            )
+        ]
+
+    def __str__(self):
+        """For representation in the Admin UI."""
+        return f"{self.name}"
+
+
+class RoomNodeInstallation(models.Model):
     node = models.ForeignKey(
         "core.Node",
         null=False,
         on_delete=models.CASCADE,
-        related_name="node_installations",
+        related_name="room_installation",
     )
-    site = models.ForeignKey(
-        Site, null=False, on_delete=models.CASCADE, related_name="node_installations"
+    room = models.ForeignKey(
+        Room, null=False, on_delete=models.CASCADE, related_name="node_installations"
     )
     from_timestamp = models.PositiveIntegerField(null=False, blank=False)
     # An ongoing association does not have an end timestamp set.
@@ -121,9 +140,9 @@ class NodeInstallation(models.Model):
 
     class Meta:
         constraints = [
-            # At any given time, a node may be attributed to one site only.
+            # At any given time, a node may be installed in one room only.
             models.UniqueConstraint(
-                fields=["node", "from_timestamp"], name="unique_node_attribution"
+                fields=["node", "from_timestamp"], name="unique_node_installation"
             ),
         ]
         ordering = ["-from_timestamp"]
@@ -131,7 +150,12 @@ class NodeInstallation(models.Model):
 
     def __str__(self):
         """For representation in the Admin UI."""
-        return f'Node: {self.node}, from: {datetime.utcfromtimestamp(self.from_timestamp)} To: {datetime.utcfromtimestamp(self.to_timestamp) if self.to_timestamp != None else "ongoing"}'
+        end_time = (
+            datetime.utcfromtimestamp(self.to_timestamp)
+            if self.to_timestamp is not None
+            else "ongoing"
+        )
+        return f"Node: {self.node}, from: {datetime.utcfromtimestamp(self.from_timestamp)} To: {end_time}"
 
     def from_iso(self):
         return datetime.fromtimestamp(self.from_timestamp)

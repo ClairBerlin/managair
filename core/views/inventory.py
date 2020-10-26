@@ -1,14 +1,17 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import get_user_model
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework import permissions
-from rest_framework_json_api.views import viewsets
+from rest_framework_json_api.views import (
+    ModelViewSet,
+    ReadOnlyModelViewSet,
+    RelationshipView,
+)
 
-from core.models import Address, NodeInstallation, Site, Organization, Membership
+from core.models import Address, Site, Room, Organization, Membership
 from core.serializers import (
     AddressSerializer,
-    NodeInstallationSerializer,
     SiteSerializer,
+    RoomSerializer,
     OrganizationSerializer,
     MembershipSerializer,
     UserSerializer,
@@ -17,13 +20,26 @@ from core.serializers import (
 User = get_user_model()
 
 
-class UserViewSet(LoginRequiredMixin, viewsets.ReadOnlyModelViewSet):
+class UserViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
     permissions = [permissions.IsAuthenticated]
-    queryset = User.objects.all()
+
     serializer_class = UserSerializer
 
+    def get_queryset(self):
+        queryset = super(UserViewSet, self).get_queryset()
 
-class AddressViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
+        # If this viewset is accessed via the 'organization-members-list' route,
+        # it wll have been passed the `user_pk` kwarg, and the queryset
+        # needs to be filtered accordingly; if it was accessed via the
+        # unnested '/users' route, the queryset should include all Users
+        if "user_pk" in self.kwargs:
+            user_pk = self.kwargs["user_pk"]
+            queryset = queryset.filter(user__pk=user_pk)
+
+        return queryset
+
+
+class AddressViewSet(LoginRequiredMixin, ModelViewSet):
     permissions = [permissions.IsAuthenticated]
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
@@ -36,7 +52,7 @@ class AddressViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
         )
 
 
-class SiteViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
+class SiteViewSet(LoginRequiredMixin, ModelViewSet):
     permissions = [permissions.IsAuthenticated]
     queryset = Site.objects.all()
     serializer_class = SiteSerializer
@@ -47,20 +63,25 @@ class SiteViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
         return queryset.filter(operated_by__user_membership__user=self.request.user)
 
 
-class NodeInstallationViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
-    queryset = NodeInstallation.objects.all()
-    serializer_class = NodeInstallationSerializer
+class SiteRelationshipView(RelationshipView):
+    queryset = Site.objects
+    self_link_view_name = "site-relationships"
+
+
+class RoomViewSet(LoginRequiredMixin, ModelViewSet):
+    permissions = [permissions.IsAuthenticated]
+    queryset = Room.objects.all()
+    serializer_class = RoomSerializer
 
     def get_queryset(self):
         """Restrict to logged-in user"""
-        queryset = super(NodeInstallationViewSet, self).get_queryset()
+        queryset = super(RoomViewSet, self).get_queryset()
         return queryset.filter(
             site__operated_by__user_membership__user=self.request.user
         )
 
 
-class OrganizationViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
+class OrganizationViewSet(LoginRequiredMixin, ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
@@ -71,7 +92,11 @@ class OrganizationViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
         return queryset.filter(user_membership__user=self.request.user)
 
 
-class MembershipViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
+class OrganizationRelationshipView(LoginRequiredMixin, RelationshipView):
+    queryset = Organization.objects
+
+
+class MembershipViewSet(LoginRequiredMixin, ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Membership.objects.all()
     serializer_class = MembershipSerializer

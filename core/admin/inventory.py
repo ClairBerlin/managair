@@ -2,7 +2,15 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
-from core.models import Address, Site, NodeInstallation, Node, Organization, Membership
+from core.models import (
+    Address,
+    Site,
+    Room,
+    RoomNodeInstallation,
+    Node,
+    Organization,
+    Membership,
+)
 
 
 @admin.register(Address)
@@ -15,9 +23,9 @@ class SiteAdmin(admin.ModelAdmin):
     list_display = ["name", "description", "operated_by", "address"]
 
 
-@admin.register(NodeInstallation)
-class NodeInstallationAdmin(admin.ModelAdmin):
-    list_display = ["node", "site", "from_iso", "to_iso"]
+@admin.register(Room)
+class RoomAdmin(admin.ModelAdmin):
+    list_display = ["name", "description", "site"]
 
 
 class MembershipInline(admin.TabularInline):
@@ -34,3 +42,8 @@ class OrganizationAdmin(admin.ModelAdmin):
 @admin.register(Membership)
 class MembershipAdmin(admin.ModelAdmin):
     list_display = ["user", "organization", "role"]
+
+
+@admin.register(RoomNodeInstallation)
+class RoomNodeInstallationAdmin(admin.ModelAdmin):
+    list_display = ["node", "room", "from_iso", "to_iso"]

@@ -1,9 +1,14 @@
-from core.models import Address, Membership, NodeInstallation, Organization, Site
-from core.serializers import NodeSerializer
-from dj_rest_auth.serializers import UserDetailsSerializer
 from django.contrib.auth import get_user_model
 from rest_framework_json_api import serializers
 from rest_framework_json_api.relations import ResourceRelatedField
+
+from core.models import (
+    Address,
+    Membership,
+    Organization,
+    Site,
+    Room,
+)
 
 User = get_user_model()
 
@@ -15,32 +20,35 @@ class AddressSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class SiteSerializer(serializers.HyperlinkedModelSerializer):
-    included_serializers = {"address": AddressSerializer, "nodes": NodeSerializer}
+    included_serializers = {"address": AddressSerializer}
+    related_serializers = {
+        "rooms": "core.serializers.RoomSerializer",
+    }
+
+    #: A Site has zero or more room instances
+    rooms = ResourceRelatedField(
+        model=Room,
+        many=True,
+        read_only=False,
+        allow_null=True,
+        required=False,
+        queryset=Room.objects.all(),
+        self_link_view_name="site-relationships",
+        related_link_view_name="site-related",
+    )
 
     class Meta:
         model = Site
-        fields = ("name", "description", "address", "nodes", "url")
+        fields = ("name", "description", "address", "rooms", "nodes", "url")
 
     class JSONAPIMeta:
         included_resources = ["address"]
 
 
-class NodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
-    included_serializers = {"node": NodeSerializer}
-
+class RoomSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = NodeInstallation
-        fields = (
-            "site",
-            "node",
-            "from_timestamp",
-            "to_timestamp",
-            "description",
-            "url",
-        )
-
-    class JSONAPIMeta:
-        included_resources = ["node"]
+        model = Room
+        fields = ["name", "description", "site", "url"]
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -79,12 +87,12 @@ class MembershipSerializer(serializers.HyperlinkedModelSerializer):
 
 class OrganizationSerializer(serializers.HyperlinkedModelSerializer):
 
-    memberships = serializers.ResourceRelatedField(
-        source="users",
-        read_only=True,
+    users = ResourceRelatedField(
         many=True,
+        read_only=True,
+        related_link_view_name="user-detail",
     )
 
     class Meta:
         model = Organization
-        fields = ("name", "description", "memberships", "url")
+        fields = ("name", "description", "users", "url")

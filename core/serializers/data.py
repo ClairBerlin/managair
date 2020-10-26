@@ -1,6 +1,7 @@
 from rest_framework_json_api import serializers
-from core.models import Sample, NodeInstallation
+
 from core.data_viewmodels import TimeseriesViewModel
+from core.models import Sample
 
 
 class SampleSerializer(serializers.HyperlinkedModelSerializer):

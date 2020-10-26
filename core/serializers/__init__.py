@@ -8,7 +8,7 @@ from .devices import (
 from .inventory import (
     AddressSerializer,
     SiteSerializer,
-    NodeInstallationSerializer,
+    RoomSerializer,
     OrganizationSerializer,
     MembershipSerializer,
     UserSerializer,
