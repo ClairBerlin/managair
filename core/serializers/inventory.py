@@ -51,31 +51,17 @@ class RoomSerializer(serializers.HyperlinkedModelSerializer):
         fields = ["name", "description", "site", "url"]
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = User
-        fields = (
-            "username",
-            "email",
-            "first_name",
-            "last_name",
-            "url",
-        )
-
-
 class MembershipSerializer(serializers.HyperlinkedModelSerializer):
 
     user_id = serializers.ReadOnlyField(source="user.id")
     user_name = serializers.ReadOnlyField(source="user.username")
     organization_id = serializers.ReadOnlyField(source="organization.id")
     organization_name = serializers.ReadOnlyField(source="organization.name")
-    user = UserSerializer
 
     class Meta:
         model = Membership
         fields = (
             "organization",
-            "user",
             "user_id",
             "user_name",
             "organization_id",
@@ -86,13 +72,49 @@ class MembershipSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class OrganizationSerializer(serializers.HyperlinkedModelSerializer):
-
+    related_serializers = {
+        "users": "core.serializers.UserSerializer",
+    }
+    #: An Organization has one or more users as members.
     users = ResourceRelatedField(
+        model=User,
         many=True,
-        read_only=True,
-        related_link_view_name="user-detail",
+        read_only=False,
+        allow_null=True,
+        required=False,
+        queryset=User.objects.all(),
+        self_link_view_name="organization-relationships",
+        related_link_view_name="organization-related",
     )
 
     class Meta:
         model = Organization
         fields = ("name", "description", "users", "url")
+
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    related_serializers = {
+        "organizations": "core.serializers.OrganizationSerializer",
+    }
+    #: A User is member of zero or more organizations.
+    organizations = ResourceRelatedField(
+        model=Organization,
+        many=True,
+        read_only=False,
+        allow_null=True,
+        required=False,
+        queryset=Organization.objects.all(),
+        self_link_view_name="user-relationships",
+        related_link_view_name="user-related",
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "organizations",
+            "url",
+        )

@@ -22,7 +22,7 @@ User = get_user_model()
 
 class UserViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
     permissions = [permissions.IsAuthenticated]
-
+    queryset = User.objects.all()
     serializer_class = UserSerializer
 
     def get_queryset(self):
@@ -31,12 +31,18 @@ class UserViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
         # If this viewset is accessed via the 'organization-members-list' route,
         # it wll have been passed the `user_pk` kwarg, and the queryset
         # needs to be filtered accordingly; if it was accessed via the
-        # unnested '/users' route, the queryset should include all Users
+        # unnested '/users' route, the queryset should include the logged-in user only.
         if "user_pk" in self.kwargs:
             user_pk = self.kwargs["user_pk"]
-            queryset = queryset.filter(user__pk=user_pk)
-
+            queryset = queryset.filter(pk=user_pk)
+        else:
+            queryset = queryset.filter(pk=self.request.user.id)
         return queryset
+
+
+class UserRelationshipView(RelationshipView):
+    queryset = User.objects
+    self_link_view_name = "user-relationships"
 
 
 class AddressViewSet(LoginRequiredMixin, ModelViewSet):
@@ -48,7 +54,7 @@ class AddressViewSet(LoginRequiredMixin, ModelViewSet):
         """Restrict to logged-in user"""
         queryset = super(AddressViewSet, self).get_queryset()
         return queryset.filter(
-            sites__operated_by__user_membership__user=self.request.user
+            sites__operated_by__users=self.request.user
         )
 
 
@@ -60,7 +66,7 @@ class SiteViewSet(LoginRequiredMixin, ModelViewSet):
     def get_queryset(self):
         """Restrict to logged-in user"""
         queryset = super(SiteViewSet, self).get_queryset()
-        return queryset.filter(operated_by__user_membership__user=self.request.user)
+        return queryset.filter(operated_by__users=self.request.user)
 
 
 class SiteRelationshipView(RelationshipView):
@@ -77,7 +83,7 @@ class RoomViewSet(LoginRequiredMixin, ModelViewSet):
         """Restrict to logged-in user"""
         queryset = super(RoomViewSet, self).get_queryset()
         return queryset.filter(
-            site__operated_by__user_membership__user=self.request.user
+            site__operated_by__users=self.request.user
         )
 
 
@@ -89,11 +95,12 @@ class OrganizationViewSet(LoginRequiredMixin, ModelViewSet):
     def get_queryset(self):
         """Restrict to logged-in user"""
         queryset = super(OrganizationViewSet, self).get_queryset()
-        return queryset.filter(user_membership__user=self.request.user)
+        return queryset.filter(users=self.request.user)
 
 
 class OrganizationRelationshipView(LoginRequiredMixin, RelationshipView):
     queryset = Organization.objects
+    self_link_view_name = "organization-relationships"
 
 
 class MembershipViewSet(LoginRequiredMixin, ModelViewSet):

@@ -9,7 +9,9 @@ class Organization(models.Model):
 
     name = models.CharField(max_length=50, null=False, blank=False)
     description = models.TextField(null=True, blank=True)
-    users = models.ManyToManyField(User, through="Membership")
+    users = models.ManyToManyField(
+        User, through="Membership", related_name="organizations"
+    )
 
     def __str__(self):
         """For representation in the Admin UI."""
@@ -38,13 +40,13 @@ class Membership(models.Model):
         User,
         null=False,
         on_delete=models.CASCADE,
-        related_name="organization_membership",
+        # related field ist User.organizations",
     )
     organization = models.ForeignKey(
         Organization,
         null=False,
         on_delete=models.CASCADE,
-        related_name="user_membership",
+        # related field is Organization.users
     )
 
     def __str__(self):

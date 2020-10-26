@@ -16,7 +16,7 @@ router.register(r"rooms", inventory.RoomViewSet)
 router.register(r"address", inventory.AddressViewSet)
 router.register(r"organizations", inventory.OrganizationViewSet)
 router.register(r"membership", inventory.MembershipViewSet)
-router.register(r"users", inventory.UserViewSet, basename="user")
+router.register(r"users", inventory.UserViewSet)
 
 # Data views
 router.register(r"samples", data.SampleViewSet)
@@ -24,7 +24,26 @@ router.register(r"timeseries", data.TimeseriesViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
-    # re_path(r'^sites/(?P<pk>[^/.]+)/relationships/(?P<related_field>[^/.]+)$',
+    path(
+        "users/<pk>/relationships/<related_field>",
+        view=inventory.UserRelationshipView.as_view(),
+        name="user-relationships",
+    ),
+    path(
+        "users/<pk>/<related_field>/",
+        inventory.UserViewSet.as_view({"get": "retrieve_related"}),
+        name="user-related",
+    ),
+    path(
+        "organizations/<pk>/relationships/<related_field>",
+        view=inventory.OrganizationRelationshipView.as_view(),
+        name="organization-relationships",
+    ),
+    path(
+        "organizations/<pk>/<related_field>/",
+        inventory.OrganizationViewSet.as_view({"get": "retrieve_related"}),
+        name="organization-related",
+    ),
     path(
         "sites/<pk>/relationships/<related_field>",
         view=inventory.SiteRelationshipView.as_view(),
