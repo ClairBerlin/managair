@@ -39,7 +39,7 @@ class SiteSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Site
-        fields = ("name", "description", "address", "rooms", "nodes", "url")
+        fields = ("name", "description", "address", "rooms", "url")
 
     class JSONAPIMeta:
         included_resources = ["address"]

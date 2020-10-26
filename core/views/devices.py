@@ -38,7 +38,7 @@ class NodeViewSet(LoginRequiredMixin, ModelViewSet):
     def get_queryset(self):
         """Restrict to logged-in user"""
         queryset = super(NodeViewSet, self).get_queryset()
-        return queryset.filter(owner__user_membership__user=self.request.user)
+        return queryset.filter(owner__users=self.request.user)
 
 
 class NodeFidelityViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):

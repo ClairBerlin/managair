@@ -110,7 +110,9 @@ class Room(models.Model):
     height_m = models.DecimalField(max_digits=3, decimal_places=1, null=True)
     max_occupancy = models.IntegerField(null=True)
     site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name="rooms")
-    nodes = models.ManyToManyField("core.Node", through="RoomNodeInstallation")
+    nodes = models.ManyToManyField(
+        "core.Node", through="RoomNodeInstallation", related_name="rooms"
+    )
 
     class Meta:
         constraints = [

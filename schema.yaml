@@ -85,41 +85,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Address'
           description: ''
-    put:
-      operationId: api_v1_address_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this address.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/Address'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Address'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Address'
-        required: true
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Address'
-          description: ''
     patch:
       operationId: api_v1_address_partial_update
       description: Verify that the current user is authenticated.
@@ -226,334 +191,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/NodeFidelity'
           description: ''
-  /api/v1/installation/:
-    get:
-      operationId: api_v1_installation_list
-      description: Verify that the current user is authenticated.
-      parameters:
-      - name: page[number]
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      - name: page[size]
-        required: false
-        in: query
-        description: Number of results to return per page.
-        schema:
-          type: integer
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/PaginatedNodeInstallationList'
-          description: ''
-    post:
-      operationId: api_v1_installation_create
-      description: Verify that the current user is authenticated.
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/NodeInstallation'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/NodeInstallation'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/NodeInstallation'
-        required: true
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/NodeInstallation'
-          description: ''
-  /api/v1/installation/{id}/:
-    get:
-      operationId: api_v1_installation_retrieve
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this node installation.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/NodeInstallation'
-          description: ''
-    put:
-      operationId: api_v1_installation_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this node installation.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/NodeInstallation'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/NodeInstallation'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/NodeInstallation'
-        required: true
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/NodeInstallation'
-          description: ''
-    patch:
-      operationId: api_v1_installation_partial_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this node installation.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/PatchedNodeInstallation'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedNodeInstallation'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedNodeInstallation'
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/NodeInstallation'
-          description: ''
-    delete:
-      operationId: api_v1_installation_destroy
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this node installation.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      responses:
-        '204':
-          description: No response body
-  /api/v1/membership/:
-    get:
-      operationId: api_v1_membership_list
-      description: Verify that the current user is authenticated.
-      parameters:
-      - name: page[number]
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      - name: page[size]
-        required: false
-        in: query
-        description: Number of results to return per page.
-        schema:
-          type: integer
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/PaginatedMembershipList'
-          description: ''
-    post:
-      operationId: api_v1_membership_create
-      description: Verify that the current user is authenticated.
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/Membership'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Membership'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Membership'
-        required: true
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Membership'
-          description: ''
-  /api/v1/membership/{id}/:
-    get:
-      operationId: api_v1_membership_retrieve
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this membership.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Membership'
-          description: ''
-    put:
-      operationId: api_v1_membership_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this membership.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/Membership'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Membership'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Membership'
-        required: true
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Membership'
-          description: ''
-    patch:
-      operationId: api_v1_membership_partial_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this membership.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/PatchedMembership'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedMembership'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedMembership'
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Membership'
-          description: ''
-    delete:
-      operationId: api_v1_membership_destroy
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this membership.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      responses:
-        '204':
-          description: No response body
   /api/v1/models/:
     get:
       operationId: api_v1_models_list
@@ -628,40 +265,6 @@ paths:
       - cookieAuth: []
       - tokenAuth: []
       - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/NodeModel'
-          description: ''
-    put:
-      operationId: api_v1_models_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this node model.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/NodeModel'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/NodeModel'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/NodeModel'
-        required: true
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
       responses:
         '200':
           content:
@@ -801,41 +404,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Node'
           description: ''
-    put:
-      operationId: api_v1_nodes_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        description: A UUID string identifying this node.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/Node'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Node'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Node'
-        required: true
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Node'
-          description: ''
     patch:
       operationId: api_v1_nodes_partial_update
       description: Verify that the current user is authenticated.
@@ -889,9 +457,9 @@ paths:
       responses:
         '204':
           description: No response body
-  /api/v1/organization/:
+  /api/v1/organizations/:
     get:
-      operationId: api_v1_organization_list
+      operationId: api_v1_organizations_list
       description: Verify that the current user is authenticated.
       parameters:
       - name: page[number]
@@ -919,7 +487,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedOrganizationList'
           description: ''
     post:
-      operationId: api_v1_organization_create
+      operationId: api_v1_organizations_create
       description: Verify that the current user is authenticated.
       tags:
       - api
@@ -945,9 +513,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Organization'
           description: ''
-  /api/v1/organization/{id}/:
+  /api/v1/organizations/{id}/:
     get:
-      operationId: api_v1_organization_retrieve
+      operationId: api_v1_organizations_retrieve
       description: Verify that the current user is authenticated.
       parameters:
       - in: path
@@ -958,40 +526,6 @@ paths:
         required: true
       tags:
       - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Organization'
-          description: ''
-    put:
-      operationId: api_v1_organization_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this organization.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/Organization'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Organization'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Organization'
-        required: true
       security:
       - cookieAuth: []
       - tokenAuth: []
@@ -1003,7 +537,7 @@ paths:
                 $ref: '#/components/schemas/Organization'
           description: ''
     patch:
-      operationId: api_v1_organization_partial_update
+      operationId: api_v1_organizations_partial_update
       description: Verify that the current user is authenticated.
       parameters:
       - in: path
@@ -1036,7 +570,7 @@ paths:
                 $ref: '#/components/schemas/Organization'
           description: ''
     delete:
-      operationId: api_v1_organization_destroy
+      operationId: api_v1_organizations_destroy
       description: Verify that the current user is authenticated.
       parameters:
       - in: path
@@ -1050,6 +584,131 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/organizations/{id}/{related_field}/:
+    get:
+      operationId: api_v1_organizations_retrieve_2
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this organization.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+          description: ''
+  /api/v1/organizations/{id}/relationships/{related_field}:
+    get:
+      operationId: api_v1_organizations_relationships_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this organization.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: api_v1_organizations_relationships_create
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this organization.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: api_v1_organizations_relationships_partial_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this organization.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: api_v1_organizations_relationships_destroy
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this organization.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
       responses:
         '204':
           description: No response body
@@ -1127,40 +786,6 @@ paths:
       - cookieAuth: []
       - tokenAuth: []
       - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/NodeProtocol'
-          description: ''
-    put:
-      operationId: api_v1_protocols_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this node protocol.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/NodeProtocol'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/NodeProtocol'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/NodeProtocol'
-        required: true
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
       responses:
         '200':
           content:
@@ -1301,40 +926,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Quantity'
           description: ''
-    put:
-      operationId: api_v1_quantities_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this quantity.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/Quantity'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Quantity'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Quantity'
-        required: true
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Quantity'
-          description: ''
     patch:
       operationId: api_v1_quantities_partial_update
       description: Verify that the current user is authenticated.
@@ -1377,6 +968,141 @@ paths:
         schema:
           type: integer
         description: A unique integer value identifying this quantity.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/rooms/:
+    get:
+      operationId: api_v1_rooms_list
+      description: Verify that the current user is authenticated.
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRoomList'
+          description: ''
+    post:
+      operationId: api_v1_rooms_create
+      description: Verify that the current user is authenticated.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Room'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Room'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Room'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Room'
+          description: ''
+  /api/v1/rooms/{id}/:
+    get:
+      operationId: api_v1_rooms_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this room.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Room'
+          description: ''
+    patch:
+      operationId: api_v1_rooms_partial_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this room.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PatchedRoom'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRoom'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRoom'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Room'
+          description: ''
+    delete:
+      operationId: api_v1_rooms_destroy
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this room.
         required: true
       tags:
       - api
@@ -1674,41 +1400,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Site'
           description: ''
-    put:
-      operationId: api_v1_sites_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this site.
-        required: true
-      tags:
-      - api
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/Site'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Site'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Site'
-        required: true
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Site'
-          description: ''
     patch:
       operationId: api_v1_sites_partial_update
       description: Verify that the current user is authenticated.
@@ -1752,6 +1443,132 @@ paths:
         schema:
           type: integer
         description: A unique integer value identifying this site.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/sites/{id}/{related_field}/:
+    get:
+      operationId: api_v1_sites_retrieve_2
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Site'
+          description: ''
+  /api/v1/sites/{id}/relationships/{related_field}:
+    get:
+      operationId: api_v1_sites_relationships_retrieve
+      description: ''
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: api_v1_sites_relationships_create
+      description: ''
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: api_v1_sites_relationships_partial_update
+      description: ''
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: api_v1_sites_relationships_destroy
+      description: ''
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
         required: true
       tags:
       - api
@@ -1822,9 +1639,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/SimpleSample'
           description: ''
-  /api/v1/user/:
+  /api/v1/users/:
     get:
-      operationId: api_v1_user_list
+      operationId: api_v1_users_list
       description: Verify that the current user is authenticated.
       parameters:
       - name: page[number]
@@ -1852,9 +1669,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/PaginatedUserList'
           description: ''
-  /api/v1/user/{id}/:
+  /api/v1/users/{id}/:
     get:
-      operationId: api_v1_user_retrieve
+      operationId: api_v1_users_retrieve
       description: Verify that the current user is authenticated.
       parameters:
       - in: path
@@ -1876,6 +1693,132 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
           description: ''
+  /api/v1/users/{id}/{related_field}/:
+    get:
+      operationId: api_v1_users_retrieve_2
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/v1/users/{id}/relationships/{related_field}:
+    get:
+      operationId: api_v1_users_relationships_retrieve
+      description: ''
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: api_v1_users_relationships_create
+      description: ''
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: api_v1_users_relationships_partial_update
+      description: ''
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: api_v1_users_relationships_destroy
+      description: ''
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
   /auth/login/:
     post:
       operationId: auth_login_create
@@ -2305,54 +2248,6 @@ components:
       - R
       - E
       type: string
-    Membership:
-      type: object
-      description: |-
-        A type of `ModelSerializer` that uses hyperlinked relationships instead
-        of primary key relationships. Specifically:
-
-        * A 'url' field is included instead of the 'id' field.
-        * Relationships to other instances are hyperlinks, instead of primary keys.
-
-        Included Mixins:
-
-        * A mixin class to enable sparse fieldsets is included
-        * A mixin class to enable validation of included resources is included
-      properties:
-        organization:
-          type: string
-          format: uri
-        user:
-          type: string
-          format: uri
-        user_id:
-          type: integer
-          readOnly: true
-        user_name:
-          type: string
-          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
-            only.
-          readOnly: true
-        organization_id:
-          type: integer
-          readOnly: true
-        organization_name:
-          type: string
-          readOnly: true
-        role:
-          $ref: '#/components/schemas/RoleEnum'
-        url:
-          type: string
-          format: uri
-          readOnly: true
-      required:
-      - organization
-      - organization_id
-      - organization_name
-      - url
-      - user
-      - user_id
-      - user_name
     Node:
       type: object
       description: |-
@@ -2428,47 +2323,6 @@ components:
       required:
       - last_check_s
       - node
-      - url
-    NodeInstallation:
-      type: object
-      description: |-
-        A type of `ModelSerializer` that uses hyperlinked relationships instead
-        of primary key relationships. Specifically:
-
-        * A 'url' field is included instead of the 'id' field.
-        * Relationships to other instances are hyperlinks, instead of primary keys.
-
-        Included Mixins:
-
-        * A mixin class to enable sparse fieldsets is included
-        * A mixin class to enable validation of included resources is included
-      properties:
-        site:
-          type: string
-          format: uri
-        node:
-          type: string
-          format: uri
-        from_timestamp:
-          type: integer
-          maximum: 2147483647
-          minimum: 0
-        to_timestamp:
-          type: integer
-          maximum: 2147483647
-          nullable: true
-          minimum: 0
-        description:
-          type: string
-          nullable: true
-        url:
-          type: string
-          format: uri
-          readOnly: true
-      required:
-      - from_timestamp
-      - node
-      - site
       - url
     NodeModel:
       type: object
@@ -2564,17 +2418,16 @@ components:
         description:
           type: string
           nullable: true
-        memberships:
+        users:
           type: array
           items:
             type: integer
-          readOnly: true
+            nullable: true
         url:
           type: string
           format: uri
           readOnly: true
       required:
-      - memberships
       - name
       - url
     PaginatedAddressList:
@@ -2597,26 +2450,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Address'
-    PaginatedMembershipList:
-      type: object
-      properties:
-        count:
-          type: integer
-          example: 123
-        next:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page[number]=4
-        previous:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page[number]=2
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/Membership'
     PaginatedNodeFidelityList:
       type: object
       properties:
@@ -2637,26 +2470,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/NodeFidelity'
-    PaginatedNodeInstallationList:
-      type: object
-      properties:
-        count:
-          type: integer
-          example: 123
-        next:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page[number]=4
-        previous:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page[number]=2
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/NodeInstallation'
     PaginatedNodeList:
       type: object
       properties:
@@ -2757,6 +2570,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Quantity'
+    PaginatedRoomList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Room'
     PaginatedSampleIngestList:
       type: object
       properties:
@@ -2928,46 +2761,6 @@ components:
           type: string
           format: uri
           readOnly: true
-    PatchedMembership:
-      type: object
-      description: |-
-        A type of `ModelSerializer` that uses hyperlinked relationships instead
-        of primary key relationships. Specifically:
-
-        * A 'url' field is included instead of the 'id' field.
-        * Relationships to other instances are hyperlinks, instead of primary keys.
-
-        Included Mixins:
-
-        * A mixin class to enable sparse fieldsets is included
-        * A mixin class to enable validation of included resources is included
-      properties:
-        organization:
-          type: string
-          format: uri
-        user:
-          type: string
-          format: uri
-        user_id:
-          type: integer
-          readOnly: true
-        user_name:
-          type: string
-          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
-            only.
-          readOnly: true
-        organization_id:
-          type: integer
-          readOnly: true
-        organization_name:
-          type: string
-          readOnly: true
-        role:
-          $ref: '#/components/schemas/RoleEnum'
-        url:
-          type: string
-          format: uri
-          readOnly: true
     PatchedNode:
       type: object
       description: |-
@@ -2997,42 +2790,6 @@ components:
         model:
           type: string
           format: uri
-        url:
-          type: string
-          format: uri
-          readOnly: true
-    PatchedNodeInstallation:
-      type: object
-      description: |-
-        A type of `ModelSerializer` that uses hyperlinked relationships instead
-        of primary key relationships. Specifically:
-
-        * A 'url' field is included instead of the 'id' field.
-        * Relationships to other instances are hyperlinks, instead of primary keys.
-
-        Included Mixins:
-
-        * A mixin class to enable sparse fieldsets is included
-        * A mixin class to enable validation of included resources is included
-      properties:
-        site:
-          type: string
-          format: uri
-        node:
-          type: string
-          format: uri
-        from_timestamp:
-          type: integer
-          maximum: 2147483647
-          minimum: 0
-        to_timestamp:
-          type: integer
-          maximum: 2147483647
-          nullable: true
-          minimum: 0
-        description:
-          type: string
-          nullable: true
         url:
           type: string
           format: uri
@@ -3121,11 +2878,11 @@ components:
         description:
           type: string
           nullable: true
-        memberships:
+        users:
           type: array
           items:
             type: integer
-          readOnly: true
+            nullable: true
         url:
           type: string
           format: uri
@@ -3154,6 +2911,33 @@ components:
           type: string
           format: uri
           readOnly: true
+    PatchedRoom:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        name:
+          type: string
+          maxLength: 50
+        description:
+          type: string
+          nullable: true
+        site:
+          type: string
+          format: uri
+        url:
+          type: string
+          format: uri
+          readOnly: true
     PatchedSite:
       type: object
       description: |-
@@ -3177,12 +2961,11 @@ components:
         address:
           type: string
           format: uri
-        nodes:
+        rooms:
           type: array
           items:
-            type: string
-            format: uri
-          readOnly: true
+            type: integer
+            nullable: true
         url:
           type: string
           format: uri
@@ -3266,12 +3049,37 @@ components:
           readOnly: true
       required:
       - detail
-    RoleEnum:
-      enum:
-      - O
-      - A
-      - I
-      type: string
+    Room:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        name:
+          type: string
+          maxLength: 50
+        description:
+          type: string
+          nullable: true
+        site:
+          type: string
+          format: uri
+        url:
+          type: string
+          format: uri
+          readOnly: true
+      required:
+      - name
+      - site
+      - url
     Sample:
       type: object
       description: |-
@@ -3436,12 +3244,11 @@ components:
         address:
           type: string
           format: uri
-        nodes:
+        rooms:
           type: array
           items:
-            type: string
-            format: uri
-          readOnly: true
+            type: integer
+            nullable: true
         url:
           type: string
           format: uri
@@ -3449,7 +3256,6 @@ components:
       required:
       - address
       - name
-      - nodes
       - url
     Token:
       type: object
@@ -3490,6 +3296,11 @@ components:
         last_name:
           type: string
           maxLength: 150
+        organizations:
+          type: array
+          items:
+            type: integer
+            nullable: true
         url:
           type: string
           format: uri
