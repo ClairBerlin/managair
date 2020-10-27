@@ -34,6 +34,7 @@ Most of the user-management endpoints are provided by the [dj-rest-auth library]
 The inventory is organized according to organizations that have one or more rooms with installed sensor nodes. All inventory resources require the user to be logged in. Data is organizaed according to the nodes that reported them. Data resources for a given organization are available only for the time-period when the node is or was owned by the organization.
 
 ### Organizations
+
 - `/api/v1/organizations/` Collection-resource of all organizations visible to the logged-in user.
   - [GET] List the organizations.
   - [POST] Register a new organization, with the logged-in user as owner.
@@ -67,6 +68,7 @@ The inventory is organized according to organizations that have one or more room
   - [POST] Create a new site operated by the organization.
 
 ### Users
+
 - `/api/v1/users/` Collection resource of all users visible to the logged-in user.
   - [GET] List the users. Filter to see members of one specific organization via the filter `filter[organization]=<organization_id>`.
 - `/api/v1/users/<user_id>/` Detail resource for a user's membership in the organization.
@@ -138,7 +140,6 @@ The inventory is organized according to organizations that have one or more room
 - `/api/v1/rooms/<room_id>/installations/` Collection-resource of all node installations in the given room.
   - [GET] List current and past installations, with individual links to the detail-resource at `/api/v1/installations/<installation_id>`.
   - [POST] Associates an already registered node with the room. A node to be associated with a room must not be associated with another room for an overlapping time period.
-
 
 ### Node-Installations
 

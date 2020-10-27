@@ -13,6 +13,10 @@ class Organization(models.Model):
         User, through="Membership", related_name="organizations"
     )
 
+    class Meta:
+        ordering = ["name"]
+        get_latest_by = "name"
+
     def __str__(self):
         """For representation in the Admin UI."""
         return f"{self.name}"
@@ -60,6 +64,7 @@ class Membership(models.Model):
                 fields=["user", "organization"], name="unique-membership"
             ),
         ]
+        ordering = ["role", "organization"]
 
 
 class Address(models.Model):
@@ -76,6 +81,8 @@ class Address(models.Model):
                 fields=["street1", "street2", "zip", "city"], name="unique_address"
             )
         ]
+        ordering = ["city", "street1"]
+        get_latest_by = "city"
 
     def __str__(self):
         """For representation in the Admin UI."""
@@ -97,6 +104,8 @@ class Site(models.Model):
                 fields=["name", "operated_by"], name="unique_site_per_organization"
             )
         ]
+        ordering = ["name"]
+        get_latest_by = "name"
 
     def __str__(self):
         """For representation in the Admin UI."""
@@ -121,6 +130,8 @@ class Room(models.Model):
                 fields=["name", "site"], name="unique_room_per_site"
             )
         ]
+        ordering = ["name"]
+        get_latest_by = "name"
 
     def __str__(self):
         """For representation in the Admin UI."""
@@ -129,12 +140,11 @@ class Room(models.Model):
 
 class RoomNodeInstallation(models.Model):
     node = models.ForeignKey(
-        "core.Node",
-        null=False,
-        on_delete=models.CASCADE,
-        related_name="installations"
+        "core.Node", null=False, on_delete=models.CASCADE, related_name="installations"
     )
-    room = models.ForeignKey(Room, null=False, on_delete=models.CASCADE, related_name="installations")
+    room = models.ForeignKey(
+        Room, null=False, on_delete=models.CASCADE, related_name="installations"
+    )
     from_timestamp_s = models.PositiveIntegerField(null=False, blank=False)
     # An ongoing association does not have an end-timestamp set.
     to_timestamp_s = models.PositiveIntegerField(null=True)
@@ -144,8 +154,7 @@ class RoomNodeInstallation(models.Model):
         constraints = [
             # At any given time, a node may be installed in one room only.
             models.UniqueConstraint(
-                fields=["node", "from_timestamp_s"],
-                name="unique_node_installation"
+                fields=["node", "from_timestamp_s"], name="unique_node_installation"
             ),
         ]
         ordering = ["-from_timestamp_s"]
