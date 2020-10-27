@@ -106,8 +106,10 @@ class MembershipSerializer(serializers.HyperlinkedModelSerializer):
 class OrganizationSerializer(serializers.HyperlinkedModelSerializer):
     related_serializers = {
         "users": "core.serializers.UserSerializer",
+        "sites": "core.serializers.SiteSerializer",
+        "nodes": "core.serializers.NodeSerializer",
     }
-    #: An Organization has one or more users as members.
+    # An Organization has one or more users as members.
     users = HyperlinkedRelatedField(
         many=True,
         read_only=False,
@@ -117,10 +119,30 @@ class OrganizationSerializer(serializers.HyperlinkedModelSerializer):
         self_link_view_name="organization-relationships",
         related_link_view_name="organization-related",
     )
+    # An Organization operates one or more sites.
+    sites = HyperlinkedRelatedField(
+        many=True,
+        read_only=False,
+        allow_null=True,
+        required=False,
+        queryset=Site.objects.all(),
+        self_link_view_name="organization-relationships",
+        related_link_view_name="organization-related",
+    )
+    # An Organization operates one or more sites.
+    nodes = HyperlinkedRelatedField(
+        many=True,
+        read_only=False,
+        allow_null=True,
+        required=False,
+        queryset=Node.objects.all(),
+        self_link_view_name="organization-relationships",
+        related_link_view_name="organization-related",
+    )
 
     class Meta:
         model = Organization
-        fields = ("name", "description", "users", "url")
+        fields = ("name", "description", "users", "sites", "nodes", "url")
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
