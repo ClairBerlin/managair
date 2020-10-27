@@ -3,6 +3,7 @@ from .devices import (
     NodeProtocolViewSet,
     NodeModelViewSet,
     NodeViewSet,
+    NodeRelationshipView,
     NodeFidelityViewSet,
 )
 from .inventory import (
@@ -10,6 +11,7 @@ from .inventory import (
     SiteViewSet,
     SiteRelationshipView,
     RoomViewSet,
+    RoomRelationshipView,
     OrganizationViewSet,
     OrganizationRelationshipView,
     MembershipViewSet,

@@ -7,11 +7,19 @@ from rest_framework_json_api.views import (
     RelationshipView,
 )
 
-from core.models import Address, Site, Room, Organization, Membership
+from core.models import (
+    Address,
+    Site,
+    Room,
+    Organization,
+    Membership,
+    RoomNodeInstallation,
+)
 from core.serializers import (
     AddressSerializer,
     SiteSerializer,
     RoomSerializer,
+    RoomNodeInstallationSerializer,
     OrganizationSerializer,
     MembershipSerializer,
     UserSerializer,
@@ -53,9 +61,7 @@ class AddressViewSet(LoginRequiredMixin, ModelViewSet):
     def get_queryset(self):
         """Restrict to logged-in user"""
         queryset = super(AddressViewSet, self).get_queryset()
-        return queryset.filter(
-            sites__operated_by__users=self.request.user
-        )
+        return queryset.filter(sites__operated_by__users=self.request.user)
 
 
 class SiteViewSet(LoginRequiredMixin, ModelViewSet):
@@ -82,9 +88,23 @@ class RoomViewSet(LoginRequiredMixin, ModelViewSet):
     def get_queryset(self):
         """Restrict to logged-in user"""
         queryset = super(RoomViewSet, self).get_queryset()
-        return queryset.filter(
-            site__operated_by__users=self.request.user
-        )
+        return queryset.filter(site__operated_by__users=self.request.user)
+
+
+class RoomRelationshipView(LoginRequiredMixin, RelationshipView):
+    queryset = Room.objects
+    self_link_view_name = "room-relationships"
+
+
+class RoomNodeInstallationViewSet(LoginRequiredMixin, ModelViewSet):
+    permissions = [permissions.IsAuthenticated]
+    queryset = RoomNodeInstallation.objects
+    serializer_class = RoomNodeInstallationSerializer
+
+    def get_queryset(self):
+        """Restrict to logged-in user"""
+        queryset = super(RoomNodeInstallationViewSet, self).get_queryset()
+        return queryset.filter(room__site__operated_by__users=self.request.user)
 
 
 class OrganizationViewSet(LoginRequiredMixin, ModelViewSet):

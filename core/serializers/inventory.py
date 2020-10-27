@@ -1,6 +1,9 @@
 from django.contrib.auth import get_user_model
 from rest_framework_json_api import serializers
-from rest_framework_json_api.relations import ResourceRelatedField
+from rest_framework_json_api.relations import (
+    ResourceRelatedField,
+    HyperlinkedRelatedField,
+)
 
 from core.models import (
     Address,
@@ -8,6 +11,8 @@ from core.models import (
     Organization,
     Site,
     Room,
+    Node,
+    RoomNodeInstallation,
 )
 
 User = get_user_model()
@@ -26,8 +31,7 @@ class SiteSerializer(serializers.HyperlinkedModelSerializer):
     }
 
     #: A Site has zero or more room instances
-    rooms = ResourceRelatedField(
-        model=Room,
+    rooms = HyperlinkedRelatedField(
         many=True,
         read_only=False,
         allow_null=True,
@@ -45,10 +49,38 @@ class SiteSerializer(serializers.HyperlinkedModelSerializer):
         included_resources = ["address"]
 
 
+class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
+    related_serializers = {
+        "room": "core.serializers.RoomSerializer",
+        "node": "core.serializers.NodeSerializer",
+    }
+    
+    class Meta:
+        model = RoomNodeInstallation
+        fields = ["room", "node", "from_timestamp_s", "to_timestamp_s", "description"]
+
+
+
 class RoomSerializer(serializers.HyperlinkedModelSerializer):
+    related_serializers = {
+        "installations": "core.serializers.RoomNodeInstallationSerializer",
+    }
+
+    #: A Room contains zero or more node installations. 
+    installations = HyperlinkedRelatedField(
+        many=True,
+        read_only=False,
+        allow_null=True,
+        required=False,
+        queryset=RoomNodeInstallation.objects.all(),
+        self_link_view_name="room-relationships",
+        related_link_view_name="room-related",
+    )
+
     class Meta:
         model = Room
-        fields = ["name", "description", "site", "url"]
+        fields = ["name", "description", "site", "nodes", "installations", "url"]
+
 
 
 class MembershipSerializer(serializers.HyperlinkedModelSerializer):
@@ -76,8 +108,7 @@ class OrganizationSerializer(serializers.HyperlinkedModelSerializer):
         "users": "core.serializers.UserSerializer",
     }
     #: An Organization has one or more users as members.
-    users = ResourceRelatedField(
-        model=User,
+    users = HyperlinkedRelatedField(
         many=True,
         read_only=False,
         allow_null=True,
@@ -97,8 +128,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         "organizations": "core.serializers.OrganizationSerializer",
     }
     #: A User is member of zero or more organizations.
-    organizations = ResourceRelatedField(
-        model=Organization,
+    organizations = HyperlinkedRelatedField(
         many=True,
         read_only=False,
         allow_null=True,

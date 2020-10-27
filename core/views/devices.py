@@ -1,6 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework import permissions
-from rest_framework_json_api.views import ModelViewSet, ReadOnlyModelViewSet
+from rest_framework_json_api.views import (
+    ModelViewSet,
+    ReadOnlyModelViewSet,
+    RelationshipView,
+)
 
 from core.models import Quantity, NodeProtocol, NodeModel, Node, NodeFidelity
 from core.serializers import (
@@ -39,6 +43,11 @@ class NodeViewSet(LoginRequiredMixin, ModelViewSet):
         """Restrict to logged-in user"""
         queryset = super(NodeViewSet, self).get_queryset()
         return queryset.filter(owner__users=self.request.user)
+
+
+class NodeRelationshipView(LoginRequiredMixin, RelationshipView):
+    queryset = Node.objects
+    self_link_view_name = "node-relationships"
 
 
 class NodeFidelityViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):

@@ -9,6 +9,7 @@ from .inventory import (
     AddressSerializer,
     SiteSerializer,
     RoomSerializer,
+    RoomNodeInstallationSerializer,
     OrganizationSerializer,
     MembershipSerializer,
     UserSerializer,

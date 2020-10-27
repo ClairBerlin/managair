@@ -191,6 +191,141 @@ paths:
               schema:
                 $ref: '#/components/schemas/NodeFidelity'
           description: ''
+  /api/v1/installations/:
+    get:
+      operationId: api_v1_installations_list
+      description: Verify that the current user is authenticated.
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRoomNodeInstallationList'
+          description: ''
+    post:
+      operationId: api_v1_installations_create
+      description: Verify that the current user is authenticated.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/RoomNodeInstallation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RoomNodeInstallation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoomNodeInstallation'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/RoomNodeInstallation'
+          description: ''
+  /api/v1/installations/{id}/:
+    get:
+      operationId: api_v1_installations_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this room node installation.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/RoomNodeInstallation'
+          description: ''
+    patch:
+      operationId: api_v1_installations_partial_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this room node installation.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PatchedRoomNodeInstallation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRoomNodeInstallation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRoomNodeInstallation'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/RoomNodeInstallation'
+          description: ''
+    delete:
+      operationId: api_v1_installations_destroy
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this room node installation.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
   /api/v1/models/:
     get:
       operationId: api_v1_models_list
@@ -454,6 +589,136 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/nodes/{id}/{related_field}/:
+    get:
+      operationId: api_v1_nodes_retrieve_2
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this node.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Node'
+          description: ''
+  /api/v1/nodes/{id}/relationships/{related_field}:
+    get:
+      operationId: api_v1_nodes_relationships_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this node.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: api_v1_nodes_relationships_create
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this node.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: api_v1_nodes_relationships_partial_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this node.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: api_v1_nodes_relationships_destroy
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this node.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
       responses:
         '204':
           description: No response body
@@ -1103,6 +1368,132 @@ paths:
         schema:
           type: integer
         description: A unique integer value identifying this room.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/rooms/{id}/{related_field}/:
+    get:
+      operationId: api_v1_rooms_retrieve_2
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this room.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Room'
+          description: ''
+  /api/v1/rooms/{id}/relationships/{related_field}:
+    get:
+      operationId: api_v1_rooms_relationships_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this room.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: api_v1_rooms_relationships_create
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this room.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: api_v1_rooms_relationships_partial_update
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this room.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: api_v1_rooms_relationships_destroy
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this room.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
         required: true
       tags:
       - api
@@ -2277,6 +2668,11 @@ components:
         model:
           type: string
           format: uri
+        installations:
+          type: array
+          items:
+            type: string
+            nullable: true
         url:
           type: string
           format: uri
@@ -2421,7 +2817,7 @@ components:
         users:
           type: array
           items:
-            type: integer
+            type: string
             nullable: true
         url:
           type: string
@@ -2590,6 +2986,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Room'
+    PaginatedRoomNodeInstallationList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoomNodeInstallation'
     PaginatedSampleIngestList:
       type: object
       properties:
@@ -2790,6 +3206,11 @@ components:
         model:
           type: string
           format: uri
+        installations:
+          type: array
+          items:
+            type: string
+            nullable: true
         url:
           type: string
           format: uri
@@ -2881,7 +3302,7 @@ components:
         users:
           type: array
           items:
-            type: integer
+            type: string
             nullable: true
         url:
           type: string
@@ -2934,10 +3355,53 @@ components:
         site:
           type: string
           format: uri
+        nodes:
+          type: array
+          items:
+            type: string
+            format: uri
+          readOnly: true
+        installations:
+          type: array
+          items:
+            type: string
+            nullable: true
         url:
           type: string
           format: uri
           readOnly: true
+    PatchedRoomNodeInstallation:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        room:
+          type: string
+          format: uri
+        node:
+          type: string
+          format: uri
+        from_timestamp_s:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        to_timestamp_s:
+          type: integer
+          maximum: 2147483647
+          nullable: true
+          minimum: 0
+        description:
+          type: string
+          nullable: true
     PatchedSite:
       type: object
       description: |-
@@ -2964,7 +3428,7 @@ components:
         rooms:
           type: array
           items:
-            type: integer
+            type: string
             nullable: true
         url:
           type: string
@@ -3072,14 +3536,62 @@ components:
         site:
           type: string
           format: uri
+        nodes:
+          type: array
+          items:
+            type: string
+            format: uri
+          readOnly: true
+        installations:
+          type: array
+          items:
+            type: string
+            nullable: true
         url:
           type: string
           format: uri
           readOnly: true
       required:
       - name
+      - nodes
       - site
       - url
+    RoomNodeInstallation:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        room:
+          type: string
+          format: uri
+        node:
+          type: string
+          format: uri
+        from_timestamp_s:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        to_timestamp_s:
+          type: integer
+          maximum: 2147483647
+          nullable: true
+          minimum: 0
+        description:
+          type: string
+          nullable: true
+      required:
+      - from_timestamp_s
+      - node
+      - room
     Sample:
       type: object
       description: |-
@@ -3247,7 +3759,7 @@ components:
         rooms:
           type: array
           items:
-            type: integer
+            type: string
             nullable: true
         url:
           type: string
@@ -3299,7 +3811,7 @@ components:
         organizations:
           type: array
           items:
-            type: integer
+            type: string
             nullable: true
         url:
           type: string

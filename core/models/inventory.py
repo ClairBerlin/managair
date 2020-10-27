@@ -132,37 +132,36 @@ class RoomNodeInstallation(models.Model):
         "core.Node",
         null=False,
         on_delete=models.CASCADE,
-        related_name="room_installation",
+        related_name="installations"
     )
-    room = models.ForeignKey(
-        Room, null=False, on_delete=models.CASCADE, related_name="node_installations"
-    )
-    from_timestamp = models.PositiveIntegerField(null=False, blank=False)
-    # An ongoing association does not have an end timestamp set.
-    to_timestamp = models.PositiveIntegerField(null=True)
+    room = models.ForeignKey(Room, null=False, on_delete=models.CASCADE, related_name="installations")
+    from_timestamp_s = models.PositiveIntegerField(null=False, blank=False)
+    # An ongoing association does not have an end-timestamp set.
+    to_timestamp_s = models.PositiveIntegerField(null=True)
     description = models.TextField(null=True, blank=True)
 
     class Meta:
         constraints = [
             # At any given time, a node may be installed in one room only.
             models.UniqueConstraint(
-                fields=["node", "from_timestamp"], name="unique_node_installation"
+                fields=["node", "from_timestamp_s"],
+                name="unique_node_installation"
             ),
         ]
-        ordering = ["-from_timestamp"]
-        get_latest_by = "from_timestamp"
+        ordering = ["-from_timestamp_s"]
+        get_latest_by = "from_timestamp_s"
 
     def __str__(self):
         """For representation in the Admin UI."""
         end_time = (
-            datetime.utcfromtimestamp(self.to_timestamp)
-            if self.to_timestamp is not None
+            datetime.utcfromtimestamp(self.to_timestamp_s)
+            if self.to_timestamp_s is not None
             else "ongoing"
         )
-        return f"Node: {self.node}, from: {datetime.utcfromtimestamp(self.from_timestamp)} To: {end_time}"
+        return f"Node: {self.node}, from: {datetime.utcfromtimestamp(self.from_timestamp_s)} To: {end_time}"
 
     def from_iso(self):
-        return datetime.fromtimestamp(self.from_timestamp)
+        return datetime.fromtimestamp(self.from_timestamp_s)
 
     def to_iso(self):
-        return datetime.fromtimestamp(self.to_timestamp)
+        return datetime.fromtimestamp(self.to_timestamp_s)
