@@ -2,8 +2,6 @@ from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 
 class Organization(models.Model):
@@ -11,7 +9,13 @@ class Organization(models.Model):
 
     name = models.CharField(max_length=50, null=False, blank=False)
     description = models.TextField(null=True, blank=True)
-    users = models.ManyToManyField(User, through="Membership")
+    users = models.ManyToManyField(
+        User, through="Membership", related_name="organizations"
+    )
+
+    class Meta:
+        ordering = ["name"]
+        get_latest_by = "name"
 
     def __str__(self):
         """For representation in the Admin UI."""
@@ -40,13 +44,13 @@ class Membership(models.Model):
         User,
         null=False,
         on_delete=models.CASCADE,
-        related_name="organization_membership",
+        # related field ist User.organizations",
     )
     organization = models.ForeignKey(
         Organization,
         null=False,
         on_delete=models.CASCADE,
-        related_name="user_membership",
+        # related field is Organization.users
     )
 
     def __str__(self):
@@ -60,6 +64,7 @@ class Membership(models.Model):
                 fields=["user", "organization"], name="unique-membership"
             ),
         ]
+        ordering = ["role", "organization"]
 
 
 class Address(models.Model):
@@ -76,6 +81,8 @@ class Address(models.Model):
                 fields=["street1", "street2", "zip", "city"], name="unique_address"
             )
         ]
+        ordering = ["city", "street1"]
+        get_latest_by = "city"
 
     def __str__(self):
         """For representation in the Admin UI."""
@@ -89,7 +96,6 @@ class Site(models.Model):
     operated_by = models.ForeignKey(
         Organization, null=False, on_delete=models.CASCADE, related_name="sites"
     )
-    nodes = models.ManyToManyField("core.Node", through="NodeInstallation")
 
     class Meta:
         constraints = [
@@ -98,43 +104,73 @@ class Site(models.Model):
                 fields=["name", "operated_by"], name="unique_site_per_organization"
             )
         ]
+        ordering = ["name"]
+        get_latest_by = "name"
 
     def __str__(self):
         """For representation in the Admin UI."""
         return f"{self.name} {self.address.street1}, {self.address.zip}"
 
 
-class NodeInstallation(models.Model):
+class Room(models.Model):
+    name = models.CharField(max_length=50, null=False, blank=False)
+    description = models.TextField(null=True, blank=True)
+    size_sqm = models.DecimalField(max_digits=5, decimal_places=1, null=True)
+    height_m = models.DecimalField(max_digits=3, decimal_places=1, null=True)
+    max_occupancy = models.IntegerField(null=True)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name="rooms")
+    nodes = models.ManyToManyField(
+        "core.Node", through="RoomNodeInstallation", related_name="rooms"
+    )
+
+    class Meta:
+        constraints = [
+            # The rooms within a given site must be unique.
+            models.UniqueConstraint(
+                fields=["name", "site"], name="unique_room_per_site"
+            )
+        ]
+        ordering = ["name"]
+        get_latest_by = "name"
+
+    def __str__(self):
+        """For representation in the Admin UI."""
+        return f"{self.name}"
+
+
+class RoomNodeInstallation(models.Model):
     node = models.ForeignKey(
-        "core.Node",
-        null=False,
-        on_delete=models.CASCADE,
-        related_name="node_installations",
+        "core.Node", null=False, on_delete=models.CASCADE, related_name="installations"
     )
-    site = models.ForeignKey(
-        Site, null=False, on_delete=models.CASCADE, related_name="node_installations"
+    room = models.ForeignKey(
+        Room, null=False, on_delete=models.CASCADE, related_name="installations"
     )
-    from_timestamp = models.PositiveIntegerField(null=False, blank=False)
-    # An ongoing association does not have an end timestamp set.
-    to_timestamp = models.PositiveIntegerField(null=True)
+    from_timestamp_s = models.PositiveIntegerField(null=False, blank=False)
+    # An ongoing association does not have an end-timestamp set.
+    to_timestamp_s = models.PositiveIntegerField(null=True)
     description = models.TextField(null=True, blank=True)
 
     class Meta:
         constraints = [
-            # At any given time, a node may be attributed to one site only.
+            # At any given time, a node may be installed in one room only.
             models.UniqueConstraint(
-                fields=["node", "from_timestamp"], name="unique_node_attribution"
+                fields=["node", "from_timestamp_s"], name="unique_node_installation"
             ),
         ]
-        ordering = ["-from_timestamp"]
-        get_latest_by = "from_timestamp"
+        ordering = ["-from_timestamp_s"]
+        get_latest_by = "from_timestamp_s"
 
     def __str__(self):
         """For representation in the Admin UI."""
-        return f'Node: {self.node}, from: {datetime.utcfromtimestamp(self.from_timestamp)} To: {datetime.utcfromtimestamp(self.to_timestamp) if self.to_timestamp != None else "ongoing"}'
+        end_time = (
+            datetime.utcfromtimestamp(self.to_timestamp_s)
+            if self.to_timestamp_s is not None
+            else "ongoing"
+        )
+        return f"Node: {self.node}, from: {datetime.utcfromtimestamp(self.from_timestamp_s)} To: {end_time}"
 
     def from_iso(self):
-        return datetime.fromtimestamp(self.from_timestamp)
+        return datetime.fromtimestamp(self.from_timestamp_s)
 
     def to_iso(self):
-        return datetime.fromtimestamp(self.to_timestamp)
+        return datetime.fromtimestamp(self.to_timestamp_s)

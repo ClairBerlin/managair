@@ -3,14 +3,19 @@ from .devices import (
     NodeProtocolViewSet,
     NodeModelViewSet,
     NodeViewSet,
+    NodeRelationshipView,
     NodeFidelityViewSet,
 )
 from .inventory import (
     AddressViewSet,
     SiteViewSet,
-    NodeInstallationViewSet,
+    SiteRelationshipView,
+    RoomViewSet,
+    RoomRelationshipView,
     OrganizationViewSet,
+    OrganizationRelationshipView,
     MembershipViewSet,
     UserViewSet,
+    UserRelationshipView
 )
 from .data import SampleViewSet, TimeseriesViewSet

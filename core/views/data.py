@@ -1,15 +1,12 @@
 from datetime import datetime
-from uuid import UUID
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from rest_framework_json_api.views import viewsets
-from rest_framework_json_api.pagination import JsonApiPageNumberPagination
-from rest_framework import permissions, generics, views, filters
 from rest_framework.response import Response
-from rest_framework.request import Request
+from rest_framework_json_api.pagination import JsonApiPageNumberPagination
+from rest_framework_json_api.views import ReadOnlyModelViewSet
 
-from core.models import Sample, Node
 from core.data_viewmodels import TimeseriesViewModel, SamplePageViewModel
+from core.models import Sample, Node
 from core.serializers import (
     SampleSerializer,
     TimeseriesSerializer,
@@ -24,7 +21,7 @@ class PagesizeLimitedPagination(JsonApiPageNumberPagination):
     page_size = 100
 
 
-class SampleViewSet(LoginRequiredMixin, viewsets.ReadOnlyModelViewSet):
+class SampleViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
     """
     Retrieve individual samples and lists of samples.
 
@@ -61,7 +58,7 @@ class SampleViewSet(LoginRequiredMixin, viewsets.ReadOnlyModelViewSet):
         return queryset
 
 
-class TimeseriesViewSet(LoginRequiredMixin, viewsets.ReadOnlyModelViewSet):
+class TimeseriesViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
     """
     Provides optimized time-series resources.
 
@@ -79,9 +76,7 @@ class TimeseriesViewSet(LoginRequiredMixin, viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         """Restrict to logged-in user"""
-        return Node.objects.filter(
-            node_installations__site__operated_by__user_membership__user=self.request.user
-        )
+        return Node.objects.filter(owner__users=self.request.user)
 
     def list(self, request):
         queryset = self.get_queryset()
