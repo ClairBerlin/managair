@@ -18,7 +18,7 @@ class SampleSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class TimeseriesSerializer(serializers.Serializer):
-    alias = serializers.CharField(max_length=30)
+    alias = serializers.CharField(max_length=100)
     query_timestamp = serializers.IntegerField()
     from_timestamp = serializers.IntegerField()
     to_timestamp = serializers.IntegerField()
