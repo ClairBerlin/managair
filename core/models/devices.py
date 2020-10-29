@@ -39,7 +39,7 @@ class NodeModel(models.Model):
 class Node(models.Model):
     id = models.UUIDField(primary_key=True)
     device_id = models.CharField(max_length=32, blank=False, unique=True)
-    alias = models.CharField(max_length=30)
+    alias = models.CharField(max_length=100)
     protocol = models.ForeignKey(
         NodeProtocol, on_delete=models.CASCADE, related_name="nodes"
     )

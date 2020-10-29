@@ -16,6 +16,14 @@
         }
     },
     {
+        "model": "core.organization",
+        "pk": 3,
+        "fields": {
+            "name": "HPI School of Entrepreneurship",
+            "description": "Zusätzlich zu einer erstklassigen universitären Ausbildung möchte das Hasso-Plattner-Institut (HPI) seine Studierenden und Wissenschaftler ermutigen, neue Geschäftsideen als Unternehmer umzusetzen. Dazu werden alle Entrepreneurship-Angebote des HPI in der HPI School of Entrepreneurship gebündelt."
+        }
+    },
+    {
         "model": "core.membership",
         "pk": 4,
         "fields": {
@@ -80,6 +88,15 @@
     },
     {
         "model": "core.membership",
+        "pk": 17,
+        "fields": {
+            "role": "O",
+            "user": 2,
+            "organization": 3
+        }
+    },
+    {
+        "model": "core.membership",
         "pk": 16,
         "fields": {
             "role": "A",
@@ -118,6 +135,16 @@
         }
     },
     {
+        "model": "core.address",
+        "pk": 4,
+        "fields": {
+            "street1": "Rudolf-Breitscheid-Str. 189",
+            "street2": "HPI Campus III",
+            "zip": "14482",
+            "city": "Potsdam"
+        }
+    },
+    {
         "model": "core.site",
         "pk": 1,
         "fields": {
@@ -145,6 +172,16 @@
             "description": "",
             "address": 3,
             "operated_by": 2
+        }
+    },
+    {
+        "model": "core.site",
+        "pk": 4,
+        "fields": {
+            "name": "HPI School of Entrepreneurship",
+            "description": "",
+            "address": 4,
+            "operated_by": 3
         }
     },
     {
@@ -331,6 +368,72 @@
             "protocol": 1,
             "model": 1,
             "owner": 1
+        }
+    },
+    {
+        "model": "core.node",
+        "pk": "f40f528b-9d0e-c2be-38fc-962f8757e531",
+        "fields": {
+            "device_id": "a81758fffe053cab",
+            "alias": "hpi-a81758fffe053cab",
+            "protocol": 2,
+            "model": 2,
+            "owner": 3
+        }
+    },
+    {
+        "model": "core.node",
+        "pk": "cd8e32d5-a17f-915e-9cb7-5d401a550312",
+        "fields": {
+            "device_id": "a81758fffe053cae",
+            "alias": "hpi-a81758fffe053cae",
+            "protocol": 2,
+            "model": 2,
+            "owner": 3
+        }
+    },
+    {
+        "model": "core.node",
+        "pk": "9f9f30bd-d8a6-0269-cf9e-f377d02986c4",
+        "fields": {
+            "device_id": "a81758fffe053cac",
+            "alias": "hpi-a81758fffe053cac",
+            "protocol": 2,
+            "model": 2,
+            "owner": 3
+        }
+    },
+    {
+        "model": "core.node",
+        "pk": "7f255730-b7bc-cc51-248f-71152d2edd79",
+        "fields": {
+            "device_id": "a81758fffe053cad",
+            "alias": "hpi-a81758fffe053cad",
+            "protocol": 2,
+            "model": 2,
+            "owner": 3
+        }
+    },
+    {
+        "model": "core.node",
+        "pk": "6fbb3d55-c86b-e021-3ec3-b45425d5b1ba",
+        "fields": {
+            "device_id": "a81758fffe053c13",
+            "alias": "hpi-a81758fffe053c13",
+            "protocol": 2,
+            "model": 2,
+            "owner": 3
+        }
+    },
+    {
+        "model": "core.node",
+        "pk": "0cc5e5eb-93ad-a18f-bbfe-ef7f36c62ff8",
+        "fields": {
+            "device_id": "a81758fffe053c14",
+            "alias": "hpi-a81758fffe053c14",
+            "protocol": 2,
+            "model": 2,
+            "owner": 3
         }
     }
 ]
