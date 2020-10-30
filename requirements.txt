@@ -9,6 +9,7 @@ drf-spectacular
 django-filter
 django_q
 redis
+whitenoise[brotli]
 sentry-sdk
 ptvsd
 django-debug-toolbar

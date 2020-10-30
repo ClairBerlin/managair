@@ -18,6 +18,18 @@
 - System administration [Django admin UI]
 - Fidelity check for all registered nodes: Warn if no messages have been received lately [adnin UI].
 
+## Deployment
+
+The Managair is desiged to be deployed as part of the _Clair Stack_, a docker swarm setup that comprises the configuration of all services necessary to ingest node data and serve it via the Managair API to frontend applications.
+
+Even though docker swarm automates most deployment tasks for the entire Clair Stack, there are several tasks that pertain to the Managair service proper:
+
+### Static Files
+
+HTML Templates, CSS, and media for the admin-UI and the browsable API are part of the Managair service. In a typicall web application, it would be the job of a webserver to serve these files - as described in the [Django documentation](https://docs.djangoproject.com/en/3.1/howto/static-files/deployment/.) To simplify configuration, and to align development with production setups, we take a somewhat different route and use the [White Noise](http://whitenoise.evans.io/en/stable/django.html) module instead. With the White Noise middleware installed, Managair can serve its own static files without the help of an additional webserver. This is not quite as performant but requires much less configuration and fewer manual steps during deployment.
+
+Upon a fresh deployment, or whenever static files have changed, you can force Django to collect all static files from all registered Django apps into a common folder by running `python manage.py collectstatic`. The `entrypoint.sh` script of the Managair docker container automatically performs this task if the environment variable `COLLECT_STATIC_FILES` is set to `true`.
+
 ## Development Setup
 
 Managair is a [Django](https://www.djangoproject.com/) web application atop a [PostgreSQL](https://www.postgresql.org) DBMS. It is meant to be run as part of the Clair backend stack. To start up your development environment, consult the stack's Readme-file.
@@ -44,7 +56,6 @@ Make sure to respect the order because of foreign-key constraints. When Managair
 
 - [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 - Linting: [PyLint](https://www.pylint.org)
-
 
 ## OpenAPI Schema
 
