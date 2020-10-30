@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source env/bin/activate
-
 if [ "$DATABASE" = "postgresql" ]
 then
     echo "Waiting for postgres..."
@@ -17,6 +15,12 @@ doMigrate=${DB_MIGRATE:-false}
 if [ "$doMigrate" = true ] ;
 then
   python manage.py migrate
+fi
+
+doCollectStaticFiles=${COLLECT_STATIC_FILES:-false}
+if [ "$doCollectStaticFiles" = true ] ;
+then
+  python manage.py collectstatic --noinput
 fi
 
 exec "$@"
