@@ -6,8 +6,13 @@ from rest_framework.exceptions import MethodNotAllowed
 from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 from rest_framework_json_api.views import ReadOnlyModelViewSet, generics
 
+from core.data_viewmodels import SamplePageViewModel
 from core.models import Sample, Node
-from core.serializers import SampleSerializer, SimpleSampleSerializer
+from core.serializers import (
+    SampleSerializer,
+    SimpleSampleSerializer,
+    SampleListSerializer,
+)
 
 
 class PagesizeLimitedPagination(JsonApiPageNumberPagination):
@@ -18,11 +23,12 @@ class PagesizeLimitedPagination(JsonApiPageNumberPagination):
 
 class SampleListView(LoginRequiredMixin, generics.ListAPIView):
     """Samples reported by the node on the resource path.
-    
+
     The currently logged-in user must have access to the given node. That is, the user must be part of the organization that owns the node.
 
     Samples will be returned in ascending order according to their time stamp.
     """
+
     serializer_class = SimpleSampleSerializer
     queryset = Node.objects.all()
 
