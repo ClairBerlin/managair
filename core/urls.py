@@ -64,6 +64,9 @@ urlpatterns = [
         name="room-related",
     ),
     path(
+        "nodes/<pk>/samples/", data.SampleListView.as_view(), name="node-samples-list"
+    ),
+    path(
         "nodes/<pk>/relationships/<related_field>",
         view=devices.NodeRelationshipView.as_view(),
         name="node-relationships",

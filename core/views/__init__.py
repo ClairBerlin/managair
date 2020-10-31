@@ -18,4 +18,4 @@ from .inventory import (
     UserViewSet,
     UserRelationshipView
 )
-from .data import SampleViewSet, TimeseriesViewSet
+from .data import SampleListView, SampleViewSet, TimeseriesViewSet
