@@ -67,7 +67,7 @@ class Node(models.Model):
         check_time_s = round(datetime.now().timestamp())
         fidelity = {"node": self, "last_check_s": check_time_s}
         latest_sample = self.samples.latest()
-        if latest_sample == None:
+        if latest_sample is None:
             fidelity["fidelity"] = NodeFidelity.UNKNOWN
             fidelity["last_contact_s"] = None
         elif (check_time_s - latest_sample.timestamp_s) <= lookback_interval_s:

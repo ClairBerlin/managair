@@ -1,5 +1,6 @@
 from rest_framework_json_api import serializers
 from rest_framework_json_api.relations import HyperlinkedRelatedField
+from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 
 from core.models import (
     Quantity,
@@ -39,9 +40,10 @@ class NodeModelSerializer(serializers.HyperlinkedModelSerializer):
 class NodeSerializer(serializers.HyperlinkedModelSerializer):
     related_serializers = {
         "installations": "core.serializers.RoomNodeInstallationSerializer",
+        "timeseries": "core.serializers.SampleSerializer",
     }
 
-    #: A Node is installed in one or more rooms over its lifetime.
+    # A Node is installed in one or more rooms over its lifetime.
     installations = HyperlinkedRelatedField(
         many=True,
         read_only=False,
@@ -61,6 +63,7 @@ class NodeSerializer(serializers.HyperlinkedModelSerializer):
             "protocol",
             "model",
             "installations",
+            "timeseries",
             "url",
         )
 
