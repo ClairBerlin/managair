@@ -67,6 +67,15 @@ urlpatterns = [
         "nodes/<pk>/samples/", data.SampleListView.as_view(), name="node-samples-list"
     ),
     path(
+        "nodes/<pk>/timeseries/", data.TimeseriesDetailView.as_view(), name="node-timeseries-all"
+    ),
+    path(
+        "nodes/<pk>/timeseries/<from>", data.TimeseriesDetailView.as_view(), name="node-timeseries-from"
+    ),
+    path(
+        "nodes/<pk>/timeseries/<to>", data.TimeseriesDetailView.as_view(), name="node-timeseries-to"
+    ),
+    path(
         "nodes/<pk>/relationships/<related_field>",
         view=devices.NodeRelationshipView.as_view(),
         name="node-relationships",

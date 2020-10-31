@@ -43,4 +43,5 @@ class SampleListSerializer(serializers.Serializer):
     samples = serializers.ListField(child=SimpleSampleSerializer(), read_only=True)
 
     class Meta:
+        resource_name = "timeseries"
         fields = ["url"]
