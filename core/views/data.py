@@ -107,7 +107,7 @@ class TimeseriesViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
         page = self.paginate_queryset(queryset)
 
         # Serialize the sample list with additional header-infos.
-        if (not page) or (page is None):
+        if not page:
             sp = SamplePageViewModel(
                 pk=pk,
                 alias=node.alias,

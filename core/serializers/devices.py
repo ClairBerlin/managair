@@ -1,6 +1,5 @@
 from rest_framework_json_api import serializers
 from rest_framework_json_api.relations import HyperlinkedRelatedField
-from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 
 from core.models import (
     Quantity,
