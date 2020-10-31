@@ -2,8 +2,8 @@ from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework.response import Response
-from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 from rest_framework_json_api.views import ReadOnlyModelViewSet
+from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 
 from core.data_viewmodels import TimeseriesViewModel, SamplePageViewModel
 from core.models import Sample, Node
@@ -13,7 +13,6 @@ from core.serializers import (
     SimpleSampleSerializer,
     SampleListSerializer,
 )
-
 
 class PagesizeLimitedPagination(JsonApiPageNumberPagination):
     """Enforce pagination with a given page size. Can be override in a query."""
@@ -37,8 +36,8 @@ class SampleViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
         """
         Optionally restricts the returned samples to a given time slice and node.
         """
-        # Restrict to nodes commanded by the currently logged-in user.
-        nodes = Node.get_user_nodes(self.request.user)
+        # Restrict to samples from nodes commanded by the currently logged-in user.
+        nodes = Node.objects.filter(owner__users=self.request.user)
         # Further restrict to node given as query parameter
         node_id = self.request.query_params.get("filter[node]", None)
         if node_id is not None:
@@ -108,7 +107,15 @@ class TimeseriesViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
         page = self.paginate_queryset(queryset)
 
         # Serialize the sample list with additional header-infos.
-        if page is not None:
+        if not page:
+            sp = SamplePageViewModel(
+                pk=pk,
+                alias=node.alias,
+                samples=[],
+                from_timestamp=0,
+                to_timestamp=0,
+            )
+        else:
             sp = SamplePageViewModel(
                 pk=pk,
                 alias=node.alias,
@@ -116,11 +123,6 @@ class TimeseriesViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
                 from_timestamp=page[0].timestamp_s,
                 to_timestamp=page[-1].timestamp_s,
             )
-            serializer = SampleListSerializer(sp)
-            paginated_response = self.get_paginated_response(serializer.data)
-            return paginated_response
-        else:
-            # TODO: Fix serializer or raise error.
-            # This branch should never be taken.
-            serializer = self.get_serializer(queryset, context=context, many=True)
-            return Response(serializer.data)
+        serializer = SampleListSerializer(sp)
+        paginated_response = self.get_paginated_response(serializer.data)
+        return paginated_response

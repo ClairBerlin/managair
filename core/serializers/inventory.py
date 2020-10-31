@@ -1,9 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework_json_api import serializers
-from rest_framework_json_api.relations import (
-    ResourceRelatedField,
-    HyperlinkedRelatedField,
-)
+from rest_framework_json_api.relations import HyperlinkedRelatedField
 
 from core.models import (
     Address,
@@ -25,8 +22,8 @@ class AddressSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class SiteSerializer(serializers.HyperlinkedModelSerializer):
-    included_serializers = {"address": AddressSerializer}
-    related_serializers = {
+    included_serializers = {
+        "address": AddressSerializer,
         "rooms": "core.serializers.RoomSerializer",
     }
 
@@ -50,7 +47,7 @@ class SiteSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
-    related_serializers = {
+    included_serializers = {
         "room": "core.serializers.RoomSerializer",
         "node": "core.serializers.NodeSerializer",
     }
@@ -62,7 +59,7 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class RoomSerializer(serializers.HyperlinkedModelSerializer):
-    related_serializers = {
+    included_serializers = {
         "installations": "core.serializers.RoomNodeInstallationSerializer",
     }
 
@@ -104,7 +101,7 @@ class MembershipSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class OrganizationSerializer(serializers.HyperlinkedModelSerializer):
-    related_serializers = {
+    included_serializers = {
         "users": "core.serializers.UserSerializer",
         "sites": "core.serializers.SiteSerializer",
         "nodes": "core.serializers.NodeSerializer",
@@ -146,7 +143,7 @@ class OrganizationSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-    related_serializers = {
+    included_serializers = {
         "organizations": "core.serializers.OrganizationSerializer",
     }
     #: A User is member of zero or more organizations.
