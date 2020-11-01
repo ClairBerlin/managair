@@ -19,7 +19,6 @@ router.register(r"rooms", inventory.RoomViewSet)
 router.register(r"installations", inventory.RoomNodeInstallationViewSet)
 # Data views
 router.register(r"samples", data.SampleViewSet)
-router.register(r"timeseries", data.TimeseriesViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
