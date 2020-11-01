@@ -2,16 +2,18 @@ from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 from rest_framework_json_api.views import ReadOnlyModelViewSet, generics
 
-from core.data_viewmodels import SamplePageViewModel
+from core.data_viewmodels import SamplePageViewModel, TimeseriesViewModel
 from core.models import Sample, Node
 from core.serializers import (
     SampleSerializer,
     SimpleSampleSerializer,
     SampleListSerializer,
+    TimeseriesSerializer,
 )
 
 
@@ -58,6 +60,26 @@ class SampleListView(LoginRequiredMixin, generics.ListAPIView):
             timestamp_s__gte=from_limit, timestamp_s__lte=to_limit
         )
         return queryset
+
+
+class TimeSeriesListView(LoginRequiredMixin, generics.ListAPIView):
+    queryset = Node.objects.all()
+    serializer_class = TimeseriesSerializer
+
+    def get_queryset(self):
+        """Restrict to logged-in user"""
+        return Node.objects.filter(owner__users=self.request.user)
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        ts_info = [
+            TimeseriesViewModel(
+                pk=node.pk, alias=node.alias, sample_count=node.samples.count()
+            )
+            for node in queryset
+        ]
+        serializer = TimeseriesSerializer(ts_info, many=True)
+        return Response(serializer.data)
 
 
 class TimeseriesDetailView(LoginRequiredMixin, generics.RetrieveAPIView):

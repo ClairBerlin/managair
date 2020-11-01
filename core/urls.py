@@ -81,7 +81,17 @@ urlpatterns = [
     ),
     path(
         "nodes/<pk>/<related_field>/",
-        devices.NodeViewSet.as_view({"get": "retrieve_related"}),
+        view=devices.NodeViewSet.as_view({"get": "retrieve_related"}),
         name="node-related",
     ),
+    path(
+        "timeseries/",
+        view=data.TimeSeriesListView.as_view(),
+        name="timeseries-list"
+    ),
+    path(
+        "timeseries/<pk>/",
+        view=data.TimeseriesDetailView.as_view(),
+        name="timeseries-detail"
+    )
 ]
