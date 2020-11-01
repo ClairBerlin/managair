@@ -72,6 +72,15 @@ class NodeSerializer(serializers.HyperlinkedModelSerializer):
         related_link_view_name="node-related",
     )
 
+    samples = HyperlinkedRelatedField(
+        many=True,
+        read_only=True,
+        allow_null=True,
+        required=False,
+        self_link_view_name="node-relationships",
+        related_link_view_name="node-related",
+    )
+
     class Meta:
         model = Node
         fields = (
@@ -84,6 +93,7 @@ class NodeSerializer(serializers.HyperlinkedModelSerializer):
             "timeseries",
             "samples",
             "timeseries",
+            "samples",
             "url",
         )
 
