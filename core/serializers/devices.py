@@ -39,8 +39,12 @@ class NodeModelSerializer(serializers.HyperlinkedModelSerializer):
 class NodeSerializer(serializers.HyperlinkedModelSerializer):
     related_serializers = {
         "installations": "core.serializers.RoomNodeInstallationSerializer",
+<<<<<<< HEAD
         "samples": "core.serializers.SimpleSampleSerializer",
         "timeseries": "core.serializers.SampleListSerializer",
+=======
+        "samples": "core.serializers.SimpleSampleSerializer"
+>>>>>>> 6a446d5 (Fix review comments)
     }
 
     # A Node is installed in one or more rooms over its lifetime.
