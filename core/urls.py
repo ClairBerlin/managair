@@ -23,7 +23,7 @@ router.register(r"samples", data.SampleViewSet)
 urlpatterns = [
     path("", include(router.urls)),
     path(
-        "users/<pk>/relationships/<related_field>",
+        "users/<pk>/relationships/<related_field>/",
         view=inventory.UserRelationshipView.as_view(),
         name="user-relationships",
     ),
@@ -33,7 +33,7 @@ urlpatterns = [
         name="user-related",
     ),
     path(
-        "organizations/<pk>/relationships/<related_field>",
+        "organizations/<pk>/relationships/<related_field>/",
         view=inventory.OrganizationRelationshipView.as_view(),
         name="organization-relationships",
     ),
@@ -43,7 +43,7 @@ urlpatterns = [
         name="organization-related",
     ),
     path(
-        "sites/<pk>/relationships/<related_field>",
+        "sites/<pk>/relationships/<related_field>/",
         view=inventory.SiteRelationshipView.as_view(),
         name="site-relationships",
     ),
@@ -53,7 +53,7 @@ urlpatterns = [
         name="site-related",
     ),
     path(
-        "rooms/<pk>/relationships/<related_field>",
+        "rooms/<pk>/relationships/<related_field>/",
         view=inventory.RoomRelationshipView.as_view(),
         name="room-relationships",
     ),
@@ -69,13 +69,13 @@ urlpatterns = [
         "nodes/<pk>/timeseries/", data.TimeseriesDetailView.as_view(), name="node-timeseries-all"
     ),
     path(
-        "nodes/<pk>/timeseries/<from>", data.TimeseriesDetailView.as_view(), name="node-timeseries-from"
+        "nodes/<pk>/timeseries/<from>/", data.TimeseriesDetailView.as_view(), name="node-timeseries-from"
     ),
     path(
-        "nodes/<pk>/timeseries/<to>", data.TimeseriesDetailView.as_view(), name="node-timeseries-to"
+        "nodes/<pk>/timeseries/<from>/<to>/", data.TimeseriesDetailView.as_view(), name="node-timeseries-to"
     ),
     path(
-        "nodes/<pk>/relationships/<related_field>",
+        "nodes/<pk>/relationships/<related_field>/",
         view=devices.NodeRelationshipView.as_view(),
         name="node-relationships",
     ),
