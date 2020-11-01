@@ -45,7 +45,7 @@ class Sample(models.Model):
             ),
             models.CheckConstraint(check=Q(co2_ppm__lte=10000), name="co2_upper_limit"),
         ]
-        ordering = ["-timestamp_s"]
+        ordering = ["timestamp_s"]
         get_latest_by = "timestamp_s"
 
     def timestamp_iso(self):
