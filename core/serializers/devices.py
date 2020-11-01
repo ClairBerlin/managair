@@ -83,6 +83,7 @@ class NodeSerializer(serializers.HyperlinkedModelSerializer):
             "installations",
             "timeseries",
             "samples",
+            "timeseries",
             "url",
         )
 
