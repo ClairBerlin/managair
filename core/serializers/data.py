@@ -32,7 +32,7 @@ class TimeseriesSerializer(serializers.Serializer):
 class SimpleSampleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sample
-        exclude = ["node", "id"]
+        exclude = ["node"]
 
 
 class SampleListSerializer(serializers.Serializer):

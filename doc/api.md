@@ -92,6 +92,10 @@ The inventory is organized according to organizations that have one or more room
   - [GET] Retrieve information about the node. Might include fidelity information.
   - [PUT, PATCH] Update node master data; e.g., node alias or tags (feature request).
   - [DELETE] Remove the node and all samples reported by this node.
+- `/api/v1/nodes/<node_id>/samples/` Collection-resource of the measurement samples reported by the given node.
+  - [GET] Retrieve a list of samples of the given node. Can be paginated. The time-range can be limited via query paramters:
+    - `filter[from]` Start timestamp as Unix epoch. Defaults to `0` (1970-01-01T00:00:00Z) if not provided.
+    - `filter[to]` End timestamp as Unix epoch. Defaults to the current system time (`now()`).
 - `/api/v1/nodes/<node_id>/relationships/installations/` Relationship resource to manage the attribution of a node to a room over time. This resource is the counterpart to `/api/v1/rooms/<room_id>/relationships/installations/`.
   - [GET] List the installations of the given node over time.
   - [POST]

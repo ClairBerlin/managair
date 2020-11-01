@@ -39,7 +39,7 @@ class NodeModelSerializer(serializers.HyperlinkedModelSerializer):
 class NodeSerializer(serializers.HyperlinkedModelSerializer):
     related_serializers = {
         "installations": "core.serializers.RoomNodeInstallationSerializer",
-        "timeseries": "core.serializers.SampleSerializer",
+        "samples": "core.serializers.SimpleSampleSerializer"
     }
 
     # A Node is installed in one or more rooms over its lifetime.
@@ -53,6 +53,15 @@ class NodeSerializer(serializers.HyperlinkedModelSerializer):
         related_link_view_name="node-related",
     )
 
+    samples = HyperlinkedRelatedField(
+        many=True,
+        read_only=True,
+        allow_null=True,
+        required=False,
+        self_link_view_name="node-relationships",
+        related_link_view_name="node-related"
+    )
+
     class Meta:
         model = Node
         fields = (
@@ -62,7 +71,7 @@ class NodeSerializer(serializers.HyperlinkedModelSerializer):
             "protocol",
             "model",
             "installations",
-            "timeseries",
+            "samples",
             "url",
         )
 
