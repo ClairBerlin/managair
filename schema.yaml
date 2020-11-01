@@ -722,6 +722,48 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/nodes/{id}/samples/:
+    get:
+      operationId: api_v1_nodes_samples_list
+      description: |-
+        Samples reported by the node on the resource path.
+
+        The currently logged-in user must have access to the given node. That is, the user must be part of the organization that owns the node.
+
+        Samples will be returned in ascending order according to their time stamp.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this node.
+        required: true
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSimpleSampleList'
+          description: ''
   /api/v1/organizations/:
     get:
       operationId: api_v1_organizations_list
@@ -2661,7 +2703,7 @@ components:
           maxLength: 32
         alias:
           type: string
-          maxLength: 30
+          maxLength: 100
         protocol:
           type: string
           format: uri
@@ -2673,6 +2715,12 @@ components:
           items:
             type: string
             nullable: true
+        samples:
+          type: array
+          items:
+            type: string
+            nullable: true
+          readOnly: true
         url:
           type: string
           format: uri
@@ -2683,6 +2731,7 @@ components:
       - id
       - model
       - protocol
+      - samples
       - url
     NodeFidelity:
       type: object
@@ -2818,6 +2867,15 @@ components:
           type: array
           items:
             type: string
+        sites:
+          type: array
+          items:
+            type: string
+            nullable: true
+        nodes:
+          type: array
+          items:
+            type: string
             nullable: true
         url:
           type: string
@@ -2826,6 +2884,7 @@ components:
       required:
       - name
       - url
+      - users
     PaginatedAddressList:
       type: object
       properties:
@@ -3199,7 +3258,7 @@ components:
           maxLength: 32
         alias:
           type: string
-          maxLength: 30
+          maxLength: 100
         protocol:
           type: string
           format: uri
@@ -3211,6 +3270,12 @@ components:
           items:
             type: string
             nullable: true
+        samples:
+          type: array
+          items:
+            type: string
+            nullable: true
+          readOnly: true
         url:
           type: string
           format: uri
@@ -3300,6 +3365,15 @@ components:
           type: string
           nullable: true
         users:
+          type: array
+          items:
+            type: string
+        sites:
+          type: array
+          items:
+            type: string
+            nullable: true
+        nodes:
           type: array
           items:
             type: string
@@ -3709,6 +3783,9 @@ components:
         * A mixin class to enable sparse fieldsets is included
         * A mixin class to enable validation of included resources is included
       properties:
+        id:
+          type: integer
+          readOnly: true
         timestamp_s:
           type: integer
           maximum: 2147483647
@@ -3732,6 +3809,7 @@ components:
           $ref: '#/components/schemas/MeasurementStatusEnum'
       required:
       - co2_ppm
+      - id
       - timestamp_s
     Site:
       type: object

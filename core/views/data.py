@@ -17,6 +17,12 @@ class PagesizeLimitedPagination(JsonApiPageNumberPagination):
 
 
 class SampleListView(LoginRequiredMixin, generics.ListAPIView):
+    """Samples reported by the node on the resource path.
+    
+    The currently logged-in user must have access to the given node. That is, the user must be part of the organization that owns the node.
+
+    Samples will be returned in ascending order according to their time stamp.
+    """
     serializer_class = SimpleSampleSerializer
     queryset = Node.objects.all()
 
