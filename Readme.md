@@ -98,3 +98,21 @@ Once the entire application stack has booted, you currently need to start its jo
 Then, open up the admin-UI and schedule a Live-Node Check at an interval of your choice. The function to call is `core.tasks.check_node_fidelity`.
 
 Results of the fidelity check are available at the API resource `api/v1/fidelity`, or via the admin UI.
+
+## Testing
+
+Dajngo comes with extensive [testing support](https://docs.djangoproject.com/en/3.1/topics/testing/overview/), from unit tests, tests of the DB interaction to full-blown integration tests. As Django installs a separate testing DB, most of the tests could even be run on a production system without interfering with its operation. Therefore, we currently do not have a separate testing configuration of the Clair Stack - simply run the tests on your local development stack.
+
+To execute the tests, use the following Django management command
+
+```shell
+$> python3 manage.py test <app>
+```
+
+where `<app>` is the Django application for which to execute test cases. For the Managair, it will most likely be `core`. For more detailed control about the tests to run, consult the [testing documentation](https://docs.djangoproject.com/en/3.1/topics/testing/overview/#running-tests).
+
+The tests can be executed perfectly well on a running Clair Stack on docker swarm. Use the management tool as follows:
+
+```shell
+$> ./tools/manage-py.sh environments/dev.env test core
+```

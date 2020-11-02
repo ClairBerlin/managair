@@ -151,38 +151,3 @@ class InventoryTest(TestCase):
                 max_occupancy=20,
                 site=site,
             )
-
-    def test_unique_node_installation(self):
-        """A node can be installed in one room at a time only."""
-        room = self.test_data["room"]
-        node = self.test_data["node"]
-
-        start1 = datetime.now() - timedelta(days=2)
-        stop1 = start1 + timedelta(days=1)
-        start2 = stop1 + timedelta(seconds=1)
-        stop2 = datetime.now()
-
-        RoomNodeInstallation.objects.create(
-            node=node,
-            room=room,
-            from_timestamp_s=round(start1.timestamp()),
-            to_timestamp_s=round(stop1.timestamp()),
-        )
-        RoomNodeInstallation.objects.create(
-            node=node,
-            room=room,
-            from_timestamp_s=round(start2.timestamp()),
-            to_timestamp_s=round(stop2.timestamp()),
-        )
-        self.assertEqual(room.nodes.count(), 2)
-
-        # Overlapping installation
-        start_err = start2 + timedelta(hours=12)
-        stop_err = start2 + timedelta(days=3)
-        with self.assertRaises(IntegrityError):
-            RoomNodeInstallation.objects.create(
-                node=node,
-                room=room,
-                from_timestamp_s=round(start_err.timestamp()),
-                to_timestamp_s=round(stop_err.timestamp()),
-            )
