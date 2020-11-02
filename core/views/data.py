@@ -2,15 +2,11 @@ from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
-<<<<<<< HEAD
 from rest_framework.response import Response
-=======
->>>>>>> master
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 from rest_framework_json_api.views import ReadOnlyModelViewSet, generics
 
-<<<<<<< HEAD
 from core.data_viewmodels import SamplePageViewModel, TimeseriesViewModel
 from core.models import Sample, Node
 from core.serializers import (
@@ -19,10 +15,6 @@ from core.serializers import (
     SampleListSerializer,
     TimeseriesSerializer,
 )
-=======
-from core.models import Sample, Node
-from core.serializers import SampleSerializer, SimpleSampleSerializer
->>>>>>> master
 
 
 class PagesizeLimitedPagination(JsonApiPageNumberPagination):
@@ -33,19 +25,10 @@ class PagesizeLimitedPagination(JsonApiPageNumberPagination):
 
 class SampleListView(LoginRequiredMixin, generics.ListAPIView):
     """Samples reported by the node on the resource path.
-<<<<<<< HEAD
-
-=======
-    
->>>>>>> master
     The currently logged-in user must have access to the given node. That is, the user must be part of the organization that owns the node.
 
     Samples will be returned in ascending order according to their time stamp.
     """
-<<<<<<< HEAD
-
-=======
->>>>>>> master
     serializer_class = SimpleSampleSerializer
     queryset = Node.objects.all()
 
