@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from django.test import TestCase
 from django.db import IntegrityError
 
-from core.models import Sample, Membership
+from core.models import Sample, Membership, Address, Site, Room, RoomNodeInstallation
 from core.test.utils import setup_basic_test_data
 
 
@@ -80,4 +80,109 @@ class InventoryTest(TestCase):
         with self.assertRaises(IntegrityError):
             Membership.objects.create(
                 role=Membership.ASSISTANT, user=user, organization=org
+            )
+
+    def test_unique_adderss(self):
+        """An address must be unique throughout the entire address data set."""
+        Address.objects.create(
+            street1="Teststraße 1", street2="Testhütte", zip="12345", city="Testdorf"
+        )
+        # A slightly different address is ok
+        Address.objects.create(
+            street1="Teststraße 1", street2="Vorderhaus", zip="12345", city="Testdorf"
+        )
+        # But exactly the same address cannot be present twice.
+        with self.assertRaises(IntegrityError):
+            Address.objects.create(
+                street1="Teststraße 1",
+                street2="Testhütte",
+                zip="12345",
+                city="Testdorf",
+            )
+
+    def test_unique_site(self):
+        """Within an organization, sites must have unique names."""
+        adr = Address.objects.create(
+            street1="Teststraße 1", zip="12345", city="Testdorf"
+        )
+        # One site with a given name and operator can be created.
+        Site.objects.create(
+            name="Test-Site",
+            description="Nur zum Test",
+            address=adr,
+            operated_by=self.test_data["organization"],
+        )
+        # A second site with the same name and operater must not exist.
+        with self.assertRaises(IntegrityError):
+            Site.objects.create(
+                name="Test-Site",
+                description="Auch zum Test",
+                address=adr,
+                operated_by=self.test_data["organization"],
+            )
+
+    def test_unique_room(self):
+        """Within a site, rooms must have unique names."""
+        adr = Address.objects.create(
+            street1="Teststraße 1", zip="12345", city="Testdorf"
+        )
+        site = Site.objects.create(
+            name="Test-Site",
+            description="Nur zum Test",
+            address=adr,
+            operated_by=self.test_data["organization"],
+        )
+        # One room with a given name and site can be created.
+        Room.objects.create(
+            name="Testraum",
+            description="Nur für Testzwecke",
+            size_sqm=12.5,
+            height_m=3.1,
+            max_occupancy=2,
+            site=site,
+        )
+        # Another room with the same name and site cannot be created.
+        with self.assertRaises(IntegrityError):
+            Room.objects.create(
+                name="Testraum",
+                description="Auch ein Testzwecke",
+                size_sqm=125,
+                height_m=31,
+                max_occupancy=20,
+                site=site,
+            )
+
+    def test_unique_node_installation(self):
+        """A node can be installed in one room at a time only."""
+        room = self.test_data["room"]
+        node = self.test_data["node"]
+
+        start1 = datetime.now() - timedelta(days=2)
+        stop1 = start1 + timedelta(days=1)
+        start2 = stop1 + timedelta(seconds=1)
+        stop2 = datetime.now()
+
+        RoomNodeInstallation.objects.create(
+            node=node,
+            room=room,
+            from_timestamp_s=round(start1.timestamp()),
+            to_timestamp_s=round(stop1.timestamp()),
+        )
+        RoomNodeInstallation.objects.create(
+            node=node,
+            room=room,
+            from_timestamp_s=round(start2.timestamp()),
+            to_timestamp_s=round(stop2.timestamp()),
+        )
+        self.assertEqual(room.nodes.count(), 2)
+
+        # Overlapping installation
+        start_err = start2 + timedelta(hours=12)
+        stop_err = start2 + timedelta(days=3)
+        with self.assertRaises(IntegrityError):
+            RoomNodeInstallation.objects.create(
+                node=node,
+                room=room,
+                from_timestamp_s=round(start_err.timestamp()),
+                to_timestamp_s=round(stop_err.timestamp()),
             )

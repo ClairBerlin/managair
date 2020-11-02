@@ -1,7 +1,16 @@
 from uuid import UUID
 
 from django.contrib.auth.models import User
-from core.models import Organization, Quantity, NodeProtocol, NodeModel, Node
+from core.models import (
+    Organization,
+    Quantity,
+    NodeProtocol,
+    NodeModel,
+    Node,
+    Address,
+    Site,
+    Room,
+)
 
 
 def setup_test_auth():
@@ -47,7 +56,7 @@ def setup_test_device(organization):
         alias="Test-Node",
         protocol=protocol,
         model=model,
-        owner=organization
+        owner=organization,
     )
     return {
         "quantities": quantities,
@@ -56,7 +65,30 @@ def setup_test_device(organization):
         "node": node,
     }
 
+
+def setup_test_location(organization):
+    address = Address.objects.create(
+        street1="Testweg 10", zip="01234", city="Teststadt"
+    )
+    site = Site.objects.create(
+        name="Test-Ort",
+        description="Nur zum Test",
+        address=address,
+        operated_by=organization,
+    )
+    room = Room.objects.create(
+        name="Test-Raum",
+        description="Nur zum Test",
+        size_sqm=100,
+        height_m=3,
+        max_occupancy=10,
+        site=site,
+    )
+    return {"address": address, "site": site, "room": room}
+
+
 def setup_basic_test_data():
     test_data = setup_test_auth()
     test_data.update(setup_test_device(test_data["organization"]))
+    test_data.update(setup_test_location(test_data["organization"]))
     return test_data
