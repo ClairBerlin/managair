@@ -17,4 +17,6 @@ from .inventory import (
 from .data import (
     SampleSerializer,
     SimpleSampleSerializer,
+    SampleListSerializer,
+    TimeseriesSerializer
 )

@@ -621,7 +621,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Node'
           description: ''
-  /api/v1/nodes/{id}/relationships/{related_field}:
+  /api/v1/nodes/{id}/relationships/{related_field}/:
     get:
       operationId: api_v1_nodes_relationships_retrieve
       description: Verify that the current user is authenticated.
@@ -763,6 +763,31 @@ paths:
             application/vnd.api+json:
               schema:
                 $ref: '#/components/schemas/PaginatedSimpleSampleList'
+          description: ''
+  /api/v1/nodes/{id}/timeseries/:
+    get:
+      operationId: api_v1_nodes_timeseries_retrieve
+      description: Verify that the current user is authenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this node.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/SampleList'
           description: ''
   /api/v1/organizations/:
     get:
@@ -922,7 +947,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Organization'
           description: ''
-  /api/v1/organizations/{id}/relationships/{related_field}:
+  /api/v1/organizations/{id}/relationships/{related_field}/:
     get:
       operationId: api_v1_organizations_relationships_retrieve
       description: Verify that the current user is authenticated.
@@ -1449,7 +1474,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Room'
           description: ''
-  /api/v1/rooms/{id}/relationships/{related_field}:
+  /api/v1/rooms/{id}/relationships/{related_field}/:
     get:
       operationId: api_v1_rooms_relationships_retrieve
       description: Verify that the current user is authenticated.
@@ -1915,7 +1940,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Site'
           description: ''
-  /api/v1/sites/{id}/relationships/{related_field}:
+  /api/v1/sites/{id}/relationships/{related_field}/:
     get:
       operationId: api_v1_sites_relationships_retrieve
       description: ''
@@ -2015,13 +2040,7 @@ paths:
   /api/v1/timeseries/:
     get:
       operationId: api_v1_timeseries_list
-      description: |-
-        Provides optimized time-series resources.
-
-        The overview resource lists the sample count for each node.
-        The detail resource contains a list of samples for a given node. This list can be restricted via `filter[from]` and `filter[to]` query parameters, and it can be paged.
-        WARNING: There is no default page size. A query without any paramter may, therefore, return a very large resource.
-        TODO: Provide some query limit to prevent DOS attacks.
+      description: Verify that the current user is authenticated.
       parameters:
       - name: page[number]
         required: false
@@ -2046,18 +2065,19 @@ paths:
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/PaginatedSimpleSampleList'
+                $ref: '#/components/schemas/PaginatedTimeseriesList'
           description: ''
   /api/v1/timeseries/{id}/:
     get:
       operationId: api_v1_timeseries_retrieve
-      description: Return the time series of a given node.
+      description: Verify that the current user is authenticated.
       parameters:
       - in: path
         name: id
         schema:
-          type: integer
-        description: A unique integer value identifying this sample.
+          type: string
+          format: uuid
+        description: A UUID string identifying this node.
         required: true
       tags:
       - api
@@ -2070,7 +2090,7 @@ paths:
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/SimpleSample'
+                $ref: '#/components/schemas/SampleList'
           description: ''
   /api/v1/users/:
     get:
@@ -2155,7 +2175,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
           description: ''
-  /api/v1/users/{id}/relationships/{related_field}:
+  /api/v1/users/{id}/relationships/{related_field}/:
     get:
       operationId: api_v1_users_relationships_retrieve
       description: ''
@@ -2715,6 +2735,10 @@ components:
           items:
             type: string
             nullable: true
+        timeseries:
+          type: string
+          readOnly: true
+          nullable: true
         samples:
           type: array
           items:
@@ -2732,6 +2756,7 @@ components:
       - model
       - protocol
       - samples
+      - timeseries
       - url
     NodeFidelity:
       type: object
@@ -3145,6 +3170,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Site'
+    PaginatedTimeseriesList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Timeseries'
     PaginatedUserList:
       type: object
       properties:
@@ -3270,6 +3315,10 @@ components:
           items:
             type: string
             nullable: true
+        timeseries:
+          type: string
+          readOnly: true
+          nullable: true
         samples:
           type: array
           items:
@@ -3760,6 +3809,28 @@ components:
       - co2_ppm
       - node
       - timestamp_s
+    SampleList:
+      type: object
+      properties:
+        query_timestamp:
+          type: integer
+        from_timestamp:
+          type: integer
+        to_timestamp:
+          type: integer
+        sample_count:
+          type: integer
+        samples:
+          type: array
+          items:
+            $ref: '#/components/schemas/SimpleSample'
+          readOnly: true
+      required:
+      - from_timestamp
+      - query_timestamp
+      - sample_count
+      - samples
+      - to_timestamp
     SimpleSample:
       type: object
       description: |-
@@ -3847,6 +3918,26 @@ components:
       - address
       - name
       - url
+    Timeseries:
+      type: object
+      properties:
+        alias:
+          type: string
+          maxLength: 100
+        query_timestamp:
+          type: integer
+        from_timestamp:
+          type: integer
+        to_timestamp:
+          type: integer
+        sample_count:
+          type: integer
+      required:
+      - alias
+      - from_timestamp
+      - query_timestamp
+      - sample_count
+      - to_timestamp
     Token:
       type: object
       description: Serializer for Token model.

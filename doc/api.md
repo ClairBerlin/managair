@@ -94,8 +94,12 @@ The inventory is organized according to organizations that have one or more room
   - [DELETE] Remove the node and all samples reported by this node.
 - `/api/v1/nodes/<node_id>/samples/` Collection-resource of the measurement samples reported by the given node.
   - [GET] Retrieve a list of samples of the given node. Can be paginated. The time-range can be limited via query paramters:
-    - `filter[from]` Start timestamp as Unix epoch. Defaults to `0` (1970-01-01T00:00:00Z) if not provided.
-    - `filter[to]` End timestamp as Unix epoch. Defaults to the current system time (`now()`).
+    - `filter[from]` Start timestamp as Unix epoch. Defaults to `0`; i.e.,1970-01-01T00:00:00Z, if not provided.
+    - `filter[to]` End timestamp as Unix epoch. Defaults to the current system time `now()`.
+- `/api/v1/nodes/<node_id>/timeseries/` Detail resource for the time-series reported by the specified node.
+  - [GET] Returns the time series reported by the given node. **Question: How to restrict the time slice to match the attribution between node and organization?** Identical to the resource at `/api/v1/timeseries/<node_id>/`. Supports querying for time slices:
+    - `filter[from]`: Start timestamp as Unix epoch. Defaults to `0`; i.e., 1970-01-01T00:00:00Z.
+    - `filter[to]`: End timestamp as Unix epoch. Defaults to the current system time `now()`.
 - `/api/v1/nodes/<node_id>/relationships/installations/` Relationship resource to manage the attribution of a node to a room over time. This resource is the counterpart to `/api/v1/rooms/<room_id>/relationships/installations/`.
   - [GET] List the installations of the given node over time.
   - [POST]
@@ -106,10 +110,15 @@ The inventory is organized according to organizations that have one or more room
   - [POST] Register a new node installation.
 - `/api/v1/nodes/fidelity/` Status list ("fidelity") for all nodes visible to the logged-in user.
   - [GET] The status is updated periodically and indicates if a given node regularly transmits data. Filter to see nodes of one specific organization only via the filter `filter[organization]=<organization_id>`; filter for nodes of a given site via `filter[site]=<site_id>`, and in a given room via `filter[room]=<room_id>`. In the future, additional information might be added, like battery status or error reports.
-- `/api/v1/nodes/timeseries/` Overview of the timeseries reported by all nodes visible to the logged-in user.
-  - [GET] Retrieve time range, number of samples, quantities reported for each node. Filter to see time series of the nodes that belong to one specific organization only via the filter `filter[organization]=<organization_id>`; filter for nodes of a given site via `filter[site]=<site_id>`, and in a given room via `filter[room]=<room_id>`. Data is only aggregated for the time slice where the node was owned by the specified organization.
-- `/api/v1/nodes/<node_id>/timeseries/` Detail resource for the time-series reported by the specified node.
-  - [GET] Returns the time series reported by the given node. **Question: How to restrict the time slice to math the attribution between node and organization?** Supports querying for time slices.
+
+### Time Series
+
+- `/api/v1/timeseries/` List resource that provides an timeseries overview.
+  - [GET] Return a list summary for the timeseries reported by all nodes to which the logged-in user has access. The summary counts the number of samples and provides information on the time span of each time series.
+- `/api/v1/timeseries/<node_id>/` Detail resource of the timeseries of node `node_id`
+  - [GET] Retrieve the time series of the specified node. This resource is identical to the resource provided at `/api/v1/nodes/<node_id>/timeseries/`. Only available if the node is visible to the logged-in user. Supports querying for time slices:
+    - `filter[from]`: Start timestamp as Unix epoch. Defaults to `0`; i.e., 1970-01-01T00:00:00Z.
+    - `filter[to]`: End timestamp as Unix epoch. Defaults to the current system time `now()`.
 
 ### Sites
 

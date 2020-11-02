@@ -1,4 +1,5 @@
 from rest_framework_json_api import serializers
+from rest_framework_json_api.relations import HyperlinkedRelatedField
 
 from core.data_viewmodels import TimeseriesViewModel
 from core.models import Sample
@@ -21,3 +22,27 @@ class SimpleSampleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sample
         exclude = ["node"]
+
+
+class SampleListSerializer(serializers.Serializer):
+    query_timestamp = serializers.IntegerField()
+    from_timestamp = serializers.IntegerField()
+    to_timestamp = serializers.IntegerField()
+    sample_count = serializers.IntegerField()
+    samples = serializers.ListField(child=SimpleSampleSerializer(), read_only=True)
+
+    class Meta:
+        resource_name = "timeseries"
+        fields = ["url"]
+
+
+class TimeseriesSerializer(serializers.Serializer):
+    alias = serializers.CharField(max_length=100)
+    query_timestamp = serializers.IntegerField()
+    from_timestamp = serializers.IntegerField()
+    to_timestamp = serializers.IntegerField()
+    sample_count = serializers.IntegerField()
+
+    class Meta:
+        model = TimeseriesViewModel
+        fields = ["url"]
