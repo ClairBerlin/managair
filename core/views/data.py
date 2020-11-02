@@ -103,15 +103,16 @@ class TimeseriesDetailView(LoginRequiredMixin, generics.RetrieveAPIView):
     def get_object(self):
         node = self.get_queryset()
         queryset = node.samples
-        from_limit = self.kwargs.get("from", 0)
-        to_limit = self.kwargs.get("to", round(datetime.now().timestamp()))
+        from_limit = self.request.query_params.get("filter[from]", 0)
+        to_limit = self.request.query_params.get(
+            "filter[to]", round(datetime.now().timestamp())
+        )
         samples = queryset.filter(
             timestamp_s__gte=from_limit, timestamp_s__lte=to_limit
         )
         return SamplePageViewModel(
             pk=node.pk,
             alias=node.alias,
-            # sample_count=samples.count(),
             from_timestamp=from_limit,
             to_timestamp=to_limit,
             samples=samples,
