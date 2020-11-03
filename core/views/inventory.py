@@ -127,6 +127,7 @@ class OrganizationViewSet(LoginRequiredMixin, ModelViewSet):
 class OrganizationRelationshipView(LoginRequiredMixin, RelationshipView):
     queryset = Organization.objects
     self_link_view_name = "organization-relationships"
+    http_method_names = ["get", "post", "delete", "options", "head"]
 
 
 class MembershipViewSet(LoginRequiredMixin, ModelViewSet):
