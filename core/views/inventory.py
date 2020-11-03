@@ -117,6 +117,12 @@ class OrganizationViewSet(LoginRequiredMixin, ModelViewSet):
         queryset = super(OrganizationViewSet, self).get_queryset()
         return queryset.filter(users=self.request.user)
 
+    def perform_create(self, serializer):
+        org = serializer.save()
+        Membership.objects.create(
+            role=Membership.OWNER, user=self.request.user, organization=org
+        )
+
 
 class OrganizationRelationshipView(LoginRequiredMixin, RelationshipView):
     queryset = Organization.objects

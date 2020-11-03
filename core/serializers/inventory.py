@@ -110,8 +110,8 @@ class OrganizationSerializer(serializers.HyperlinkedModelSerializer):
     users = HyperlinkedRelatedField(
         many=True,
         read_only=False,
-        allow_null=False,
-        required=True,
+        allow_null=True,
+        required=False,
         queryset=User.objects.all(),
         self_link_view_name="organization-relationships",
         related_link_view_name="organization-related",

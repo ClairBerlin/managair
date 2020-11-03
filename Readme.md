@@ -36,13 +36,13 @@ Managair is a [Django](https://www.djangoproject.com/) web application atop a [P
 
 ### Debugging
 
-When run in DEBUG mode, the `managair_server` has the [Python Tools for Visual Studio Debug Server](https://github.com/microsoft/ptvsd) (PTVSD) included. It allows to attach a Python debugger from within Visual Studio Code to the application running inside to container. To get started, copy `dev_utils/launch.json` into your project-local `.vscode` folder. Details on setup and usage can be found in this [blog post](https://testdriven.io/blog/django-debugging-vs-code/).
+When run in DEBUG mode, the `managair_server` has the [Python Tools for Visual Studio Debug Server](https://github.com/microsoft/ptvsd) (PTVSD) included. It allows to attach a Python debugger from within Visual Studio Code to the application running inside to container. To get started, copy `dev_utils/launch.json` into your project-local `.vscode` folder. To attach the debugger to the _Managair_ application running inside a container, select the _Debug Django_ run-configuration on the VS-Code debug pane. If the status bar turns from blue into orange, the debugger is attached. Set a breakpoint and fire a request to get going. Details on setup and usage can be found in this [blog post](https://testdriven.io/blog/django-debugging-vs-code/).
 
 ### Django Debug Toolbar
 
 When the debug mode is activated via the environment variable `DEBUG=1`, the [Django Debug Toolbar](https://django-debug-toolbar.readthedocs.io/en/latest/index.html) becomes visible on all HTML views; e.g., the admin UI or the browsable ReST API.
 
-### Data fixtures
+### Data Fixtures
 
 To start development work right away, it would be convenient if important data was preloaded into the DB already. This is what [Django fixtures](https://docs.djangoproject.com/en/3.1/howto/initial-data/) are for. Fixture files are JSON files that contain data in a format that can be directly importet into the DB. They are available for the individual applications in their `fixture` folders. To set up the the application for development, load the fixtures as follows:
 
@@ -101,7 +101,7 @@ Results of the fidelity check are available at the API resource `api/v1/fidelity
 
 ## Testing
 
-Dajngo comes with extensive [testing support](https://docs.djangoproject.com/en/3.1/topics/testing/overview/), from unit tests, tests of the DB interaction to full-blown integration tests. As Django installs a separate testing DB, most of the tests could even be run on a production system without interfering with its operation. Therefore, we currently do not have a separate testing configuration of the Clair Stack - simply run the tests on your local development stack.
+Django comes with extensive [testing support](https://docs.djangoproject.com/en/3.1/topics/testing/overview/), from unit tests, tests of the DB interaction to full-blown integration tests. As Django installs a separate testing DB, most of the tests could even be run on a production system without interfering with its operation. Therefore, we currently do not have a separate testing configuration of the Clair Stack - simply run the tests on your local development stack.
 
 To execute the tests, use the following Django management command
 
@@ -116,3 +116,15 @@ The tests can be executed perfectly well on a running Clair Stack on docker swar
 ```shell
 $> ./tools/manage-py.sh environments/dev.env test core
 ```
+
+### Debuggin While Testing
+
+When doing test-driven development or simply while developing test, it is quite common that things don't work out as intended. In such a case, it is very helpful to set a breakpoint and launch into a debugging session right where the problem occurs. When running the _Managair_ application as part of the Clair Stack, the debugger must be attached remotely.
+
+Unfortunately, the standard attach procedure outlined above does not work - the debugger there waits for the development server to reload, which does not happen during testing. Instead, there is a separate debug configuration for use in Visual Studio Code: Select the _Debug Django Tests_ run configuration and set a breakpoint in the test case you are working on. Then, use the Python script `debugtests.py` to start a test session with debug support. On docker swarm, execute it via
+
+```shell
+docker exec -it $(docker ps -q -f name=managair_server) python3 debugtests.py <test-args>
+```
+
+Once the script prompts `Waiting for external debugger...`, switch back to VS-Code and execute the _Debug Django Tests_ run configuration (click on the green arrow).
