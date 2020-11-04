@@ -115,3 +115,8 @@ class OrganizationTestCase(APITestCase):
         # DELETE /organizatons/<organization_id>/relationships/users/
         response3 = self.client.delete(url, data=request_data)
         self.assertEqual(response3.status_code, 200)
+        # Ensure that the user is no longer a member of the organization.
+        # GET /organizatons/<organization_id>/relationships/users/
+        response4 = self.client.get(url)
+        self.assertEqual(response2.status_code, 200)
+        self.assertNotIn({"type": "User", "id": "4"}, response4.data)
