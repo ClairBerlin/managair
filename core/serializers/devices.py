@@ -1,5 +1,8 @@
 from rest_framework_json_api import serializers
-from rest_framework_json_api.relations import HyperlinkedRelatedField
+from rest_framework_json_api.relations import (
+    HyperlinkedRelatedField,
+    ResourceRelatedField,
+)
 
 from core.models import (
     Quantity,
@@ -8,6 +11,7 @@ from core.models import (
     Node,
     NodeFidelity,
     RoomNodeInstallation,
+    Organization,
 )
 
 
@@ -38,10 +42,31 @@ class NodeModelSerializer(serializers.HyperlinkedModelSerializer):
 
 class NodeSerializer(serializers.HyperlinkedModelSerializer):
     related_serializers = {
+        "protocol": "core.serializers.NodeProtocolSerializer",
+        "model": "core.serializers.NodeModelSerializer",
+        "owner": "core.serializers.OrganizationSerializer",
         "installations": "core.serializers.RoomNodeInstallationSerializer",
         "samples": "core.serializers.SimpleSampleSerializer",
         "timeseries": "core.serializers.SampleListSerializer",
     }
+
+    protocol = ResourceRelatedField(
+        queryset=NodeProtocol.objects.all(),
+        self_link_view_name="node-relationships",
+        related_link_view_name="node-related"
+    )
+
+    model = ResourceRelatedField(
+        queryset=NodeModel.objects.all(),
+        self_link_view_name="node-relationships",
+        related_link_view_name="node-related"
+    )
+
+    owner = ResourceRelatedField(
+        queryset=Organization.objects.all(),
+        self_link_view_name="node-relationships",
+        related_link_view_name="node-related"
+    )
 
     # A Node is installed in one or more rooms over its lifetime.
     installations = HyperlinkedRelatedField(
@@ -80,6 +105,7 @@ class NodeSerializer(serializers.HyperlinkedModelSerializer):
             "alias",
             "protocol",
             "model",
+            "owner",
             "installations",
             "timeseries",
             "samples",
