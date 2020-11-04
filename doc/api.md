@@ -33,30 +33,26 @@ Most of the user-management endpoints are provided by the [dj-rest-auth library]
 
 The inventory is organized according to organizations that have one or more rooms with installed sensor nodes. All inventory resources require the user to be logged in. Data is organizaed according to the nodes that reported them. Data resources for a given organization are available only for the time-period when the node is or was owned by the organization.
 
+A **[T]** means that there exists at least on API test for the thus-marked resource.
+
 ### Organizations
 
-- `/api/v1/organizations/` Collection-resource of all organizations visible to the logged-in user.
+- **[T]** `/api/v1/organizations/` Collection-resource of all organizations visible to the logged-in user.
   - [GET] List the organizations.
   - [POST] Register a new organization, with the logged-in user as owner.
-- `/api/v1/organizations/<organization_id>/` Details-resource of the organization with ID `organization_id`.
+- **[T]** `/api/v1/organizations/<organization_id>/` Details-resource of the organization with ID `organization_id`.
   - [GET] Details about the organization. Only available if the logged-in user is a member of this organization.
   - [PUT, PATCH] Replace resp. update organization data. Only available for users that have the OWNER role for the organization.
   - [DELETE] Remove the organization and all assets and data it owns - sites, rooms, nodes, and node time series. Only available for users that have the OWNER role for the organization.
-- `/api/v1/organizations/<organization_id>/relationships/users/` Relationship resource to manage the users that form part of the organization. See the [JSON:API specification](https://jsonapi.org/format/#crud-updating-to-many-relationships) for detailed semantics.
+- **[T]** `/api/v1/organizations/<organization_id>/relationships/users/` Relationship resource to manage the users that form part of the organization. See the [JSON:API specification](https://jsonapi.org/format/#crud-updating-to-many-relationships) for detailed semantics.
   - [GET] List the user-members of the organization.
   - [POST] Add one or more existing users as members of the organization. The default membership role will be _INSPECTOR_, which is the least-privileged role (read-only.)
   - [DELETE] Delete the member specified in the request body. **WARNING** Allows the logged-in user to be removed from the organization.
-- `/api/v1/organizations/<organization_id>/users/` Collection-resource for the organizations members; that is, the users that are part of the organization.
+- **[T]** `/api/v1/organizations/<organization_id>/users/` Collection-resource for the organizations members; that is, the users that are part of the organization.
   - [GET] List the members, with individual links to the membership detail resouces at `/api/v1/users/<user_id>/`.
-- `/api/v1/organizations/<organization_id>/relationships/nodes/` Relationship resource to manage the nodes owned by the organization.
-  - [GET] List the nodes owned by the organization.
-  - [POST]
-  - [PATCH]
-  - [DELETE]
-- `/api/v1/organizations/<organization_id>/nodes/` Collection-resource of all nodes that belong to the specified organization.
+- **[T]** `/api/v1/organizations/<organization_id>/nodes/` Collection-resource of all nodes that belong to the specified organization.
   - [GET] List all nodes owned by the organization, with individual links to node detail resources at `/api/v1/nodes/<node_id>`.
-  - [POST] Register a new node that is currently unknown to the Managair. This new node will be attributed to the goven organization.
-- `/api/v1/organizations/<organization_id>/sites/` Collection-resource of all sites that belong to the organization `organization_id`.
+- **[T]** `/api/v1/organizations/<organization_id>/sites/` Collection-resource of all sites that belong to the organization `organization_id`.
   - [GET] List the sites, with individual links to the detail-resource at `/api/v1/sites/<site_id>`.
 
 ### Users
