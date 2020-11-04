@@ -120,3 +120,21 @@ class OrganizationTestCase(APITestCase):
         response4 = self.client.get(url)
         self.assertEqual(response2.status_code, 200)
         self.assertNotIn({"type": "User", "id": "4"}, response4.data)
+
+    def test_get_organization_nodes(self):
+        """GET /organizations/<organization_id>/nodes/"""
+        url = reverse(
+            "organization-related", kwargs={"pk": 1, "related_field": "nodes"}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+    def test_get_organization_sites(self):
+        """GET /organizations/<organization_id>/sites/"""
+        url = reverse(
+            "organization-related", kwargs={"pk": 1, "related_field": "sites"}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
