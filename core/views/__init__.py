@@ -16,6 +16,7 @@ from .inventory import (
     OrganizationRelationshipView,
     MembershipViewSet,
     UserViewSet,
-    UserRelationshipView
+    UserRelationshipView,
+    SiteNotFoundExceptionView
 )
 from .data import SampleListView, SampleViewSet

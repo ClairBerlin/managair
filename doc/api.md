@@ -42,14 +42,12 @@ The inventory is organized according to organizations that have one or more room
   - [GET] Details about the organization. Only available if the logged-in user is a member of this organization.
   - [PUT, PATCH] Replace resp. update organization data. Only available for users that have the OWNER role for the organization.
   - [DELETE] Remove the organization and all assets and data it owns - sites, rooms, nodes, and node time series. Only available for users that have the OWNER role for the organization.
-- `/api/v1/organizations/<organization_id>/relationships/users/` Relationship resource to manage the users that form part of the organization.
+- `/api/v1/organizations/<organization_id>/relationships/users/` Relationship resource to manage the users that form part of the organization. See the [JSON:API specification](https://jsonapi.org/format/#crud-updating-to-many-relationships) for detailed semantics.
   - [GET] List the user-members of the organization.
-  - [POST]
-  - [PATCH]
-  - [DELETE]
+  - [POST] Add one or more existing users as members of the organization. The default membership role will be _INSPECTOR_, which is the least-privileged role (read-only.)
+  - [DELETE] Delete the member specified in the request body. **WARNING** Allows the logged-in user to be removed from the organization.
 - `/api/v1/organizations/<organization_id>/users/` Collection-resource for the organizations members; that is, the users that are part of the organization.
-  - [GET] List the members, with individual links to the membership detail resouces at `/api/v1/members/<user_id>/`.
-  - [POST] Add an already existing user to the organization in one of the available roles. The logged-in user must be an OWNER of the organization to perform this task.
+  - [GET] List the members, with individual links to the membership detail resouces at `/api/v1/users/<user_id>/`.
 - `/api/v1/organizations/<organization_id>/relationships/nodes/` Relationship resource to manage the nodes owned by the organization.
   - [GET] List the nodes owned by the organization.
   - [POST]
@@ -58,14 +56,8 @@ The inventory is organized according to organizations that have one or more room
 - `/api/v1/organizations/<organization_id>/nodes/` Collection-resource of all nodes that belong to the specified organization.
   - [GET] List all nodes owned by the organization, with individual links to node detail resources at `/api/v1/nodes/<node_id>`.
   - [POST] Register a new node that is currently unknown to the Managair. This new node will be attributed to the goven organization.
-- `/api/v1/organizations/<organization_id>/relationships/sites/` Relationship resource to manage the sites operated by the organization.
-  - [GET] List the sites operated by the organization.
-  - [POST]
-  - [PATCH]
-  - [DELETE]
 - `/api/v1/organizations/<organization_id>/sites/` Collection-resource of all sites that belong to the organization `organization_id`.
   - [GET] List the sites, with individual links to the detail-resource at `/api/v1/sites/<site_id>`.
-  - [POST] Create a new site operated by the organization.
 
 ### Users
 

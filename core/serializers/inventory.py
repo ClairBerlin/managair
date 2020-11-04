@@ -119,11 +119,9 @@ class OrganizationSerializer(serializers.HyperlinkedModelSerializer):
     # An Organization operates zero or more sites.
     sites = HyperlinkedRelatedField(
         many=True,
-        read_only=False,
+        read_only=True, # Sites cannot be detached from their organization.
         allow_null=True,
         required=False,
-        queryset=Site.objects.all(),
-        self_link_view_name="organization-relationships",
         related_link_view_name="organization-related",
     )
     # An Organization operates one or more nodes.
@@ -133,7 +131,6 @@ class OrganizationSerializer(serializers.HyperlinkedModelSerializer):
         allow_null=True,
         required=False,
         queryset=Node.objects.all(),
-        self_link_view_name="organization-relationships",
         related_link_view_name="organization-related",
     )
 

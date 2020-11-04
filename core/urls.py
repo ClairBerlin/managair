@@ -33,6 +33,16 @@ urlpatterns = [
         name="user-related",
     ),
     path(
+        "organizations/<pk>/relationships/nodes/",
+        view=inventory.SiteNotFoundExceptionView.as_view(),
+        name="organization-relationships",
+    ),
+    path(
+        "organizations/<pk>/relationships/sites/",
+        view=inventory.SiteNotFoundExceptionView.as_view(),
+        name="organization-relationships",
+    ),
+    path(
         "organizations/<pk>/relationships/<related_field>/",
         view=inventory.OrganizationRelationshipView.as_view(),
         name="organization-relationships",
