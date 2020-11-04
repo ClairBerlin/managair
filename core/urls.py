@@ -79,11 +79,6 @@ urlpatterns = [
         "nodes/<pk>/timeseries/", data.TimeseriesDetailView.as_view(), name="node-timeseries-detail"
     ),
     path(
-        "nodes/<pk>/relationships/<related_field>/",
-        view=devices.NodeRelationshipView.as_view(),
-        name="node-relationships",
-    ),
-    path(
         "nodes/<pk>/<related_field>/",
         view=devices.NodeViewSet.as_view({"get": "retrieve_related"}),
         name="node-related",

@@ -3,7 +3,6 @@ from .devices import (
     NodeProtocolViewSet,
     NodeModelViewSet,
     NodeViewSet,
-    NodeRelationshipView,
     NodeFidelityViewSet,
 )
 from .inventory import (

@@ -52,19 +52,16 @@ class NodeSerializer(serializers.HyperlinkedModelSerializer):
 
     protocol = ResourceRelatedField(
         queryset=NodeProtocol.objects.all(),
-        self_link_view_name="node-relationships",
         related_link_view_name="node-related"
     )
 
     model = ResourceRelatedField(
         queryset=NodeModel.objects.all(),
-        self_link_view_name="node-relationships",
         related_link_view_name="node-related"
     )
 
     owner = ResourceRelatedField(
         queryset=Organization.objects.all(),
-        self_link_view_name="node-relationships",
         related_link_view_name="node-related"
     )
 
@@ -75,7 +72,6 @@ class NodeSerializer(serializers.HyperlinkedModelSerializer):
         allow_null=True,
         required=False,
         queryset=RoomNodeInstallation.objects.all(),
-        self_link_view_name="node-relationships",
         related_link_view_name="node-related",
     )
 
@@ -93,7 +89,6 @@ class NodeSerializer(serializers.HyperlinkedModelSerializer):
         read_only=True,
         allow_null=True,
         required=False,
-        self_link_view_name="node-relationships",
         related_link_view_name="node-related",
     )
 

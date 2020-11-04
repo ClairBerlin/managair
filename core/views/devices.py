@@ -45,11 +45,6 @@ class NodeViewSet(LoginRequiredMixin, ModelViewSet):
         return queryset.filter(owner__users=self.request.user)
 
 
-class NodeRelationshipView(LoginRequiredMixin, RelationshipView):
-    queryset = Node.objects
-    self_link_view_name = "node-relationships"
-
-
 class NodeFidelityViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = NodeFidelity.objects.all()
