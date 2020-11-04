@@ -5,7 +5,6 @@ from rest_framework_json_api.utils import format_resource_type
 
 class NodeTestCase(APITestCase):
     fixtures = ["user-fixtures.json", "inventory-fixtures.json"]
-    url = ""
     node_id = "3b95a1b2-74e7-9e98-52c4-4acae441f0ae"
 
     def setUp(self):

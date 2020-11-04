@@ -104,20 +104,14 @@ A **[T]** means that there exists at least on API test for the thus-marked resou
 
 ### Sites
 
-- `/api/v1/sites/` Collection-resource of all sites visible to a logged-in user.
+- **[T]** `/api/v1/sites/` Collection-resource of all sites visible to a logged-in user.
   - [GET] List the sites. Filter to see sites of one specific organization only via the filter `filter[organization]=<organization_id>`.
-- `/api/v1/sites/<site_id>/` Details-resource of the specified site.
+- **[T]** `/api/v1/sites/<site_id>/` Details-resource of the specified site.
   - [GET] Rertieve the site resource.
   - [PUT, PATCH] Replace resp. update site master data.
-  - [DELETE] Remove the site and all rooms within the site. Does not delete nodes attributed to the site or any of its rooms.
-- `/api/v1/sites/<site_id>/relationships/rooms/` Relationship resource to manage the rooms that belong to the site.
-  - [GET] List the rooms that belong to the given site.
-  - [POST]
-  - [PATCH]
-  - [DELETE]
-- `/api/v1/sites/<site_id>/rooms/` Collection-resource of all rooms of the given site.
+  - [DELETE] Remove the site and all rooms within the site. Does not delete nodes attributed to the enclosing organization.
+- **[T]** `/api/v1/sites/<site_id>/rooms/` Collection-resource of all rooms of the given site.
   - [GET] List the rooms, with individual links to the detail-resource at `/api/v1/rooms/<room_id>`.
-  - [POST] Create a new room that is part of the given site.
 
 ### Rooms
 

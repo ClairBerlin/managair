@@ -5,7 +5,6 @@ from rest_framework_json_api.utils import format_resource_type
 
 class OrganizationTestCase(APITestCase):
     fixtures = ["user-fixtures.json", "inventory-fixtures.json"]
-    url = ""
 
     def setUp(self):
         # tomTester is owner of the organization Test-Team with pk=1
