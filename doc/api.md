@@ -94,7 +94,6 @@ The inventory is organized according to organizations that have one or more room
     - `filter[to]`: End timestamp as Unix epoch. Defaults to the current system time `now()`.
 - `/api/v1/nodes/<node_id>/installations/` Collection-resource of all installations a node has ever undergone.
   - [GET] List all present and past installations of the given node, with individual links to installation detail resources at `/api/v1/installations/<installation_id>/`.
-  - [POST] Register a new node installation.
 - `/api/v1/nodes/fidelity/` Status list ("fidelity") for all nodes visible to the logged-in user.
   - [GET] The status is updated periodically and indicates if a given node regularly transmits data. Filter to see nodes of one specific organization only via the filter `filter[organization]=<organization_id>`; filter for nodes of a given site via `filter[site]=<site_id>`, and in a given room via `filter[room]=<room_id>`. In the future, additional information might be added, like battery status or error reports.
 
