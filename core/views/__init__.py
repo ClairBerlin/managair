@@ -8,7 +8,6 @@ from .devices import (
 from .inventory import (
     AddressViewSet,
     SiteViewSet,
-    SiteRelationshipView,
     RoomViewSet,
     RoomRelationshipView,
     OrganizationViewSet,

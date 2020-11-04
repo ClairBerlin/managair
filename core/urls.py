@@ -53,11 +53,6 @@ urlpatterns = [
         name="organization-related",
     ),
     path(
-        "sites/<pk>/relationships/<related_field>/",
-        view=inventory.SiteRelationshipView.as_view(),
-        name="site-relationships",
-    ),
-    path(
         "sites/<pk>/<related_field>/",
         inventory.SiteViewSet.as_view({"get": "retrieve_related"}),
         name="site-related",
