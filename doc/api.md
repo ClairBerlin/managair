@@ -78,9 +78,9 @@ The inventory is organized according to organizations that have one or more room
 
 ### Nodes
 
-- `/api/v1/nodes/` Collection-resource of the nodes visible to the logged-in user.
+- **[T]** `/api/v1/nodes/` Collection-resource of the nodes visible to the logged-in user.
   - [GET] List the nodes. Filter to see nodes of one specific organization only via the filter `filter[organization]=<organization_id>`.
-- `/api/v1/nodes/<node_id>/` Details-resource of the specified node. Only accessible if the node is visible to the logged-in user.
+- **[T]** `/api/v1/nodes/<node_id>/` Details-resource of the specified node. Only accessible if the node is visible to the logged-in user.
   - [GET] Retrieve information about the node. Might include fidelity information.
   - [PUT, PATCH] Update node master data; e.g., node alias or tags (feature request).
   - [DELETE] Remove the node and all samples reported by this node.
@@ -92,14 +92,8 @@ The inventory is organized according to organizations that have one or more room
   - [GET] Returns the time series reported by the given node. **Question: How to restrict the time slice to match the attribution between node and organization?** Identical to the resource at `/api/v1/timeseries/<node_id>/`. Supports querying for time slices:
     - `filter[from]`: Start timestamp as Unix epoch. Defaults to `0`; i.e., 1970-01-01T00:00:00Z.
     - `filter[to]`: End timestamp as Unix epoch. Defaults to the current system time `now()`.
-- `/api/v1/nodes/<node_id>/relationships/installations/` Relationship resource to manage the attribution of a node to a room over time. This resource is the counterpart to `/api/v1/rooms/<room_id>/relationships/installations/`.
-  - [GET] List the installations of the given node over time.
-  - [POST]
-  - [PATCH]
-  - [DELETE]
-- `/api/v1/nodes/<node_id>/installations/` Collection-resource of all installations a node has ever undergone.
+- **[T]** `/api/v1/nodes/<node_id>/installations/` Collection-resource of all installations a node has ever undergone.
   - [GET] List all present and past installations of the given node, with individual links to installation detail resources at `/api/v1/installations/<installation_id>/`.
-  - [POST] Register a new node installation.
 - `/api/v1/nodes/fidelity/` Status list ("fidelity") for all nodes visible to the logged-in user.
   - [GET] The status is updated periodically and indicates if a given node regularly transmits data. Filter to see nodes of one specific organization only via the filter `filter[organization]=<organization_id>`; filter for nodes of a given site via `filter[site]=<site_id>`, and in a given room via `filter[room]=<room_id>`. In the future, additional information might be added, like battery status or error reports.
 
