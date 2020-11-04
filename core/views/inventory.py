@@ -1,10 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework import permissions
+from rest_framework.exceptions import NotFound
 from rest_framework_json_api.views import (
     ModelViewSet,
     ReadOnlyModelViewSet,
     RelationshipView,
+    generics,
 )
 
 from core.models import (
@@ -26,6 +28,17 @@ from core.serializers import (
 )
 
 User = get_user_model()
+
+
+class SiteNotFoundExceptionView(LoginRequiredMixin, generics.RetrieveAPIView):
+    """This view returns a 404 Not Found exception."""
+
+    queryset = Site.objects.all()
+    permissions = [permissions.IsAuthenticated]
+    serializer_class = SiteSerializer
+
+    def get(self, request, *args, **kwargs):
+        raise NotFound()  # (detail="Error 404, page not found", code=404)
 
 
 class UserViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
