@@ -74,18 +74,18 @@ class SitesTestCase(APITestCase):
         self.assertEqual(response1.data["operated_by"]["id"], "2")
         # Fetch the site resource just created.
         response_url = response1.data["url"]
-        # GET /sites/<site_id/
+        # GET /sites/<site_id>/
         response2 = self.client.get(response_url)
         self.assertEqual(response2.status_code, 200)
         self.assertEqual(response2.data["name"], "Versuchsort 2")
         self.assertEqual(response2.data["address"]["id"], "2")
         self.assertEqual(response2.data["operated_by"]["id"], "2")
         # Delete the site.
-        # DELETE /site/<site_id/
+        # DELETE /site/<site_id>/
         response3 = self.client.delete(response_url)
         self.assertEqual(response3.status_code, 204)
         # Make sure it is gone.
-        # GET /site/<site_id>
+        # GET /site/<site_id>/
         response4 = self.client.get(response_url)
         self.assertEqual(response4.status_code, 404)
 

@@ -58,11 +58,6 @@ urlpatterns = [
         name="site-related",
     ),
     path(
-        "rooms/<pk>/relationships/<related_field>/",
-        view=inventory.RoomRelationshipView.as_view(),
-        name="room-relationships",
-    ),
-    path(
         "rooms/<pk>/<related_field>/",
         inventory.RoomViewSet.as_view({"get": "retrieve_related"}),
         name="room-related",
