@@ -1,7 +1,7 @@
-Django==3.1.2
+Django
 psycopg2-binary
-djangorestframework==3.12.1
-djangorestframework-jsonapi==3.2.0
+djangorestframework
+djangorestframework-jsonapi
 dj-rest-auth[with_social]
 django-allauth
 django-cors-headers
