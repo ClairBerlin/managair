@@ -56,14 +56,8 @@ The inventory is organized according to organizations that have one or more room
 - `/api/v1/organizations/<organization_id>/nodes/` Collection-resource of all nodes that belong to the specified organization.
   - [GET] List all nodes owned by the organization, with individual links to node detail resources at `/api/v1/nodes/<node_id>`.
   - [POST] Register a new node that is currently unknown to the Managair. This new node will be attributed to the goven organization.
-- `/api/v1/organizations/<organization_id>/relationships/sites/` Relationship resource to manage the sites operated by the organization.
-  - [GET] List the sites operated by the organization.
-  - [POST]
-  - [PATCH]
-  - [DELETE]
 - `/api/v1/organizations/<organization_id>/sites/` Collection-resource of all sites that belong to the organization `organization_id`.
   - [GET] List the sites, with individual links to the detail-resource at `/api/v1/sites/<site_id>`.
-  - [POST] Create a new site operated by the organization.
 
 ### Users
 
