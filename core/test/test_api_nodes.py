@@ -72,17 +72,17 @@ class NodeTestCase(APITestCase):
         self.assertEqual(response1.data["alias"], "Test Node")
         # Fetch the node resource just created.
         response_url = response1.data["url"]
-        # GET /nodes/<node_id/
+        # GET /nodes/<node_id>/
         response2 = self.client.get(response_url)
         self.assertEqual(response2.status_code, 200)
         self.assertEqual(response2.data["device_id"], "fefffffffdff0000")
         self.assertEqual(response2.data["alias"], "Test Node")
         # Delete the node.
-        # DELETE /node/<node_id/
+        # DELETE /node/<node_id>/
         response3 = self.client.delete(response_url)
         self.assertEqual(response3.status_code, 204)
         # Make sure it is gone.
-        # GET /node/<node_id>
+        # GET /node/<node_id>/
         response4 = self.client.get(response_url)
         self.assertEqual(response4.status_code, 404)
 

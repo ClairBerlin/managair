@@ -69,9 +69,14 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class RoomSerializer(serializers.HyperlinkedModelSerializer):
-    included_serializers = {
+    related_serializers = {
+        "site": "core.serializers.SiteSerializer",
         "installations": "core.serializers.RoomNodeInstallationSerializer",
     }
+
+    site = ResourceRelatedField(
+        queryset=Site.objects.all(), related_link_view_name="room-related"
+    )
 
     #: A Room contains zero or more node installations.
     installations = HyperlinkedRelatedField(
@@ -80,13 +85,21 @@ class RoomSerializer(serializers.HyperlinkedModelSerializer):
         allow_null=True,
         required=False,
         queryset=RoomNodeInstallation.objects.all(),
-        self_link_view_name="room-relationships",
         related_link_view_name="room-related",
     )
 
     class Meta:
         model = Room
-        fields = ["name", "description", "site", "nodes", "installations", "url"]
+        fields = [
+            "name",
+            "description",
+            "size_sqm",
+            "height_m",
+            "max_occupancy",
+            "site",
+            "installations",
+            "url",
+        ]
 
 
 class MembershipSerializer(serializers.HyperlinkedModelSerializer):

@@ -99,11 +99,6 @@ class RoomViewSet(LoginRequiredMixin, ModelViewSet):
         return queryset.filter(site__operated_by__users=self.request.user)
 
 
-class RoomRelationshipView(LoginRequiredMixin, RelationshipView):
-    queryset = Room.objects
-    self_link_view_name = "room-relationships"
-
-
 class RoomNodeInstallationViewSet(LoginRequiredMixin, ModelViewSet):
     permissions = [permissions.IsAuthenticated]
     queryset = RoomNodeInstallation.objects

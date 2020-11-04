@@ -9,7 +9,6 @@ from .inventory import (
     AddressViewSet,
     SiteViewSet,
     RoomViewSet,
-    RoomRelationshipView,
     OrganizationViewSet,
     OrganizationRelationshipView,
     MembershipViewSet,
