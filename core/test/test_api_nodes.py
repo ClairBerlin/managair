@@ -87,6 +87,17 @@ class NodeTestCase(APITestCase):
         response4 = self.client.get(response_url)
         self.assertEqual(response4.status_code, 404)
 
+    def test_get_node_installations(self):
+        """GET /nodes/<node_id>/installations/"""
+        url = reverse(
+            "node-related",
+            kwargs={"pk": self.node_id, "related_field": "installations"},
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+
+
     # TODO: Failure cases:
     # - Nodes the user does not have access to.
     # - Add incompletely specified nodes.
