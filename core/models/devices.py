@@ -54,13 +54,9 @@ class Node(models.Model):
         """String for representing the Model object."""
         return f"{self.alias}: {self.id}"
 
-    # @classmethod
-    # def get_user_nodes(cls, user, query_time=round(datetime.now().timestamp())):
-    #     """Return a queryset with all nodes attributed to the given user"""
-    #     return cls.objects.filter(
-    #         node_installations__site__responsible=user,
-    #         node_installations__from_timestamp__lte=query_time,
-    #         node_installations__to_timestamp__gte=query_time)
+    class Meta:
+        ordering = ["device_id"]
+        get_latest_by = "device_id"
 
     def check_fidelity(self, lookback_interval_s: int):
         """Check if a message was received within the lookback interval."""
