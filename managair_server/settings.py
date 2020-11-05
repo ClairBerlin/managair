@@ -44,7 +44,7 @@ if SENTRY:
     sentry_sdk.init(
         dsn="https://279c821aafab4487a7a3189ccbcf47a9@o454687.ingest.sentry.io/5460530",
         integrations=[DjangoIntegration()],
-        traces_sample_rate=1.0,
+        traces_sample_rate=0.0,
         # If you wish to associate users to errors (assuming you are using
         # django.contrib.auth) you may enable sending PII data.
         send_default_pii=False,
