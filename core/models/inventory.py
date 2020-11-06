@@ -44,13 +44,13 @@ class Membership(models.Model):
         User,
         null=False,
         on_delete=models.CASCADE,
-        # related field ist User.organizations",
+        related_name="memberships"
     )
     organization = models.ForeignKey(
         Organization,
         null=False,
         on_delete=models.CASCADE,
-        # related field is Organization.users
+        related_name="memberships"
     )
 
     def __str__(self):

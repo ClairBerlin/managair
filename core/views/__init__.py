@@ -1,3 +1,4 @@
+from .data import SampleListView, SampleViewSet
 from .devices import (
     QuantityViewSet,
     NodeProtocolViewSet,
@@ -16,4 +17,3 @@ from .inventory import (
     UserRelationshipView,
     SiteNotFoundExceptionView
 )
-from .data import SampleListView, SampleViewSet

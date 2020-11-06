@@ -11,7 +11,6 @@ from core.models import (
     Organization,
     Site,
     Room,
-    Node,
     RoomNodeInstallation,
 )
 
@@ -102,20 +101,35 @@ class RoomSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
-class MembershipSerializer(serializers.HyperlinkedModelSerializer):
+class MembershipSerializer(serializers.ModelSerializer):
+    included_serializers = {
+        "organization": "core.serializers.OrganizationSerializer",
+        "user": "core.serializers.UserSerializer",
+    }
 
-    user_id = serializers.ReadOnlyField(source="user.id")
     user_name = serializers.ReadOnlyField(source="user.username")
-    organization_id = serializers.ReadOnlyField(source="organization.id")
     organization_name = serializers.ReadOnlyField(source="organization.name")
+
+    organization = ResourceRelatedField(
+        allow_null=False,
+        required=True,
+        queryset=Organization.objects.all(),
+        related_link_view_name="membership-related",
+    )
+
+    user = ResourceRelatedField(
+        allow_null=False,
+        required=True,
+        queryset=User.objects.all(),
+        related_link_view_name="membership-related",
+    )
 
     class Meta:
         model = Membership
         fields = (
             "organization",
-            "user_id",
+            "user",
             "user_name",
-            "organization_id",
             "organization_name",
             "role",
             "url",
@@ -125,21 +139,29 @@ class MembershipSerializer(serializers.HyperlinkedModelSerializer):
 class OrganizationSerializer(serializers.HyperlinkedModelSerializer):
     included_serializers = {
         "users": "core.serializers.UserSerializer",
+        "memberships": "core.serializers.MembershipSerializer",
         "sites": "core.serializers.SiteSerializer",
         "nodes": "core.serializers.NodeSerializer",
     }
     # An Organization has one or more users as members.
-    users = HyperlinkedRelatedField(
+    users = ResourceRelatedField(
         many=True,
-        read_only=False,
         allow_null=True,
         required=False,
         queryset=User.objects.all(),
         self_link_view_name="organization-relationships",
         related_link_view_name="organization-related",
     )
-    # An Organization operates zero or more sites.
+    # An Organization is related to its members via Memberships.
     sites = HyperlinkedRelatedField(
+        many=True,
+        read_only=True,  # Memberships cannot be detached from their organization.
+        allow_null=True,
+        required=False,
+        related_link_view_name="organization-related",
+    )
+    # An Organization operates zero or more sites.
+    memberships = HyperlinkedRelatedField(
         many=True,
         read_only=True,  # Sites cannot be detached from their organization.
         allow_null=True,
@@ -149,23 +171,37 @@ class OrganizationSerializer(serializers.HyperlinkedModelSerializer):
     # An Organization operates one or more nodes.
     nodes = HyperlinkedRelatedField(
         many=True,
-        read_only=False,
+        read_only=True,  # Nodes cannot be detached from their organization.
         allow_null=True,
         required=False,
-        queryset=Node.objects.all(),
         related_link_view_name="organization-related",
     )
 
     class Meta:
         model = Organization
-        fields = ("name", "description", "users", "sites", "nodes", "url")
+        fields = (
+            "name",
+            "description",
+            "users",
+            "memberships",
+            "sites",
+            "nodes",
+            "url",
+        )
+
+
+class UsernameSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ["username"]
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     included_serializers = {
         "organizations": "core.serializers.OrganizationSerializer",
+        "memberships": "core.serializers.MembershipSerializer",
     }
-    #: A User is member of zero or more organizations.
+    # A User is member of zero or more organizations.
     organizations = HyperlinkedRelatedField(
         many=True,
         read_only=False,
@@ -173,6 +209,14 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         required=False,
         queryset=Organization.objects.all(),
         self_link_view_name="user-relationships",
+        related_link_view_name="user-related",
+    )
+    # A User holds zero or more organization memberships.
+    memberships = HyperlinkedRelatedField(
+        many=True,
+        read_only=True,  # Memberships cannot be detached from their user.
+        allow_null=True,
+        required=False,
         related_link_view_name="user-related",
     )
 
@@ -184,5 +228,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             "first_name",
             "last_name",
             "organizations",
+            "memberships",
             "url",
         )

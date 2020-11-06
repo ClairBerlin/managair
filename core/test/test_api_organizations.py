@@ -87,6 +87,15 @@ class OrganizationTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 4)
 
+    def test_get_organization_memberships(self):
+        """GET /organizations/<organization_id>/memberships/"""
+        url = reverse(
+            "organization-related", kwargs={"pk": 1, "related_field": "memberships"}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 4)
+
     def test_get_organization_user_relationships(self):
         """GET /organizations/<organization_id>/relationships/users/"""
         url = reverse(

@@ -1,10 +1,10 @@
-from random import randint, sample
 from datetime import datetime, timedelta
+from random import randint, sample
 
-from django.test import TestCase
 from django.db import IntegrityError
+from django.test import TestCase
 
-from core.models import Sample, Membership, Address, Site, Room, RoomNodeInstallation
+from core.models import Sample, Membership, Address, Site, Room
 from core.test.utils import setup_basic_test_data
 
 

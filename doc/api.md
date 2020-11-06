@@ -48,29 +48,36 @@ A **[T]** means that there exists at least on API test for the thus-marked resou
   - [GET] List the user-members of the organization.
   - [POST] Add one or more existing users as members of the organization. The default membership role will be _INSPECTOR_, which is the least-privileged role (read-only.)
   - [DELETE] Delete the member specified in the request body. **WARNING** Allows the logged-in user to be removed from the organization.
-- **[T]** `/api/v1/organizations/<organization_id>/users/` Collection-resource for the organizations members; that is, the users that are part of the organization.
-  - [GET] List the members, with individual links to the membership detail resouces at `/api/v1/users/<user_id>/`.
+- **[T]** `/api/v1/organizations/<organization_id>/users/` Collection-resource for the organization's members; that is, the users that are part of the organization.
+  - [GET] List the users of the organization, with individual links to the user detail resouces at `/api/v1/users/<user_id>/`.
+- **[T]** `/api/v1/organizations/<organization_id>/memberships/` Collection-resource for the organization's memberships.
+  - [GET] List the memberships of the organization, with individual links to membership detail resouces at `/api/v1/memberships/<membership_id>/`.
 - **[T]** `/api/v1/organizations/<organization_id>/nodes/` Collection-resource of all nodes that belong to the specified organization.
   - [GET] List all nodes owned by the organization, with individual links to node detail resources at `/api/v1/nodes/<node_id>`.
 - **[T]** `/api/v1/organizations/<organization_id>/sites/` Collection-resource of all sites that belong to the organization `organization_id`.
   - [GET] List the sites, with individual links to the detail-resource at `/api/v1/sites/<site_id>`.
 
-### Users
+### Users and Organization Membership
 
-- `/api/v1/users/` Collection resource of all users visible to the logged-in user.
-  - [GET] List the users. Filter to see members of one specific organization via the filter `filter[organization]=<organization_id>`.
-- `/api/v1/users/<user_id>/` Detail resource for a user's membership in the organization.
+- **[T]** `/api/v1/users/` Collection resource of all users visible to the logged-in user.
+  - [GET] List all usernames. Filter to see members of one specific organization via the filter `filter[organization]=<organization_id>`.
+- **[T]** `/api/v1/users/<user_id>/` Detail resource for a user. Only those users are accessible that are member of an organization where the logged-in user is also a member of.
   - [GET] Retrieve membership details. The membership contains the user's role and relations, and a nested `/api/v1/auth/user/<user_id>` resource.
-  - [PUT, PATCH] Replace resp. update membership details. The logged-in user must be an OWNER of the organization to perform this task.
-  - [DELETE] Revoke membership of a user. This action does not delete the user account, only the organization membership is affected. The logged-in user must be an OWNER of the organization to perform this task.
-- `/api/v1/users/<user_id>/relationships/organizations/` Relationship resource to manage the organizations a user is part of. This resource is the counterpart to `/api/v1/organizations/<organization_id>/relationships/users/`.
-  - [GET] List the organizations the user is part of.
-  - [POST]
-  - [PATCH]
-  - [DELETE]
-- `/api/v1/users/<user_id>/organizations/` Collection-resource of all organizations that the user is a member of.
+- **[Currently unavailable becaus of an upstream bug]** `/api/v1/users/<user_id>/organizations/` Collection-resource of all organizations that the user is a member of.
   - [GET] List all organizations of which the given user is a member, with individual links to organization detail resources at `/api/v1/organizations/<organization_id>/`.
-  - [POST] Register a new organization membership for the currently logged-in user.
+- **[Currently unavailable becaus of an upstream bug]** `/api/v1/users/<user_id>/memberships/` Collection-resource of all organization-memberships that the user holds. This resource is very similar to `/api/v1/users/<user_id>/organizations/`. However, it does not directly link to the organization the memberhsip pertains to, but includes the membership role instead.
+  - [GET] List all memberships the given user holds, with individual links to membership detail resources at `/api/v1/memberships/<membership_id>/`.
+- **[T]** `/api/v1/memberships/` Collection resource of all memberships the currentyl logged-in user holds.
+  - [GET] List all memberships of the currently logged-in user.
+  - [POST] Register a new member of an organization for which the logged-in user must be an OWNER.
+- **[T]** `/api/v1/memberships/<membership_id>/` Details-resource of the specified membership. Only accessible if the logged-in user is also a member of the membership organization.
+  - [GET] Retrieve information about the membership.
+  - [PUT, PATCH] Update membership: Use to alter membership role.
+  - [DELETE] Cancel the membership. Both user and organization are not affected.
+- **[T]** `/api/v1/memberships/<membership_id>/user` Details-resource of the user-member.
+  - [GET] Retrieve the user resource. This is the same resource as available at `/api/v1/users/<user_id/>`.
+- **[T]** `/api/v1/memberships/<membership_id>/organization` Details-resource of the membership organization.
+  - [GET] Retrieve the organization resource. This is the same resource as available at `/api/v1/organizations/<organization_id/>`.
 
 ### Nodes
 
