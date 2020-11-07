@@ -1,3 +1,4 @@
+from .data import Sample
 from .devices import Quantity, NodeModel, NodeProtocol, Node, NodeFidelity
 from .inventory import (
     Organization,
@@ -7,4 +8,3 @@ from .inventory import (
     Room,
     RoomNodeInstallation,
 )
-from .data import Sample

@@ -1,3 +1,9 @@
+from .data import (
+    SampleSerializer,
+    SimpleSampleSerializer,
+    SampleListSerializer,
+    TimeseriesSerializer
+)
 from .devices import (
     QuantitySerializer,
     NodeProtocolSerializer,
@@ -12,11 +18,6 @@ from .inventory import (
     RoomNodeInstallationSerializer,
     OrganizationSerializer,
     MembershipSerializer,
+    UsernameSerializer,
     UserSerializer,
-)
-from .data import (
-    SampleSerializer,
-    SimpleSampleSerializer,
-    SampleListSerializer,
-    TimeseriesSerializer
 )

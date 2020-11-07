@@ -1,3 +1,4 @@
+from .data import SampleAdmin
 from .devices import QuantityAdmin, NodeProtocolAdmin, NodeModelAdmin, NodeAdmin
 from .inventory import (
     AddressAdmin,
@@ -7,4 +8,3 @@ from .inventory import (
     MembershipAdmin,
     RoomNodeInstallationAdmin,
 )
-from .data import SampleAdmin

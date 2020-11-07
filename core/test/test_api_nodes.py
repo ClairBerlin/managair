@@ -96,7 +96,6 @@ class NodeTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
 
-
     # TODO: Failure cases:
     # - Nodes the user does not have access to.
     # - Add incompletely specified nodes.

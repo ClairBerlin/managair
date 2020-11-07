@@ -3,7 +3,6 @@ from rest_framework import permissions
 from rest_framework_json_api.views import (
     ModelViewSet,
     ReadOnlyModelViewSet,
-    RelationshipView,
 )
 
 from core.models import Quantity, NodeProtocol, NodeModel, Node, NodeFidelity

@@ -13,6 +13,7 @@ router.register(r"fidelity", devices.NodeFidelityViewSet)
 # Inventory management views
 router.register(r"users", inventory.UserViewSet)
 router.register(r"organizations", inventory.OrganizationViewSet)
+router.register(r"memberships", inventory.MembershipViewSet)
 router.register(r"sites", inventory.SiteViewSet)
 router.register(r"address", inventory.AddressViewSet)
 router.register(r"rooms", inventory.RoomViewSet)
@@ -28,6 +29,11 @@ urlpatterns = [
         name="user-relationships",
     ),
     path(
+        "memberships/<pk>/<related_field>/",
+        inventory.MembershipViewSet.as_view({"get": "retrieve_related"}),
+        name="membership-related",
+    ),
+    path(
         "users/<pk>/<related_field>/",
         inventory.UserViewSet.as_view({"get": "retrieve_related"}),
         name="user-related",
@@ -39,6 +45,11 @@ urlpatterns = [
     ),
     path(
         "organizations/<pk>/relationships/sites/",
+        view=inventory.SiteNotFoundExceptionView.as_view(),
+        name="organization-relationships",
+    ),
+    path(
+        "organizations/<pk>/relationships/memberships/",
         view=inventory.SiteNotFoundExceptionView.as_view(),
         name="organization-relationships",
     ),
