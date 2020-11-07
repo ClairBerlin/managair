@@ -120,7 +120,7 @@ A **[T]** means that there exists at least on API test for the thus-marked resou
 - **[T]** `/api/v1/sites/<site_id>/rooms/` Collection-resource of all rooms of the given site.
   - [GET] List the rooms, with individual links to the detail-resource at `/api/v1/rooms/<room_id>`.
 
-### Rooms
+### Rooms and Node-Installations
 
 - **[T]** `/api/v1/rooms/` Collection-resource of all rooms visible to a logged-in user.
   - [GET] List the rooms. Filter to see sites of one specific organization only via the filter `filter[organization]=<organization_id>`, and the rooms within one specific site via the filter `filter[site]=<site_id>`.
@@ -130,16 +130,17 @@ A **[T]** means that there exists at least on API test for the thus-marked resou
   - [DELETE] Remove the room resource and the node-installation it might contain. Does not delete the node resources themselves.
 - **[T]** `/api/v1/rooms/<room_id>/installations/` Collection-resource of all node installations in the given room.
   - [GET] List current and past installations, with individual links to the detail-resource at `/api/v1/installations/<installation_id>`.
-
-### Node-Installations
-
-- `/api/v1/installations/` Collection-resource for the all node installation visible to the logged-in user.
+- **[T]** `/api/v1/installations/` Collection-resource for the all node installation visible to the logged-in user.
   - [GET] List the installations. Filter to see onstallations of one specific organization with the filter `filter[organization]=<organization_id>`, for one specific site with the filter `filter[site]=<site_id>`, for one specific room via the filter `filter[room]=<room_id>`, and for all installations of a specific node via the filter `filter[node]=<node_id>`.
-- `/api/v1/installations/<installation_id>/` Details-resource for the installation of the identified node.
+  - [POST] Associate an already-registered node with an already-registered room. A node to be associated with a room must not be associated with another room for an overlapping time period.
+- **[T]** `/api/v1/installations/<installation_id>/` Details-resource for the installation of the identified node.
   - [GET] Provide details about the installation - time slice, photo, and additional installation information.
-  - [POST] Associate an already registered node with the room. A node to be associated with a room must not be associated with another room for an overlapping time period.
-  - [PUT, PATCH] Replace resp. update the association with the room. To end the association with a room, update it with an end date; this preserves the association history.
+  - [PUT, PATCH] Replace resp. update the association with the room. To end the association with a room, update it with an end timestamp earlier than 2147483647 (2038-01-19T03:14:07Z); this preserves the association history.
   - [DELETE] Removes the association with the room. This removes the association history, as if the node was never associated with the room.
+- **[T]** `/api/v1/installations/<installation_id>/room/` Detail-resource of the room the given installation pertains to.
+  - [GET] Details the room, with link to the room resource at `/api/v1/rooms/<room_id>`.
+- **[T]** `/api/v1/installations/<installation_id>/node/` Detail-resource of the node the given installation pertains to.
+  - [GET] Details the node, with link to the node resource at `/api/v1/nodes/<node_id>`.
 
 ## Public
 
