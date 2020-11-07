@@ -47,11 +47,8 @@ class UserViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
     queryset = User.objects.all()
     # Use different serializers for different actions.
     # See https://stackoverflow.com/questions/22616973/django-rest-framework-use-different-serializers-in-the-same-modelviewset
-    serializer_classes = {
-        "list": UsernameSerializer,
-        "retrieve": UserSerializer
-    }
-    serializer_class = UserSerializer # fallback
+    serializer_classes = {"list": UsernameSerializer, "retrieve": UserSerializer}
+    serializer_class = UserSerializer  # fallback
 
     def get_queryset(self):
         queryset = super(UserViewSet, self).get_queryset()
@@ -68,8 +65,12 @@ class UserViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
                 queryset = queryset.only("username")
             else:
                 # Otherwise, return those users only that are in an organization
-                # accessible by the logged-in user.
-                queryset = queryset.filter(organizations__users=self.request.user.id)
+                # accessible by the logged-in user. Need to make the filter result
+                # distinct because the underlying JOIN might return the same user
+                # multiple times if it is a member of several organizations.
+                queryset = queryset.filter(
+                    organizations__users=self.request.user.id
+                ).distinct()
         return queryset
 
     def get_serializer_class(self):
@@ -91,7 +92,7 @@ class AddressViewSet(LoginRequiredMixin, ModelViewSet):
     def get_queryset(self):
         """Restrict to logged-in user"""
         queryset = super(AddressViewSet, self).get_queryset()
-        return queryset.filter(sites__operated_by__users=self.request.user)
+        return queryset.filter(sites__operated_by__users=self.request.user).distinct()
 
 
 class SiteViewSet(LoginRequiredMixin, ModelViewSet):
@@ -102,7 +103,7 @@ class SiteViewSet(LoginRequiredMixin, ModelViewSet):
     def get_queryset(self):
         """Restrict to logged-in user"""
         queryset = super(SiteViewSet, self).get_queryset()
-        return queryset.filter(operated_by__users=self.request.user)
+        return queryset.filter(operated_by__users=self.request.user).distinct()
 
 
 class RoomViewSet(LoginRequiredMixin, ModelViewSet):
@@ -113,7 +114,7 @@ class RoomViewSet(LoginRequiredMixin, ModelViewSet):
     def get_queryset(self):
         """Restrict to logged-in user"""
         queryset = super(RoomViewSet, self).get_queryset()
-        return queryset.filter(site__operated_by__users=self.request.user)
+        return queryset.filter(site__operated_by__users=self.request.user).distinct()
 
 
 class RoomNodeInstallationViewSet(LoginRequiredMixin, ModelViewSet):
@@ -124,7 +125,9 @@ class RoomNodeInstallationViewSet(LoginRequiredMixin, ModelViewSet):
     def get_queryset(self):
         """Restrict to logged-in user"""
         queryset = super(RoomNodeInstallationViewSet, self).get_queryset()
-        return queryset.filter(room__site__operated_by__users=self.request.user)
+        return queryset.filter(
+            room__site__operated_by__users=self.request.user
+        ).distinct()
 
 
 class OrganizationViewSet(LoginRequiredMixin, ModelViewSet):
@@ -158,4 +161,4 @@ class MembershipViewSet(LoginRequiredMixin, ModelViewSet):
     def get_queryset(self):
         """Restrict to users in the same organization."""
         queryset = super(MembershipViewSet, self).get_queryset()
-        return queryset.filter(organization__users=self.request.user)
+        return queryset.filter(organization__users=self.request.user).distinct()

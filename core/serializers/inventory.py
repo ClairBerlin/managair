@@ -193,7 +193,7 @@ class OrganizationSerializer(serializers.HyperlinkedModelSerializer):
 class UsernameSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ["username"]
+        fields = ["username", "url"]
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
