@@ -1,4 +1,4 @@
-from .data import SampleListView, SampleViewSet
+from .data import SampleListView, SampleViewSet, TimeSeriesViewSet
 from .devices import (
     QuantityViewSet,
     NodeProtocolViewSet,
