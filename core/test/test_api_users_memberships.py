@@ -127,7 +127,7 @@ class MembershipsTestCase(APITestCase):
         self.assertEqual(response2.data["user"]["id"], "5")
         self.assertEqual(response2.data["organization"]["id"], "2")
         # Delete the membership.
-        # DELETE /membership/<membership_id>/
+        # DELETE /memberships/<membership_id>/
         response3 = self.client.delete(response_url)
         self.assertEqual(response3.status_code, 204)
         # Make sure it is gone.

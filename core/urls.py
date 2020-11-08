@@ -17,7 +17,9 @@ router.register(r"memberships", inventory.MembershipViewSet)
 router.register(r"sites", inventory.SiteViewSet)
 router.register(r"address", inventory.AddressViewSet)
 router.register(r"rooms", inventory.RoomViewSet)
-router.register(r"installations", inventory.RoomNodeInstallationViewSet)
+router.register(
+    r"installations", inventory.RoomNodeInstallationViewSet, basename="installation"
+)
 # Data views
 router.register(r"samples", data.SampleViewSet)
 
@@ -74,24 +76,27 @@ urlpatterns = [
         name="room-related",
     ),
     path(
+        "installations/<pk>/<related_field>/",
+        inventory.RoomNodeInstallationViewSet.as_view({"get": "retrieve_related"}),
+        name="installation-related",
+    ),
+    path(
         "nodes/<pk>/samples/", data.SampleListView.as_view(), name="node-samples-list"
     ),
     path(
-        "nodes/<pk>/timeseries/", data.TimeseriesDetailView.as_view(), name="node-timeseries-detail"
+        "nodes/<pk>/timeseries/",
+        data.TimeseriesDetailView.as_view(),
+        name="node-timeseries-detail",
     ),
     path(
         "nodes/<pk>/<related_field>/",
         view=devices.NodeViewSet.as_view({"get": "retrieve_related"}),
         name="node-related",
     ),
-    path(
-        "timeseries/",
-        view=data.TimeSeriesListView.as_view(),
-        name="timeseries-list"
-    ),
+    path("timeseries/", view=data.TimeSeriesListView.as_view(), name="timeseries-list"),
     path(
         "timeseries/<pk>/",
         view=data.TimeseriesDetailView.as_view(),
-        name="timeseries-detail"
-    )
+        name="timeseries-detail",
+    ),
 ]

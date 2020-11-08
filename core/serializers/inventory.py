@@ -11,6 +11,7 @@ from core.models import (
     Organization,
     Site,
     Room,
+    Node,
     RoomNodeInstallation,
 )
 
@@ -58,13 +59,32 @@ class SiteSerializer(serializers.HyperlinkedModelSerializer):
 
 class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
     included_serializers = {
-        "room": "core.serializers.RoomSerializer",
         "node": "core.serializers.NodeSerializer",
+        "room": "core.serializers.RoomSerializer",
     }
+
+    node = ResourceRelatedField(
+        queryset=Node.objects.all(), related_link_view_name="installation-related"
+    )
+
+    room = ResourceRelatedField(
+        queryset=Room.objects.all(), related_link_view_name="installation-related"
+    )
+
+    url = serializers.HyperlinkedIdentityField(
+        view_name='installation-detail'
+    )
 
     class Meta:
         model = RoomNodeInstallation
-        fields = ["room", "node", "from_timestamp_s", "to_timestamp_s", "description"]
+        fields = [
+            "room",
+            "node",
+            "from_timestamp_s",
+            "to_timestamp_s",
+            "description",
+            "url",
+        ]
 
 
 class RoomSerializer(serializers.HyperlinkedModelSerializer):
@@ -86,9 +106,10 @@ class RoomSerializer(serializers.HyperlinkedModelSerializer):
         queryset=RoomNodeInstallation.objects.all(),
         related_link_view_name="room-related",
     )
-
+    
     class Meta:
         model = Room
+        
         fields = [
             "name",
             "description",
