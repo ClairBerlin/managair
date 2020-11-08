@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework import permissions
 from rest_framework.exceptions import NotFound
+from rest_framework.filters import SearchFilter
+from rest_framework_json_api import filters
 from rest_framework_json_api.views import (
     ModelViewSet,
     ReadOnlyModelViewSet,
@@ -49,6 +51,8 @@ class UserViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
     # See https://stackoverflow.com/questions/22616973/django-rest-framework-use-different-serializers-in-the-same-modelviewset
     serializer_classes = {"list": UsernameSerializer, "retrieve": UserSerializer}
     serializer_class = UserSerializer  # fallback
+    filter_backends = (filters.QueryParameterValidationFilter, SearchFilter)
+    search_fields = ("username", "email")
 
     def get_queryset(self):
         queryset = super(UserViewSet, self).get_queryset()
@@ -63,6 +67,11 @@ class UserViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
             if self.action == "list":
                 # For the list view, return just the username of all users
                 queryset = queryset.only("username")
+                organization_id = self.request.query_params.get(
+                    "filter[organization]", None
+                )
+                if organization_id is not None:
+                    queryset = queryset.filter(organizations=organization_id)
             else:
                 # Otherwise, return those users only that are in an organization
                 # accessible by the logged-in user. Need to make the filter result
@@ -99,22 +108,43 @@ class SiteViewSet(LoginRequiredMixin, ModelViewSet):
     permissions = [permissions.IsAuthenticated]
     queryset = Site.objects.all()
     serializer_class = SiteSerializer
+    filter_backends = (filters.QueryParameterValidationFilter, SearchFilter)
+    search_fields = ("name", "description")
 
     def get_queryset(self):
         """Restrict to logged-in user"""
         queryset = super(SiteViewSet, self).get_queryset()
-        return queryset.filter(operated_by__users=self.request.user).distinct()
+        queryset = queryset.filter(operated_by__users=self.request.user)
+        if self.action == "list":
+            organization_id = self.request.query_params.get(
+                "filter[organization]", None
+            )
+            if organization_id is not None:
+                queryset = queryset.filter(operated_by=organization_id)
+        return queryset.distinct()
 
 
 class RoomViewSet(LoginRequiredMixin, ModelViewSet):
     permissions = [permissions.IsAuthenticated]
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
+    filter_backends = (filters.QueryParameterValidationFilter, SearchFilter)
+    search_fields = ("name", "description")
 
     def get_queryset(self):
         """Restrict to logged-in user"""
         queryset = super(RoomViewSet, self).get_queryset()
-        return queryset.filter(site__operated_by__users=self.request.user).distinct()
+        queryset = queryset.filter(site__operated_by__users=self.request.user)
+        if self.action == "list":
+            organization_id = self.request.query_params.get(
+                "filter[organization]", None
+            )
+            if organization_id is not None:
+                queryset = queryset.filter(site__operated_by=organization_id)
+            site_id = self.request.query_params.get("filter[site]", None)
+            if site_id is not None:
+                queryset = queryset.filter(site=site_id)
+        return queryset.distinct()
 
 
 class RoomNodeInstallationViewSet(LoginRequiredMixin, ModelViewSet):
@@ -125,9 +155,24 @@ class RoomNodeInstallationViewSet(LoginRequiredMixin, ModelViewSet):
     def get_queryset(self):
         """Restrict to logged-in user"""
         queryset = super(RoomNodeInstallationViewSet, self).get_queryset()
-        return queryset.filter(
-            room__site__operated_by__users=self.request.user
-        ).distinct()
+        queryset = queryset.filter(
+            room__site__operated_by__users=self.request.user)
+        if self.action == "list":
+            organization_id = self.request.query_params.get(
+                "filter[organization]", None
+            )
+            if organization_id is not None:
+                queryset = queryset.filter(room__site__operated_by=organization_id)
+            site_id = self.request.query_params.get("filter[site]", None)
+            if site_id is not None:
+                queryset = queryset.filter(room__site=site_id)
+            room_id = self.request.query_params.get("filter[room]", None)
+            if room_id is not None:
+                queryset = queryset.filter(room=room_id)
+            node_id = self.request.query_params.get("filter[node]", None)
+            if node_id is not None:
+                queryset = queryset.filter(node=node_id)
+        return queryset.distinct()
 
 
 class OrganizationViewSet(LoginRequiredMixin, ModelViewSet):
@@ -161,4 +206,17 @@ class MembershipViewSet(LoginRequiredMixin, ModelViewSet):
     def get_queryset(self):
         """Restrict to users in the same organization."""
         queryset = super(MembershipViewSet, self).get_queryset()
-        return queryset.filter(organization__users=self.request.user).distinct()
+        queryset = queryset.filter(organization__users=self.request.user)
+        if self.action == "list":
+            organization_id = self.request.query_params.get(
+                "filter[organization]", None
+            )
+            if organization_id is not None:
+                queryset = queryset.filter(organization=organization_id)
+            username = self.request.query_params.get("filter[username]", None)
+            if username is not None:
+                queryset = queryset.filter(user__username=username)
+            user_id = self.request.query_params.get("filter[user]", None)
+            if user_id is not None:
+                queryset = queryset.filter(user=user_id)
+        return queryset.distinct()

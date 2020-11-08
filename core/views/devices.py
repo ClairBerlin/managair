@@ -1,5 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework import permissions
+from rest_framework.filters import SearchFilter
+from rest_framework_json_api import filters
 from rest_framework_json_api.views import (
     ModelViewSet,
     ReadOnlyModelViewSet,
@@ -37,11 +39,19 @@ class NodeViewSet(LoginRequiredMixin, ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Node.objects.all()
     serializer_class = NodeSerializer
+    filter_backends = (filters.QueryParameterValidationFilter, SearchFilter)
+    search_fields = ("alias", "device_id")
 
     def get_queryset(self):
         """Restrict to logged-in user"""
         queryset = super(NodeViewSet, self).get_queryset()
-        return queryset.filter(owner__users=self.request.user)
+        queryset = queryset.filter(owner__users=self.request.user)
+        if self.action == "list":
+            organization_id = self.request.query_params.get(
+                    "filter[organization]", None)
+            if organization_id is not None:
+                queryset = queryset.filter(owner=organization_id)
+        return queryset.distinct()
 
 
 class NodeFidelityViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):

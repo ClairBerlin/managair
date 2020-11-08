@@ -35,8 +35,6 @@ class TimeseriesTestCase(APITestCase):
         self.assertEqual(response.data["sample_count"], 589)
         self.assertEqual(len(response.data["samples"]), 589)
 
-    # TODO: test query parameters.
-
     def test_get_node_timeseries(self):
         """GET /nodes/<node_id>/timeseries/"""
         url = reverse(
@@ -45,6 +43,19 @@ class TimeseriesTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.data["sample_count"], 589)
         self.assertEqual(len(response.data["samples"]), 589)
+
+    def test_get_node_timeseries_slice(self):
+        """GET /nodes/<node_id>/timeseries/?filter[from]=<from_timestamp>&filter[to]=<to_timestamp>"""
+        url = reverse(
+            "node-related", kwargs={"pk": self.node_id, "related_field": "timeseries"}
+        )
+        response = self.client.get(
+            url, {"filter[from]": 1601725200, "filter[to]": 1601795400}
+        )
+        self.assertEqual(response.data["sample_count"], 39)
+        self.assertEqual(len(response.data["samples"]), 39)
+        self.assertEqual(response.data["from_timestamp"], 1601725200)
+        self.assertEqual(response.data["to_timestamp"], 1601795400)
 
 
 class SamplesTestCase(APITestCase):
@@ -68,6 +79,27 @@ class SamplesTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 100)  # Result is paged.
         self.assertEqual(response.data["meta"]["pagination"]["count"], 1554)
+
+    def test_get_sample_per_node(self):
+        """GET /samples/?filter[node]=<node_id>"""
+        response = self.client.get(self.collection_url, {"filter[node]": self.node_id})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 100)  # Result is paged.
+        self.assertEqual(response.data["meta"]["pagination"]["count"], 589)
+
+    def test_get_sample_slice_per_node(self):
+        """GET /samples/?filter[node]=<node_id>&filter[from]=<from_timestamp&filter[to]=<to_timestamp"""
+        response = self.client.get(
+            self.collection_url,
+            {
+                "filter[node]": self.node_id,
+                "filter[from]": 1601725200,
+                "filter[to]": 1601795400,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 39)
+        self.assertEqual(response.data["meta"]["pagination"]["count"], 39)
 
     # TODO: test query parameters and paging
 

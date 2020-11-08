@@ -30,7 +30,18 @@ class UsersTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 7)
 
-    # TODO: GET a specific room via query-parameter.
+    def test_get_users_search(self):
+        """GET /users/?filter[search]=<search-text>"""
+        response = self.client.get(self.collection_url, {"filter[search]": "tom"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["username"], "tomTester")
+
+    def test_get_users_in_organization(self):
+        """GET /users/?filter[organization]=<organization_id>"""
+        response = self.client.get(self.collection_url, {"filter[organization]": "2"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 4)
 
     def test_get_user(self):
         """GET /users/<user_id>/"""
@@ -71,8 +82,36 @@ class MembershipsTestCase(APITestCase):
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 8)
+    
+    def test_get_membership_in_organization(self):
+        """GET /memberships/?filter[organization]=<organization_id>"""
+        # Need a different user for this test case.
+        self.client.logout()
+        # user priskaPrueferin is member in two organizations
+        self.client.login(username="priskaPrueferin", password="priska")
+        response = self.client.get(self.collection_url, {"filter[organization]": 2})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 4)
 
-    # TODO: GET memberships for a specific organization or user via query-parameters.
+    def test_get_membership_per_username(self):
+        """GET /memberships/?filter[username]=<username>"""
+        # Need a different user for this test case.
+        self.client.logout()
+        # user priskaPrueferin is member in two organizations
+        self.client.login(username="priskaPrueferin", password="priska")
+        response = self.client.get(self.collection_url, {"filter[username]": "ingoInspekteur"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 2)
+    
+    def test_get_membership_per_user(self):
+        """GET /memberships/?filter[user]=<user_id>"""
+        # Need a different user for this test case.
+        self.client.logout()
+        # user priskaPrueferin is member in two organizations
+        self.client.login(username="priskaPrueferin", password="priska")
+        response = self.client.get(self.collection_url, {"filter[user]": 6})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 2)
 
     def test_get_membership(self):
         """GET /memberships/<membership_id>/"""
