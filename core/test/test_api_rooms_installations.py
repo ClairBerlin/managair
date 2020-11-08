@@ -27,7 +27,21 @@ class RoomsTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
 
-    # TODO: GET a specific room via query-parameter.
+    def test_get_rooms_per_organization(self):
+        """GET /rooms/?filter[organization]=<organization_id>"""
+        # Need a different user for this test case.
+        self.client.logout()
+        # user priskaPrueferin is member in two organizations
+        self.client.login(username="priskaPrueferin", password="priska")
+        response = self.client.get(self.collection_url, {"filter[organization]": 1})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 2)
+
+    def test_get_rooms_per_site(self):
+        """GET /rooms/?filter[site]=<site_id>"""
+        response = self.client.get(self.collection_url, {"filter[site]": 2})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 1)
 
     def test_get_room(self):
         """GET /rooms/<room_id>/"""
@@ -111,6 +125,7 @@ class RoomsTestCase(APITestCase):
 
 class InstallationsTestCase(APITestCase):
     fixtures = ["user-fixtures.json", "inventory-fixtures.json"]
+    node_id = "3b95a1b2-74e7-9e98-52c4-4acae441f0ae"
 
     def setUp(self):
         # veraVersuch is owner of the organization Versuchsverbund with pk=2.
@@ -133,7 +148,35 @@ class InstallationsTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
 
-    # TODO: GET with various filter options.
+    def test_get_installations_per_organization(self):
+        """GET /installations/?filter[organization]=<organization_id>"""
+        # Need a different user for this test case.
+        self.client.logout()
+        # user priskaPrueferin is member in two organizations
+        self.client.login(username="priskaPrueferin", password="priska")
+        response = self.client.get(self.collection_url, {"filter[organization]": 1})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 1)
+
+    def test_get_installations_per_site(self):
+        """GET /installations/?filter[site]=<site_id>"""
+        response = self.client.get(self.collection_url, {"filter[site]": 3})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["from_timestamp_s"], 1602720001)
+
+    def test_get_installations_per_room(self):
+        """GET /installations/?filter[room]=<room_id>"""
+        response = self.client.get(self.collection_url, {"filter[room]": 3})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["from_timestamp_s"], 1601510400)
+
+    def test_get_installations_per_node(self):
+        """GET /installations/?filter[node]=<node_id>"""
+        response = self.client.get(self.collection_url, {"filter[node]": self.node_id})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 2)
 
     def test_get_installation(self):
         """GET /installations/<installation_id>/"""

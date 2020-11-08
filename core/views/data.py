@@ -3,7 +3,7 @@ from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions
-from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.exceptions import MethodNotAllowed, NotFound
 from rest_framework.response import Response
 from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 from rest_framework_json_api.views import ReadOnlyModelViewSet, generics
@@ -81,8 +81,8 @@ class TimeSeriesViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
         if self.action == "retrieve":
             # Restrict the samples to a node, if one is given.
             if "node_pk" in self.kwargs:
-                # If the view is accessed via the `node-samples-list` route, it will have
-                # been passed the node_pk as lookup_field.
+                # If the view is accessed via the `node-samples-list` route, it will
+                # have been passed the node_pk as lookup_field.
                 node_id = self.kwargs["node_pk"]
                 return get_object_or_404(authorized_nodes, pk=node_id)
             elif "pk" in self.kwargs:
@@ -149,22 +149,28 @@ class SampleViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
         """
         Optionally restricts the returned samples to a given time slice and node.
         """
+        queryset = super(SampleViewSet, self).get_queryset()
         # Restrict to samples from nodes commanded by the currently logged-in user.
         nodes = Node.objects.filter(owner__users=self.request.user)
-        # Further restrict to node given as query parameter
-        node_id = self.request.query_params.get("filter[node]", None)
-        if node_id is not None:
-            query_node = Node.objects.get(pk=node_id)
-            nodes = nodes.union(query_node)
-        # Time-slicing query parameter
-        from_limit = self.request.query_params.get("filter[from]", 0)
-        to_limit = self.request.query_params.get(
-            "filter[to]", round(datetime.now().timestamp())
-        )
-
-        queryset = super(SampleViewSet, self).get_queryset()
         queryset = queryset.filter(node__in=nodes)
-        queryset = queryset.filter(
-            timestamp_s__gte=from_limit, timestamp_s__lte=to_limit
-        )
-        return queryset
+        # Further restrict to node given as query parameter
+        if self.action == "list":
+            queryset = queryset.filter(node__in=nodes)
+            node_id = self.request.query_params.get("filter[node]", None)
+            if node_id is not None:
+                query_node = get_object_or_404(nodes, pk=node_id)
+                if query_node is not None:
+                    queryset = queryset.filter(node=node_id)
+                else:
+                    raise NotFound
+            queryset = queryset.filter(node__in=nodes)
+            # Time-slicing query parameter
+            from_limit = self.request.query_params.get("filter[from]", 0)
+            to_limit = self.request.query_params.get(
+                "filter[to]", round(datetime.now().timestamp())
+            )
+            queryset = queryset.filter(
+                timestamp_s__gte=from_limit, timestamp_s__lte=to_limit
+            )
+
+        return queryset.distinct()

@@ -25,7 +25,15 @@ class NodeTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
 
-    # TODO: GET a specific node via query-parameter.
+    def test_get_nodes_per_organization(self):
+        """GET /nodes/?filter[organization]=<organization_id>"""
+        # Need a different user for this test case.
+        self.client.logout()
+        # user priskaPrueferin is member in two organizations
+        self.client.login(username="priskaPrueferin", password="priska")
+        response = self.client.get(self.collection_url, {"filter[organization]": 2})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 2)
 
     def test_get_node(self):
         """GET /node/<node_id>/"""

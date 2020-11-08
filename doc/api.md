@@ -60,15 +60,19 @@ A **[T]** means that there exists at least on API test for the thus-marked resou
 ### Users and Organization Membership
 
 - **[T]** `/api/v1/users/` Collection resource of all users visible to the logged-in user.
-  - [GET] List all usernames. Filter to see members of one specific organization via the filter `filter[organization]=<organization_id>`.
+  - [GET] List all usernames. Filter to limit the collection:
+    - Text-search for a specific user by username or email via tha filter `filter[search]=<search-text>`.
+    - See members of one specific organization via the filter `filter[organization]=<organization_id>`.
 - **[T]** `/api/v1/users/<user_id>/` Detail resource for a user. Only those users are accessible that are member of an organization where the logged-in user is also a member of.
   - [GET] Retrieve membership details. The membership contains the user's role and relations, and a nested `/api/v1/auth/user/<user_id>` resource.
 - **[Currently unavailable becaus of an upstream bug]** `/api/v1/users/<user_id>/organizations/` Collection-resource of all organizations that the user is a member of.
   - [GET] List all organizations of which the given user is a member, with individual links to organization detail resources at `/api/v1/organizations/<organization_id>/`.
 - **[Currently unavailable becaus of an upstream bug]** `/api/v1/users/<user_id>/memberships/` Collection-resource of all organization-memberships that the user holds. This resource is very similar to `/api/v1/users/<user_id>/organizations/`. However, it does not directly link to the organization the memberhsip pertains to, but includes the membership role instead.
   - [GET] List all memberships the given user holds, with individual links to membership detail resources at `/api/v1/memberships/<membership_id>/`.
-- **[T]** `/api/v1/memberships/` Collection resource of all memberships the currentyl logged-in user holds.
-  - [GET] List all memberships of the currently logged-in user.
+- **[T]** `/api/v1/memberships/` Collection resource of all memberships visible to the currently logged-in user; i.e., memberships for all organizations where the currently logged-in user is itself a member.
+  - [GET] List all memberships visible to the currently logged-in user. Narrow-down the result via the following filters:
+    - `filter[organization]=<organization_id>`: Return memberships of the given organization only.
+    - `filter[username]=<username>` or `filter[user]=<user_id>`: Return memberships of the given user only. Note that only memberships in organizations will be returned where the currently logged-in user is also a member.
   - [POST] Register a new member of an organization for which the logged-in user must be an OWNER.
 - **[T]** `/api/v1/memberships/<membership_id>/` Details-resource of the specified membership. Only accessible if the logged-in user is also a member of the membership organization.
   - [GET] Retrieve information about the membership.
@@ -82,7 +86,9 @@ A **[T]** means that there exists at least on API test for the thus-marked resou
 ### Nodes
 
 - **[T]** `/api/v1/nodes/` Collection-resource of the nodes visible to the logged-in user.
-  - [GET] List the nodes. Filter to see nodes of one specific organization only via the filter `filter[organization]=<organization_id>`.
+  - [GET] List the nodes. Filter to narrow down the list:
+    - Get nodes of one specific organization only via the filter `filter[organization]=<organization_id>`.
+    - Search for nodes with a specific alias or device-EUI via the filter `filter[search]=<search-text>`.
 - **[T]** `/api/v1/nodes/<node_id>/` Details-resource of the specified node. Only accessible if the node is visible to the logged-in user.
   - [GET] Retrieve information about the node. Might include fidelity information.
   - [PUT, PATCH] Update node master data; e.g., node alias or tags (feature request).
@@ -95,7 +101,9 @@ A **[T]** means that there exists at least on API test for the thus-marked resou
 ### Sites
 
 - **[T]** `/api/v1/sites/` Collection-resource of all sites visible to a logged-in user.
-  - [GET] List the sites. Filter to see sites of one specific organization only via the filter `filter[organization]=<organization_id>`.
+  - [GET] List the sites. Filter to narrow down the list:
+    - Get sites of one specific organization only via the filter `filter[organization]=<organization_id>`.
+    - Search for sites with a specific name or description via the filter `filter[search]=<search-text>`.
 - **[T]** `/api/v1/sites/<site_id>/` Details-resource of the specified site.
   - [GET] Rertieve the site resource.
   - [PUT, PATCH] Replace resp. update site master data.
@@ -106,7 +114,10 @@ A **[T]** means that there exists at least on API test for the thus-marked resou
 ### Rooms and Node-Installations
 
 - **[T]** `/api/v1/rooms/` Collection-resource of all rooms visible to a logged-in user.
-  - [GET] List the rooms. Filter to see sites of one specific organization only via the filter `filter[organization]=<organization_id>`, and the rooms within one specific site via the filter `filter[site]=<site_id>`.
+  - [GET] List the rooms. Filter to narrow down the list:
+    - See sites of one specific organization only via the filter `filter[organization]=<organization_id>`.
+    - See the rooms within one specific site only via the filter `filter[site]=<site_id>`.
+    - Search for rooms with a specific name or description via the filter `filter[search]=<search-text>`.
 - **[T]** `/api/v1/rooms/<room_id>/` Details-resource of the specified room.
   - [GET] Retrieve the room resource.
   - [PUT, PATCH] Replace resp. update the room resouce.
@@ -114,7 +125,11 @@ A **[T]** means that there exists at least on API test for the thus-marked resou
 - **[T]** `/api/v1/rooms/<room_id>/installations/` Collection-resource of all node installations in the given room.
   - [GET] List current and past installations, with individual links to the detail-resource at `/api/v1/installations/<installation_id>`.
 - **[T]** `/api/v1/installations/` Collection-resource for the all node installation visible to the logged-in user.
-  - [GET] List the installations. Filter to see onstallations of one specific organization with the filter `filter[organization]=<organization_id>`, for one specific site with the filter `filter[site]=<site_id>`, for one specific room via the filter `filter[room]=<room_id>`, and for all installations of a specific node via the filter `filter[node]=<node_id>`.
+  - [GET] List the installations. Filter to narrow down the list
+    - See installations of one specific organization with the filter `filter[organization]=<organization_id>`.
+    - See installations of one specific site with the filter `filter[site]=<site_id>`.
+    - See installations in one specific room via the filter `filter[room]=<room_id>`.
+    - See installations of a specific node via the filter `filter[node]=<node_id>`.
   - [POST] Associate an already-registered node with an already-registered room. A node to be associated with a room must not be associated with another room for an overlapping time period.
 - **[T]** `/api/v1/installations/<installation_id>/` Details-resource for the installation of the identified node.
   - [GET] Provide details about the installation - time slice, photo, and additional installation information.
