@@ -43,6 +43,10 @@ class TimeseriesSerializer(serializers.Serializer):
     to_timestamp = serializers.IntegerField()
     sample_count = serializers.IntegerField()
 
+    url = serializers.HyperlinkedIdentityField(
+        view_name='timeseries-detail'
+    )
+
     class Meta:
         model = TimeseriesViewModel
         fields = ["url"]

@@ -2,8 +2,9 @@ from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
-from rest_framework.response import Response
+from rest_framework import permissions
 from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.response import Response
 from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 from rest_framework_json_api.views import ReadOnlyModelViewSet, generics
 
@@ -29,6 +30,7 @@ class SampleListView(LoginRequiredMixin, generics.ListAPIView):
 
     Samples will be returned in ascending order according to their time stamp.
     """
+
     serializer_class = SimpleSampleSerializer
     queryset = Node.objects.all()
 
@@ -60,13 +62,45 @@ class SampleListView(LoginRequiredMixin, generics.ListAPIView):
         return queryset
 
 
-class TimeSeriesListView(LoginRequiredMixin, generics.ListAPIView):
+class TimeSeriesViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
+    permissions = [permissions.IsAuthenticated]
     queryset = Node.objects.all()
-    serializer_class = TimeseriesSerializer
+    # Use different serializers for different actions.
+    # See https://stackoverflow.com/questions/22616973/django-rest-framework-use-different-serializers-in-the-same-modelviewset
+    serializer_classes = {
+        "list": TimeseriesSerializer,
+        "retrieve": SampleListSerializer,
+    }
+    serializer_class = TimeseriesSerializer  # fallback
 
     def get_queryset(self):
-        """Restrict to logged-in user"""
-        return Node.objects.filter(owner__users=self.request.user)
+        queryset = super(TimeSeriesViewSet, self).get_queryset()
+        # Restrict to samples from nodes commanded by the currently logged-in user.
+        authorized_nodes = queryset.filter(owner__users=self.request.user)
+
+        if self.action == "retrieve":
+            # Restrict the samples to a node, if one is given.
+            if "node_pk" in self.kwargs:
+                # If the view is accessed via the `node-samples-list` route, it will have
+                # been passed the node_pk as lookup_field.
+                node_id = self.kwargs["node_pk"]
+                return get_object_or_404(authorized_nodes, pk=node_id)
+            elif "pk" in self.kwargs:
+                # If the view is accessed via the `timeseries-details` route, it will have
+                # been passed the pk as lookup_field.
+                node_id = self.kwargs["pk"]
+                return get_object_or_404(authorized_nodes, pk=node_id)
+            else:
+                raise MethodNotAllowed
+        elif self.action == "list":
+            return authorized_nodes
+        else:
+            raise MethodNotAllowed
+
+    def get_serializer_class(self):
+        # TODO: Does not work for related fields because of this upstream bug:
+        # https://github.com/django-json-api/django-rest-framework-json-api/issues/859
+        return self.serializer_classes.get(self.action, self.serializer_class)
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -76,27 +110,9 @@ class TimeSeriesListView(LoginRequiredMixin, generics.ListAPIView):
             )
             for node in queryset
         ]
-        serializer = TimeseriesSerializer(ts_info, many=True)
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(ts_info, many=True, context={"request": request})
         return Response(serializer.data)
-
-
-class TimeseriesDetailView(LoginRequiredMixin, generics.RetrieveAPIView):
-    queryset = Node.objects.all()
-    serializer_class = SampleListSerializer
-
-    def get_queryset(self):
-        queryset = super(TimeseriesDetailView, self).get_queryset()
-        # Restrict to samples from nodes commanded by the currently logged-in user.
-        authorized_nodes = queryset.filter(owner__users=self.request.user)
-
-        # Furthermore, restrict the samples to a node, if one is given.
-        if self.lookup_field:
-            # If the view is accessed via the `node-samples-list` route, it will have
-            # been passed the node-pk as lookup_field.
-            node_id = self.kwargs[self.lookup_field]
-            return get_object_or_404(authorized_nodes, pk=node_id)
-        else:
-            raise MethodNotAllowed
 
     def get_object(self):
         node = self.get_queryset()

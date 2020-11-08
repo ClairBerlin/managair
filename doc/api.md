@@ -87,27 +87,10 @@ A **[T]** means that there exists at least on API test for the thus-marked resou
   - [GET] Retrieve information about the node. Might include fidelity information.
   - [PUT, PATCH] Update node master data; e.g., node alias or tags (feature request).
   - [DELETE] Remove the node and all samples reported by this node.
-- `/api/v1/nodes/<node_id>/samples/` Collection-resource of the measurement samples reported by the given node.
-  - [GET] Retrieve a list of samples of the given node. Can be paginated. The time-range can be limited via query paramters:
-    - `filter[from]` Start timestamp as Unix epoch. Defaults to `0`; i.e.,1970-01-01T00:00:00Z, if not provided.
-    - `filter[to]` End timestamp as Unix epoch. Defaults to the current system time `now()`.
-- `/api/v1/nodes/<node_id>/timeseries/` Detail resource for the time-series reported by the specified node.
-  - [GET] Returns the time series reported by the given node. **Question: How to restrict the time slice to match the attribution between node and organization?** Identical to the resource at `/api/v1/timeseries/<node_id>/`. Supports querying for time slices:
-    - `filter[from]`: Start timestamp as Unix epoch. Defaults to `0`; i.e., 1970-01-01T00:00:00Z.
-    - `filter[to]`: End timestamp as Unix epoch. Defaults to the current system time `now()`.
 - **[T]** `/api/v1/nodes/<node_id>/installations/` Collection-resource of all installations a node has ever undergone.
   - [GET] List all present and past installations of the given node, with individual links to installation detail resources at `/api/v1/installations/<installation_id>/`.
 - `/api/v1/nodes/fidelity/` Status list ("fidelity") for all nodes visible to the logged-in user.
   - [GET] The status is updated periodically and indicates if a given node regularly transmits data. Filter to see nodes of one specific organization only via the filter `filter[organization]=<organization_id>`; filter for nodes of a given site via `filter[site]=<site_id>`, and in a given room via `filter[room]=<room_id>`. In the future, additional information might be added, like battery status or error reports.
-
-### Time Series
-
-- `/api/v1/timeseries/` List resource that provides an timeseries overview.
-  - [GET] Return a list summary for the timeseries reported by all nodes to which the logged-in user has access. The summary counts the number of samples and provides information on the time span of each time series.
-- `/api/v1/timeseries/<node_id>/` Detail resource of the timeseries of node `node_id`
-  - [GET] Retrieve the time series of the specified node. This resource is identical to the resource provided at `/api/v1/nodes/<node_id>/timeseries/`. Only available if the node is visible to the logged-in user. Supports querying for time slices:
-    - `filter[from]`: Start timestamp as Unix epoch. Defaults to `0`; i.e., 1970-01-01T00:00:00Z.
-    - `filter[to]`: End timestamp as Unix epoch. Defaults to the current system time `now()`.
 
 ### Sites
 
@@ -141,6 +124,37 @@ A **[T]** means that there exists at least on API test for the thus-marked resou
   - [GET] Details the room, with link to the room resource at `/api/v1/rooms/<room_id>`.
 - **[T]** `/api/v1/installations/<installation_id>/node/` Detail-resource of the node the given installation pertains to.
   - [GET] Details the node, with link to the node resource at `/api/v1/nodes/<node_id>`.
+
+## Data
+
+Measurement data is what the Clair network is all about. Therefore, the API endpoints described next provide access to the most essential resources of the system: samples and time series. A _sample_ is a measurement of one or more _measurement quantities_ taken by one specific node at one specific instant in time. A _time series_ is a chronologically ordered list of samples recorded by a given node.
+
+### Time Series
+
+- **[T]** `/api/v1/timeseries/` Collection resource that lists all timeseries.
+  - [GET] Return a list summary for the timeseries reported by all nodes to which the logged-in user has access. The summary counts the number of samples and provides information on the time span of each time series.
+- **[T]** `/api/v1/timeseries/<node_id>/` Detail resource of the timeseries of node `node_id`
+  - [GET] Retrieve the time series of the specified node. This resource is identical to the resource provided at `/api/v1/nodes/<node_id>/timeseries/`. Only available if the node is visible to the logged-in user. Supports querying for time slices:
+    - `filter[from]`: Start timestamp as Unix epoch. Defaults to `0`; i.e., 1970-01-01T00:00:00Z.
+    - `filter[to]`: End timestamp as Unix epoch. Defaults to the current system time `now()`.
+- **[T]** `/api/v1/nodes/<node_id>/timeseries/` Detail resource for the time-series reported by the specified node.
+  - [GET] Returns the time series reported by the given node. **Question: How to restrict the time slice to match the attribution between node and organization?** Identical to the resource at `/api/v1/timeseries/<node_id>/`. Supports querying for time slices:
+    - `filter[from]`: Start timestamp as Unix epoch. Defaults to `0`; i.e., 1970-01-01T00:00:00Z.
+    - `filter[to]`: End timestamp as Unix epoch. Defaults to the current system time `now()`.
+
+### Samples
+
+- **[T]** `/api/v1/samples/` Collection resource that returns all recorded samples.
+  - [GET] Return a list of all samples recorded by all nodes to which the logged-in user has access. Because the data volume can get quite large, this collection is paged by default. In addition to paging, the selection can be reduced by the following query paramters
+    - `filter[node]` Restrict to samples recorded by the given node only.
+    - `filter[from]` Start timestamp as Unix epoch. Defaults to `0`; i.e.,1970-01-01T00:00:00Z, if not provided.
+    - `filter[to]` End timestamp as Unix epoch. Defaults to the current system time `now()`.
+- **[T]** `/api/v1/samples/<sample_id>` Detail resource of an individual sample.
+  - [GET] Retrieve an individual sample, if it results from a node the logged-in user has access to.
+- **[T]** `/api/v1/nodes/<node_id>/samples/` Detail resource for the samples reported by the specified node.
+  - [GET] Returns the samples reported by the given node. **Question: How to restrict the time slice to match the attribution between node and organization?** Identical to the resource at `/api/v1/samples/?filter[node]=<node_id>`. Supports querying for time slices:
+    - `filter[from]`: Start timestamp as Unix epoch. Defaults to `0`; i.e., 1970-01-01T00:00:00Z.
+    - `filter[to]`: End timestamp as Unix epoch. Defaults to the current system time `now()`.
 
 ## Public
 
