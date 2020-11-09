@@ -25,7 +25,7 @@ class NodeModelAdmin(admin.ModelAdmin):
 
 @admin.register(Node)
 class NodeAdmin(admin.ModelAdmin):
-    list_display = ["alias", "id", "device_id", "model", "owner"]
+    list_display = ["alias", "id", "eui64", "model", "owner"]
     list_filter = ["model", "owner"]
 
 

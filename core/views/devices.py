@@ -40,7 +40,7 @@ class NodeViewSet(LoginRequiredMixin, ModelViewSet):
     queryset = Node.objects.all()
     serializer_class = NodeSerializer
     filter_backends = (filters.QueryParameterValidationFilter, SearchFilter)
-    search_fields = ("alias", "device_id")
+    search_fields = ("alias", "eui64")
 
     def get_queryset(self):
         """Restrict to logged-in user"""

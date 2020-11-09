@@ -38,7 +38,7 @@ class NodeModel(models.Model):
 
 class Node(models.Model):
     id = models.UUIDField(primary_key=True)
-    device_id = models.CharField(max_length=32, blank=False, unique=True)
+    eui64 = models.CharField(max_length=32, blank=False, unique=True)
     alias = models.CharField(max_length=100)
     protocol = models.ForeignKey(
         NodeProtocol, on_delete=models.CASCADE, related_name="nodes"
@@ -55,8 +55,8 @@ class Node(models.Model):
         return f"{self.alias}: {self.id}"
 
     class Meta:
-        ordering = ["device_id"]
-        get_latest_by = "device_id"
+        ordering = ["eui64"]
+        get_latest_by = "eui64"
 
     def check_fidelity(self, lookback_interval_s: int):
         """Check if a message was received within the lookback interval."""
