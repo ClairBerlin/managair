@@ -70,7 +70,7 @@ class SitesTestCase(APITestCase):
                 },
                 "relationships": {
                     "address": {"data": {"type": "Address", "id": "2"}},
-                    "operated_by": {"data": {"type": "Organization", "id": "2"}},
+                    "operator": {"data": {"type": "Organization", "id": "2"}},
                 },
             }
         }
@@ -79,7 +79,7 @@ class SitesTestCase(APITestCase):
         self.assertEqual(response1.status_code, 201)
         self.assertEqual(response1.data["name"], "Versuchsort 2")
         self.assertEqual(response1.data["address"]["id"], "2")
-        self.assertEqual(response1.data["operated_by"]["id"], "2")
+        self.assertEqual(response1.data["operator"]["id"], "2")
         # Fetch the site resource just created.
         response_url = response1.data["url"]
         # GET /sites/<site_id>/
@@ -87,7 +87,7 @@ class SitesTestCase(APITestCase):
         self.assertEqual(response2.status_code, 200)
         self.assertEqual(response2.data["name"], "Versuchsort 2")
         self.assertEqual(response2.data["address"]["id"], "2")
-        self.assertEqual(response2.data["operated_by"]["id"], "2")
+        self.assertEqual(response2.data["operator"]["id"], "2")
         # Delete the site.
         # DELETE /site/<site_id>/
         response3 = self.client.delete(response_url)

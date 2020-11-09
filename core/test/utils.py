@@ -75,7 +75,7 @@ def setup_test_location(organization):
         name="Test-Ort",
         description="Nur zum Test",
         address=address,
-        operated_by=organization,
+        operator=organization,
     )
     room = Room.objects.create(
         name="Test-Raum",
