@@ -53,7 +53,7 @@ def setup_test_device(organization):
     # Use a testing DeviceEUI. See https://lora-developers.semtech.com/library/tech-papers-and-guides/the-book/deveui/
     node = Node.objects.create(
         id=UUID(hex="0094826d4b122b94d16caf86a16f9cc3"),
-        device_id="fefffffffdff0000",
+        eui64="fefffffffdff0000",
         alias="Test-Node",
         protocol=protocol,
         model=model,

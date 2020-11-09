@@ -97,7 +97,7 @@ class NodeSerializer(serializers.HyperlinkedModelSerializer):
         model = Node
         fields = (
             "id",
-            "device_id",
+            "eui64",
             "alias",
             "protocol",
             "model",

@@ -48,7 +48,7 @@ class NodeTestCase(APITestCase):
                 "type": format_resource_type("Node"),
                 "id": self.node_id,
                 "attributes": {
-                    "device_id": "003CB7EA62A7DCBB",
+                    "eui64": "003CB7EA62A7DCBB",
                     "alias": "Clairchen Black",
                 },
             }
@@ -63,7 +63,7 @@ class NodeTestCase(APITestCase):
                 "type": format_resource_type("Node"),
                 "id": "0094826d4b122b94d16caf86a16f9cc3",
                 "attributes": {
-                    "device_id": "fefffffffdff0000",
+                    "eui64": "fefffffffdff0000",
                     "alias": "Test Node",
                 },
                 "relationships": {
@@ -76,14 +76,14 @@ class NodeTestCase(APITestCase):
         # POST /nodes/
         response1 = self.client.post(self.collection_url, data=request_data)
         self.assertEqual(response1.status_code, 201)
-        self.assertEqual(response1.data["device_id"], "fefffffffdff0000")
+        self.assertEqual(response1.data["eui64"], "fefffffffdff0000")
         self.assertEqual(response1.data["alias"], "Test Node")
         # Fetch the node resource just created.
         response_url = response1.data["url"]
         # GET /nodes/<node_id>/
         response2 = self.client.get(response_url)
         self.assertEqual(response2.status_code, 200)
-        self.assertEqual(response2.data["device_id"], "fefffffffdff0000")
+        self.assertEqual(response2.data["eui64"], "fefffffffdff0000")
         self.assertEqual(response2.data["alias"], "Test Node")
         # Delete the node.
         # DELETE /node/<node_id>/
