@@ -151,7 +151,7 @@
             "name": "Test-Site",
             "description": "",
             "address": 1,
-            "operated_by": 1
+            "operator": 1
         }
     },
     {
@@ -161,7 +161,7 @@
             "name": "Versuchs-Site",
             "description": "",
             "address": 2,
-            "operated_by": 2
+            "operator": 2
         }
     },
     {
@@ -171,7 +171,7 @@
             "name": "Prüf-Site",
             "description": "",
             "address": 3,
-            "operated_by": 2
+            "operator": 2
         }
     },
     {
@@ -181,7 +181,7 @@
             "name": "HPI School of Entrepreneurship",
             "description": "",
             "address": 4,
-            "operated_by": 3
+            "operator": 3
         }
     },
     {

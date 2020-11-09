@@ -110,7 +110,7 @@ class InventoryTest(TestCase):
             name="Test-Site",
             description="Nur zum Test",
             address=adr,
-            operated_by=self.test_data["organization"],
+            operator=self.test_data["organization"],
         )
         # A second site with the same name and operater must not exist.
         with self.assertRaises(IntegrityError):
@@ -118,7 +118,7 @@ class InventoryTest(TestCase):
                 name="Test-Site",
                 description="Auch zum Test",
                 address=adr,
-                operated_by=self.test_data["organization"],
+                operator=self.test_data["organization"],
             )
 
     def test_unique_room(self):
@@ -130,7 +130,7 @@ class InventoryTest(TestCase):
             name="Test-Site",
             description="Nur zum Test",
             address=adr,
-            operated_by=self.test_data["organization"],
+            operator=self.test_data["organization"],
         )
         # One room with a given name and site can be created.
         Room.objects.create(

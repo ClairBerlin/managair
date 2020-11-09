@@ -27,7 +27,7 @@ class AddressSerializer(serializers.HyperlinkedModelSerializer):
 class SiteSerializer(serializers.HyperlinkedModelSerializer):
     included_serializers = {
         "address": "core.serializers.AddressSerializer",
-        "operated_by": "core.serializers.OrganizationSerializer",
+        "operator": "core.serializers.OrganizationSerializer",
         "rooms": "core.serializers.RoomSerializer",
     }
 
@@ -35,7 +35,7 @@ class SiteSerializer(serializers.HyperlinkedModelSerializer):
         queryset=Address.objects.all(), related_link_view_name="site-related"
     )
 
-    operated_by = ResourceRelatedField(
+    operator = ResourceRelatedField(
         queryset=Organization.objects.all(), related_link_view_name="site-related"
     )
 
@@ -51,7 +51,7 @@ class SiteSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Site
-        fields = ("name", "description", "address", "operated_by", "rooms", "url")
+        fields = ("name", "description", "address", "operator", "rooms", "url")
 
     class JSONAPIMeta:
         included_resources = ["address"]

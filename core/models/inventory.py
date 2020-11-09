@@ -93,7 +93,7 @@ class Site(models.Model):
     name = models.CharField(max_length=50, null=False, blank=False)
     description = models.TextField(null=True, blank=True)
     address = models.ForeignKey(Address, on_delete=models.PROTECT, related_name="sites")
-    operated_by = models.ForeignKey(
+    operator = models.ForeignKey(
         Organization, null=False, on_delete=models.CASCADE, related_name="sites"
     )
 
@@ -101,7 +101,7 @@ class Site(models.Model):
         constraints = [
             # The sites of a given organization must be unique.
             models.UniqueConstraint(
-                fields=["name", "operated_by"], name="unique_site_per_organization"
+                fields=["name", "operator"], name="unique_site_per_organization"
             )
         ]
         ordering = ["name"]

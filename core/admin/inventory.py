@@ -17,7 +17,7 @@ class AddressAdmin(admin.ModelAdmin):
 
 @admin.register(Site)
 class SiteAdmin(admin.ModelAdmin):
-    list_display = ["name", "description", "operated_by", "address"]
+    list_display = ["name", "description", "operator", "address"]
 
 
 @admin.register(Room)

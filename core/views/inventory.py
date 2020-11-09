@@ -101,7 +101,7 @@ class AddressViewSet(LoginRequiredMixin, ModelViewSet):
     def get_queryset(self):
         """Restrict to logged-in user"""
         queryset = super(AddressViewSet, self).get_queryset()
-        return queryset.filter(sites__operated_by__users=self.request.user).distinct()
+        return queryset.filter(sites__operator__users=self.request.user).distinct()
 
 
 class SiteViewSet(LoginRequiredMixin, ModelViewSet):
@@ -114,13 +114,13 @@ class SiteViewSet(LoginRequiredMixin, ModelViewSet):
     def get_queryset(self):
         """Restrict to logged-in user"""
         queryset = super(SiteViewSet, self).get_queryset()
-        queryset = queryset.filter(operated_by__users=self.request.user)
+        queryset = queryset.filter(operator__users=self.request.user)
         if self.action == "list":
             organization_id = self.request.query_params.get(
                 "filter[organization]", None
             )
             if organization_id is not None:
-                queryset = queryset.filter(operated_by=organization_id)
+                queryset = queryset.filter(operator=organization_id)
         return queryset.distinct()
 
 
@@ -134,13 +134,13 @@ class RoomViewSet(LoginRequiredMixin, ModelViewSet):
     def get_queryset(self):
         """Restrict to logged-in user"""
         queryset = super(RoomViewSet, self).get_queryset()
-        queryset = queryset.filter(site__operated_by__users=self.request.user)
+        queryset = queryset.filter(site__operator__users=self.request.user)
         if self.action == "list":
             organization_id = self.request.query_params.get(
                 "filter[organization]", None
             )
             if organization_id is not None:
-                queryset = queryset.filter(site__operated_by=organization_id)
+                queryset = queryset.filter(site__operator=organization_id)
             site_id = self.request.query_params.get("filter[site]", None)
             if site_id is not None:
                 queryset = queryset.filter(site=site_id)
@@ -156,13 +156,13 @@ class RoomNodeInstallationViewSet(LoginRequiredMixin, ModelViewSet):
         """Restrict to logged-in user"""
         queryset = super(RoomNodeInstallationViewSet, self).get_queryset()
         queryset = queryset.filter(
-            room__site__operated_by__users=self.request.user)
+            room__site__operator__users=self.request.user)
         if self.action == "list":
             organization_id = self.request.query_params.get(
                 "filter[organization]", None
             )
             if organization_id is not None:
-                queryset = queryset.filter(room__site__operated_by=organization_id)
+                queryset = queryset.filter(room__site__operator=organization_id)
             site_id = self.request.query_params.get("filter[site]", None)
             if site_id is not None:
                 queryset = queryset.filter(room__site=site_id)
