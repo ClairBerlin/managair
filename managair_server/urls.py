@@ -24,12 +24,11 @@ from drf_spectacular.views import (
 
 urlpatterns = [
     path("", include("user_manager.urls")),
-    # path('api/auth/', include('rest_framework.urls')),
     path("api/v1/", include("core.urls")),
     path("ingest/v1/", include("ingest.urls")),
     path("admin/", admin.site.urls),
-    path("auth/", include("dj_rest_auth.urls")),
-    path("auth/registration/", include("dj_rest_auth.registration.urls")),
+    path("api/v1/auth/", include("dj_rest_auth.urls")),
+    path("api/v1/auth/registration/", include("dj_rest_auth.registration.urls")),
     # OpenAPI
     path("api/v1/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
