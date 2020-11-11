@@ -49,8 +49,7 @@ class IsOrganizationOwner(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        # Read permissions are allowed to any request,
-        # so we'll always allow GET, HEAD or OPTIONS requests.
+        """Permissions at the request-level are relevant for new nodes."""
         if request.method == "POST":
             # Is the authorized user an OWNER of the organization to which the node
             # is to be added?
@@ -75,8 +74,8 @@ class IsOrganizationOwner(permissions.BasePermission):
             raise MethodNotAllowed(request.method)
 
     def has_object_permission(self, request, view, obj):
-        # Read permissions are allowed to any request,
-        # so we'll always allow GET, HEAD or OPTIONS requests.
+        """Permissions at the object-level are important for existing nodes."""
+
         if request.method in ["PUT", "PATCH", "DELETE"]:
             # Is the authorized user an OWNER of the organization that owns the node
             # that is to be modified?

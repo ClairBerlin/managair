@@ -1,6 +1,5 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
-from rest_framework.exceptions import PermissionDenied, NotFound, APIException
 from rest_framework_json_api.utils import format_resource_type
 
 
