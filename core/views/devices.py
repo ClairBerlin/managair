@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework import permissions
+from rest_framework.exceptions import PermissionDenied, MethodNotAllowed
 from rest_framework.filters import SearchFilter
 from rest_framework_json_api import filters
 from rest_framework_json_api.views import (
@@ -7,7 +8,14 @@ from rest_framework_json_api.views import (
     ReadOnlyModelViewSet,
 )
 
-from core.models import Quantity, NodeProtocol, NodeModel, Node, NodeFidelity
+from core.models import (
+    Quantity,
+    NodeProtocol,
+    NodeModel,
+    Node,
+    NodeFidelity,
+    Membership,
+)
 from core.serializers import (
     QuantitySerializer,
     NodeProtocolSerializer,
@@ -35,8 +43,58 @@ class NodeModelViewSet(LoginRequiredMixin, ModelViewSet):
     serializer_class = NodeModelSerializer
 
 
+class IsOrganizationOwner(permissions.BasePermission):
+    """
+    Permission that allows only the OWNERS of an organization to add, modify or delete a node.
+    """
+
+    def has_permission(self, request, view):
+        # Read permissions are allowed to any request,
+        # so we'll always allow GET, HEAD or OPTIONS requests.
+        if request.method == "POST":
+            # Is the authorized user an OWNER of the organization to which the node
+            # is to be added?
+            organization_id = request.data["owner"]["id"]
+            try:
+                membership = request.user.memberships.get(
+                    organization__id=organization_id
+                )
+            except Membership.DoesNotExist:
+                raise PermissionDenied
+            return membership.isOwner()
+        elif request.method in permissions.SAFE_METHODS or request.method in [
+            "PUT",
+            "PATCH",
+            "DELETE",
+        ]:
+            # Safe methods are handled by filtering the queryset in get_queryset.
+            # PUT and PATCH are handled at the object level.
+            return True
+        else:
+            # Should not exist
+            raise MethodNotAllowed(request.method)
+
+    def has_object_permission(self, request, view, obj):
+        # Read permissions are allowed to any request,
+        # so we'll always allow GET, HEAD or OPTIONS requests.
+        if request.method in ["PUT", "PATCH", "DELETE"]:
+            # Is the authorized user an OWNER of the organization that owns the node
+            # that is to be modified?
+            try:
+                owning_organization = obj.get_owner()
+                membership = request.user.memberships.get(
+                    organization__id=owning_organization.id
+                )
+            except Membership.DoesNotExist:
+                raise PermissionDenied
+            return membership.isOwner()
+
+        else:
+            return True
+
+
 class NodeViewSet(LoginRequiredMixin, ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOrganizationOwner]
     queryset = Node.objects.all()
     serializer_class = NodeSerializer
     filter_backends = (filters.QueryParameterValidationFilter, SearchFilter)
@@ -48,7 +106,8 @@ class NodeViewSet(LoginRequiredMixin, ModelViewSet):
         queryset = queryset.filter(owner__users=self.request.user)
         if self.action == "list":
             organization_id = self.request.query_params.get(
-                    "filter[organization]", None)
+                "filter[organization]", None
+            )
             if organization_id is not None:
                 queryset = queryset.filter(owner=organization_id)
         return queryset.distinct()

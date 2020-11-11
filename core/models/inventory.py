@@ -41,21 +41,19 @@ class Membership(models.Model):
         default=INSPECTOR,
     )
     user = models.ForeignKey(
-        User,
-        null=False,
-        on_delete=models.CASCADE,
-        related_name="memberships"
+        User, null=False, on_delete=models.CASCADE, related_name="memberships"
     )
     organization = models.ForeignKey(
-        Organization,
-        null=False,
-        on_delete=models.CASCADE,
-        related_name="memberships"
+        Organization, null=False, on_delete=models.CASCADE, related_name="memberships"
     )
 
     def __str__(self):
         """For representation in the Admin UI."""
         return f"{self.user.username} is member of {self.organization.name} with role {self.role}."
+
+    def isOwner(self):
+        """Return True if the membership role is OWNER."""
+        return self.role == self.OWNER
 
     class Meta:
         constraints = [
@@ -107,6 +105,10 @@ class Site(models.Model):
         ordering = ["name"]
         get_latest_by = "name"
 
+    def get_owner(self):
+        """Return the organization that owns the present site."""
+        return self.operator
+
     def __str__(self):
         """For representation in the Admin UI."""
         return f"{self.name} {self.address.street1}, {self.address.zip}"
@@ -132,6 +134,10 @@ class Room(models.Model):
         ]
         ordering = ["name"]
         get_latest_by = "name"
+
+    def get_owner(self):
+        """Return the organization that owns the present room."""
+        return self.site.operator
 
     def __str__(self):
         """For representation in the Admin UI."""
@@ -159,6 +165,10 @@ class RoomNodeInstallation(models.Model):
         ]
         ordering = ["-from_timestamp_s"]
         get_latest_by = "from_timestamp_s"
+
+    def get_owner(self):
+        """Return the organization that owns the present installation."""
+        return self.room.site.operator
 
     def __str__(self):
         """For representation in the Admin UI."""

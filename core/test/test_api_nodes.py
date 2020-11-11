@@ -1,5 +1,6 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
+from rest_framework.exceptions import PermissionDenied, NotFound, APIException
 from rest_framework_json_api.utils import format_resource_type
 
 
@@ -104,7 +105,55 @@ class NodeTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
 
-    # TODO: Failure cases:
+    def test_unauthorized_create_no_member(self):
+        """POST /nodes/ for an organization where the user ist not an OWNER."""
+        request_data = {
+            "data": {
+                "type": format_resource_type("Node"),
+                "id": "0094826d4b122b94d16caf86a16f9cc3",
+                "attributes": {
+                    "eui64": "fefffffffdff0000",
+                    "alias": "Test Node",
+                },
+                "relationships": {
+                    "protocol": {"data": {"type": "NodeProtocol", "id": "1"}},
+                    "model": {"data": {"type": "NodeModel", "id": "1"}},
+                    # The currently logged-in user VeraVersuch is not a member of the
+                    # # organization Test-Team with pk=1.
+                    "owner": {"data": {"type": "Organization", "id": "1"}},
+                },
+            }
+        }
+        response = self.client.post(self.collection_url, data=request_data)
+        self.assertEqual(response.status_code, 403)
+
+    def test_unauthorized_create_no_owner(self):
+        """POST /nodes/ for an organization the user ist not a member of"""
+        # Need a different user for this test case.
+        self.client.logout()
+        # User horstHilfsarbeiter is ASSISTENT in Versuchsverbung (pk=2).
+        self.client.login(username="horstHilfsarbeiter", password="horst")
+        request_data = {
+            "data": {
+                "type": format_resource_type("Node"),
+                "id": "0094826d4b122b94d16caf86a16f9cc3",
+                "attributes": {
+                    "eui64": "fefffffffdff0000",
+                    "alias": "Test Node",
+                },
+                "relationships": {
+                    "protocol": {"data": {"type": "NodeProtocol", "id": "1"}},
+                    "model": {"data": {"type": "NodeModel", "id": "1"}},
+                    # The currently logged-in user horstHilfsarbeiter is not an OWNER 
+                    # of the organization Versuchsverbund with pk=2.
+                    "owner": {"data": {"type": "Organization", "id": "2"}},
+                },
+            }
+        }
+        response = self.client.post(self.collection_url, data=request_data)
+        self.assertEqual(response.status_code, 403)
+
+    # TODO: More Failure cases:
     # - Nodes the user does not have access to.
     # - Add incompletely specified nodes.
     # - Illegal node updates.
