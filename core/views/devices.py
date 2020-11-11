@@ -45,35 +45,34 @@ class NodeModelViewSet(LoginRequiredMixin, ModelViewSet):
 
 class IsOrganizationOwner(permissions.BasePermission):
     """
-    Permission that allows only the OWNERS of an organization to add, modify or delete a node.
+    Permission that allows only the OWNERS of an organization to add, modify or delete a node owned by this orgnization.
     """
 
-    def has_permission(self, request, view):
-        """Permissions at the request-level are relevant for new nodes."""
+    def has_create_permission(self, request, validated_data):
+        """Authorize a new resource to be created.
+
+        This is not a method overwritten on BasePermission, but a custom method necessary for our access policy that depends on the incoming resource.
+        
+        This method must be called after deserialization and validation of the incoming request data to prevent injection attacks. To my understanding, the only place to do so on a generic viewset is in the `perform_create()` method. Thus: Overwrite `perform_create()` on your viewset and call the present method there.
+        """
         if request.method == "POST":
             # Is the authorized user an OWNER of the organization to which the node
             # is to be added?
-            organization_id = request.data["owner"]["id"]
+
+            organization = validated_data["owner"]
             try:
                 membership = request.user.memberships.get(
-                    organization__id=organization_id
+                    organization__id=organization.id
                 )
             except Membership.DoesNotExist:
                 raise PermissionDenied
             return membership.isOwner()
-        elif request.method in permissions.SAFE_METHODS or request.method in [
-            "PUT",
-            "PATCH",
-            "DELETE",
-        ]:
-            # Safe methods are handled by filtering the queryset in get_queryset.
-            # PUT and PATCH are handled at the object level.
-            return True
         else:
-            # Should not exist
+            # Should never happen.
             raise MethodNotAllowed(request.method)
-
-    def has_object_permission(self, request, view, obj):
+    
+    @classmethod
+    def has_object_permission(cls, request, view, obj):
         """Permissions at the object-level are important for existing nodes."""
 
         if request.method in ["PUT", "PATCH", "DELETE"]:
@@ -110,6 +109,15 @@ class NodeViewSet(LoginRequiredMixin, ModelViewSet):
             if organization_id is not None:
                 queryset = queryset.filter(owner=organization_id)
         return queryset.distinct()
+
+    def perform_create(self, serializer):
+        """Inject permission checking on the validated incoming resource data."""
+        if IsOrganizationOwner().has_create_permission(
+            self.request, serializer.validated_data
+        ):
+            super(NodeViewSet, self).perform_create(serializer)
+        else:
+            raise PermissionDenied
 
 
 class NodeFidelityViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
