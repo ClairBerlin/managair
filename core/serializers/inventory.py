@@ -88,6 +88,13 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
             "url",
         ]
 
+    def get_owner(self):
+        """Return the owner of the resource, once data is validated."""
+        room = self.validated_data["room"]
+        site = room.site
+        owner = site.operator
+        return owner
+
 
 class RoomSerializer(serializers.HyperlinkedModelSerializer):
     related_serializers = {
@@ -122,6 +129,12 @@ class RoomSerializer(serializers.HyperlinkedModelSerializer):
             "installations",
             "url",
         ]
+
+    def get_owner(self):
+        """Return the owner of the resource, once data is validated."""
+        site = self.validated_data["site"]
+        owner = site.operator
+        return owner
 
 
 class MembershipSerializer(serializers.ModelSerializer):

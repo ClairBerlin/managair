@@ -105,7 +105,7 @@ class NodeTestCase(APITestCase):
         self.assertEqual(len(response.data), 2)
 
     def test_unauthorized_create_no_member(self):
-        """POST /nodes/ for an organization the user ist not a member of"""
+        """POST /nodes/ for an organization the user ist not a member of."""
         request_data = {
             "data": {
                 "type": format_resource_type("Node"),
@@ -153,7 +153,7 @@ class NodeTestCase(APITestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_unauthorized_patch_no_member(self):
-        """PATCH /nodes/ of an organization of which the use ist not an OWNER."""
+        """PATCH /nodes/ of an organization of which the use ist not a member."""
         node_id = "c727b2f8-8377-d4cb-0e95-ac03200b8c93"
         node_eui = "9876B600001193E0"
         detail_url = reverse("node-detail", kwargs={"pk": node_id})
