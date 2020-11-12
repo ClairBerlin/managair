@@ -105,7 +105,7 @@ class NodeTestCase(APITestCase):
         self.assertEqual(len(response.data), 2)
 
     def test_unauthorized_create_no_member(self):
-        """POST /nodes/ for an organization where the user ist not an OWNER."""
+        """POST /nodes/ for an organization the user ist not a member of"""
         request_data = {
             "data": {
                 "type": format_resource_type("Node"),
@@ -127,7 +127,7 @@ class NodeTestCase(APITestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_unauthorized_create_no_owner(self):
-        """POST /nodes/ for an organization the user ist not a member of"""
+        """POST /nodes/ for an organization where the user is not an OWNER."""
         # Need a different user for this test case.
         self.client.logout()
         # User horstHilfsarbeiter is ASSISTANT in Versuchsverbung (pk=2).
@@ -143,7 +143,7 @@ class NodeTestCase(APITestCase):
                 "relationships": {
                     "protocol": {"data": {"type": "NodeProtocol", "id": "1"}},
                     "model": {"data": {"type": "NodeModel", "id": "1"}},
-                    # The currently logged-in user horstHilfsarbeiter is not an OWNER 
+                    # The currently logged-in user horstHilfsarbeiter is not an OWNER
                     # of the organization Versuchsverbund with pk=2.
                     "owner": {"data": {"type": "Organization", "id": "2"}},
                 },
@@ -168,7 +168,7 @@ class NodeTestCase(APITestCase):
             }
         }
         response = self.client.patch(detail_url, data=request_data)
-        # Expect a HTTP 404 error code, because the object to be patched should not be 
+        # Expect a HTTP 404 error code, because the object to be patched should not be
         # accessible to the logged-in user.
         self.assertEqual(response.status_code, 404)
 
@@ -189,7 +189,7 @@ class NodeTestCase(APITestCase):
             }
         }
         response = self.client.patch(self.detail_url, data=request_data)
-        # Expect a HTTP 403 error code, because the user has access to the Node but is 
+        # Expect a HTTP 403 error code, because the user has access to the Node but is
         # not sufficiently privileged to alter it.
         self.assertEqual(response.status_code, 403)
 
