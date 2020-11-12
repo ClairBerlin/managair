@@ -50,13 +50,13 @@ class Node(models.Model):
         Organization, null=False, on_delete=models.CASCADE, related_name="nodes"
     )
 
-    def __str__(self):
-        """String for representing the Model object."""
-        return f"{self.alias}: {self.id}"
-
     class Meta:
         ordering = ["eui64"]
         get_latest_by = "eui64"
+
+    def get_owner(self):
+        """Return the organization that owns the present node."""
+        return self.owner
 
     def check_fidelity(self, lookback_interval_s: int):
         """Check if a message was received within the lookback interval."""
@@ -78,6 +78,10 @@ class Node(models.Model):
         return NodeFidelity.objects.update_or_create(
             node=fidelity["node"], defaults={**fidelity}
         )
+
+    def __str__(self):
+        """String for representing the Model object."""
+        return f"{self.alias}: {self.id}"
 
 
 class NodeFidelity(models.Model):

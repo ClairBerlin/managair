@@ -104,7 +104,96 @@ class NodeTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
 
-    # TODO: Failure cases:
-    # - Nodes the user does not have access to.
+    def test_unauthorized_create_no_member(self):
+        """POST /nodes/ for an organization where the user ist not an OWNER."""
+        request_data = {
+            "data": {
+                "type": format_resource_type("Node"),
+                "id": "0094826d4b122b94d16caf86a16f9cc3",
+                "attributes": {
+                    "eui64": "fefffffffdff0000",
+                    "alias": "Test Node",
+                },
+                "relationships": {
+                    "protocol": {"data": {"type": "NodeProtocol", "id": "1"}},
+                    "model": {"data": {"type": "NodeModel", "id": "1"}},
+                    # The currently logged-in user VeraVersuch is not a member of the
+                    # # organization Test-Team with pk=1.
+                    "owner": {"data": {"type": "Organization", "id": "1"}},
+                },
+            }
+        }
+        response = self.client.post(self.collection_url, data=request_data)
+        self.assertEqual(response.status_code, 403)
+
+    def test_unauthorized_create_no_owner(self):
+        """POST /nodes/ for an organization the user ist not a member of"""
+        # Need a different user for this test case.
+        self.client.logout()
+        # User horstHilfsarbeiter is ASSISTANT in Versuchsverbung (pk=2).
+        self.client.login(username="horstHilfsarbeiter", password="horst")
+        request_data = {
+            "data": {
+                "type": format_resource_type("Node"),
+                "id": "0094826d4b122b94d16caf86a16f9cc3",
+                "attributes": {
+                    "eui64": "fefffffffdff0000",
+                    "alias": "Test Node",
+                },
+                "relationships": {
+                    "protocol": {"data": {"type": "NodeProtocol", "id": "1"}},
+                    "model": {"data": {"type": "NodeModel", "id": "1"}},
+                    # The currently logged-in user horstHilfsarbeiter is not an OWNER 
+                    # of the organization Versuchsverbund with pk=2.
+                    "owner": {"data": {"type": "Organization", "id": "2"}},
+                },
+            }
+        }
+        response = self.client.post(self.collection_url, data=request_data)
+        self.assertEqual(response.status_code, 403)
+
+    def test_unauthorized_patch_no_member(self):
+        """PATCH /nodes/ of an organization of which the use ist not an OWNER."""
+        node_id = "c727b2f8-8377-d4cb-0e95-ac03200b8c93"
+        node_eui = "9876B600001193E0"
+        detail_url = reverse("node-detail", kwargs={"pk": node_id})
+        request_data = {
+            "data": {
+                "type": format_resource_type("Node"),
+                "id": node_id,
+                "attributes": {
+                    "eui64": node_eui,
+                    "alias": "Evil new alias",
+                },
+            }
+        }
+        response = self.client.patch(detail_url, data=request_data)
+        # Expect a HTTP 404 error code, because the object to be patched should not be 
+        # accessible to the logged-in user.
+        self.assertEqual(response.status_code, 404)
+
+    def test_unauthorized_patch_no_owner(self):
+        """PATCH /nodes/ of an organization where the user ist not an OWNER."""
+        # Need a different user for this test case.
+        self.client.logout()
+        # User horstHilfsarbeiter is ASSISTANT in Versuchsverbung (pk=2).
+        self.client.login(username="horstHilfsarbeiter", password="horst")
+        request_data = {
+            "data": {
+                "type": format_resource_type("Node"),
+                "id": self.node_id,
+                "attributes": {
+                    "eui64": "003CB7EA62A7DCBB",
+                    "alias": "Evil new alias",
+                },
+            }
+        }
+        response = self.client.patch(self.detail_url, data=request_data)
+        # Expect a HTTP 403 error code, because the user has access to the Node but is 
+        # not sufficiently privileged to alter it.
+        self.assertEqual(response.status_code, 403)
+
+    # TODO: More Failure cases:
+    # - Get Nodes the user does not have access to.
     # - Add incompletely specified nodes.
-    # - Illegal node updates.
+    # - PUT

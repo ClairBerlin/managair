@@ -58,7 +58,7 @@ class UserViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
         queryset = super(UserViewSet, self).get_queryset()
 
         # If this viewset is accessed via the 'organization-related' route,
-        # it wll have been passed the `user_pk` kwarg, and the queryset
+        # it will have been passed the `user_pk` kwarg, and the queryset
         # needs to be filtered accordingly;
         if "user_pk" in self.kwargs:
             user_pk = self.kwargs["user_pk"]
