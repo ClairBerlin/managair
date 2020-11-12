@@ -130,7 +130,7 @@ class NodeTestCase(APITestCase):
         """POST /nodes/ for an organization where the user is not an OWNER."""
         # Need a different user for this test case.
         self.client.logout()
-        # User horstHilfsarbeiter is ASSISTANT in Versuchsverbung (pk=2).
+        # User horstHilfsarbeiter is ASSISTANT in Versuchsverbund (pk=2).
         self.client.login(username="horstHilfsarbeiter", password="horst")
         request_data = {
             "data": {
@@ -176,7 +176,7 @@ class NodeTestCase(APITestCase):
         """PATCH /nodes/ of an organization where the user ist not an OWNER."""
         # Need a different user for this test case.
         self.client.logout()
-        # User horstHilfsarbeiter is ASSISTANT in Versuchsverbung (pk=2).
+        # User horstHilfsarbeiter is ASSISTANT in Versuchsverbund (pk=2).
         self.client.login(username="horstHilfsarbeiter", password="horst")
         request_data = {
             "data": {

@@ -18,6 +18,10 @@ class Organization(models.Model):
         ordering = ["name"]
         get_latest_by = "name"
 
+    def get_owner(self):
+        """The organization owns itself."""
+        return self
+
     def __str__(self):
         """For representation in the Admin UI."""
         return f"{self.name}"
