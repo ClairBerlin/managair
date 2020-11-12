@@ -146,3 +146,39 @@ class OrganizationTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
+
+    def test_unauthorized_patch_no_member(self):
+        """PATCH /organization/ where the user is not a member of."""
+        # Need a different user for this test case.
+        self.client.logout()
+        # User horstHilfsarbeiter is ASSISTANT in Versuchsverbund (pk=2).
+        self.client.login(username="horstHilfsarbeiter", password="horst")
+        request_data = {
+            "data": {
+                "type": format_resource_type("Organization"),
+                "id": str(1),
+                "attributes": {"description": "Fake Description"},
+            }
+        }
+        response = self.client.patch(self.detail_url, data=request_data)
+        # Expect a HTTP 404 error code, because the user should not have access to the
+        # organization.
+        self.assertEqual(response.status_code, 404)
+
+    def test_unauthorized_patch_no_owner(self):
+        """PATCH /organization/ where the user is not an OWNER."""
+        # Need a different user for this test case.
+        self.client.logout()
+        # User ingoInspekteur (pk=6) is INSPECTOR in Test-Team (pk=1).
+        self.client.login(username="ingoInspekteur", password="ingo")
+        request_data = { 
+            "data": {
+                "type": format_resource_type("Organization"),
+                "id": str(1),
+                "attributes": {"description": "Fake Description"},
+            }
+        }
+        response = self.client.patch(self.detail_url, data=request_data)
+        # Expect a HTTP 403 error code, because the user can access the organization 
+        # but is not authorized to change it.
+        self.assertEqual(response.status_code, 403)

@@ -202,7 +202,7 @@ class RoomNodeInstallationViewSet(LoginRequiredMixin, ModelViewSet):
 
 
 class OrganizationViewSet(LoginRequiredMixin, ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOrganizationOwner]
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
 
@@ -212,6 +212,7 @@ class OrganizationViewSet(LoginRequiredMixin, ModelViewSet):
         return queryset.filter(users=self.request.user)
 
     def perform_create(self, serializer):
+        """The user adding the present organization automatically is its OWNER."""
         org = serializer.save()
         Membership.objects.create(
             role=Membership.OWNER, user=self.request.user, organization=org
