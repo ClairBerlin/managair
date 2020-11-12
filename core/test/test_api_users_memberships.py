@@ -67,9 +67,10 @@ class MembershipsTestCase(APITestCase):
     fixtures = ["user-fixtures.json", "inventory-fixtures.json"]
 
     def setUp(self):
-        # priskaPrueferin is OWNER of Versuchsverbund, Membership pk=15;
+        # priskaPrueferin (pk=7) is OWNER of Versuchsverbund, Membership pk=15;
         # and ASSISTANT in Test-Team, Membership pk=16.
         self.client.login(username="priskaPrueferin", password="priska")
+        self.user_id = 7
         self.mid = 15
         self.detail_url = reverse("membership-detail", kwargs={"pk": self.mid})
         self.collection_url = reverse("membership-list")
@@ -82,7 +83,7 @@ class MembershipsTestCase(APITestCase):
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 8)
-    
+
     def test_get_membership_in_organization(self):
         """GET /memberships/?filter[organization]=<organization_id>"""
         # Need a different user for this test case.
@@ -99,10 +100,12 @@ class MembershipsTestCase(APITestCase):
         self.client.logout()
         # user priskaPrueferin is member in two organizations
         self.client.login(username="priskaPrueferin", password="priska")
-        response = self.client.get(self.collection_url, {"filter[username]": "ingoInspekteur"})
+        response = self.client.get(
+            self.collection_url, {"filter[username]": "ingoInspekteur"}
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
-    
+
     def test_get_membership_per_user(self):
         """GET /memberships/?filter[user]=<user_id>"""
         # Need a different user for this test case.
@@ -189,3 +192,82 @@ class MembershipsTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["name"], "Versuchsverbund")
+
+    def test_unauthorized_create_membership_no_member(self):
+        """POST /memberships/ where the user is not a member of the organization."""
+        # Need a different user for this test case.
+        self.client.logout()
+        # User tomTester (pk=2) is OWNER of Test-Team (pk=1).
+        self.client.login(username="tomTester", password="test")
+        request_data = {
+            "data": {
+                "type": format_resource_type("Membership"),
+                "attributes": {
+                    "role": "A",
+                },
+                "relationships": {
+                    # Make annaAngestellte (pk=5) a Versuchsverbund (pk=2) ASSISTANT.
+                    "user": {"data": {"type": format_resource_type("User"), "id": 5}},
+                    "organization": {
+                        "data": {
+                            "type": format_resource_type("Organization"),
+                            "id": 2,
+                        }
+                    },
+                },
+            }
+        }
+        response = self.client.post(self.collection_url, data=request_data)
+        self.assertEqual(response.status_code, 403)
+
+    def test_unauthorized_add_membership_no_member(self):
+        """POST /memberships/ for a user that is not a member of the organization."""
+        # Need a different user for this test case.
+        self.client.logout()
+        # User tomTester (pk=2) is OWNER of Test-Team (pk=1).
+        user_id = 2
+        self.client.login(username="tomTester", password="test")
+        request_data = {
+            "data": {
+                "type": format_resource_type("Membership"),
+                "attributes": {
+                    "role": "A",
+                },
+                "relationships": {
+                    # Make tomTester a Versuchsverbund (pk=2) ASSISTANT.
+                    "user": {
+                        "data": {"type": format_resource_type("User"), "id": user_id}
+                    },
+                    "organization": {
+                        "data": {
+                            "type": format_resource_type("Organization"),
+                            "id": 2,
+                        }
+                    },
+                },
+            }
+        }
+        response = self.client.post(self.collection_url, data=request_data)
+        self.assertEqual(response.status_code, 403)
+
+    def test_unauthorized_leave_organization(self):
+        """DELETE /membership/ for a member that is not the OWNER of the organizatin."""
+        # priskaPrüferin is ASSISTANT in Test-Team (membership pk=16).
+        request_url = reverse("membership-detail", kwargs={"pk": 16})
+        response = self.client.delete(request_url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_unauthorized_role_change_no_owner(self):
+        """PATCH /membership/ for a member that is not OWNER of the organization."""
+        # priskaPrüferin is ASSISTANT in Test-Team (membership pk=16).
+        membership_id = 16
+        request_url = reverse("membership-detail", kwargs={"pk": membership_id})
+        request_data = {
+            "data": {
+                "type": format_resource_type("Membership"),
+                "id": membership_id,
+                "attributes": {"role": "O"},  # Attempt to self-upgrade.
+            }
+        }
+        response = self.client.patch(request_url, data=request_data)
+        self.assertEqual(response.status_code, 403)
