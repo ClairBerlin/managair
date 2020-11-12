@@ -2,13 +2,14 @@ from datetime import datetime, timedelta
 from random import randint, sample
 
 from django.db import IntegrityError
+from django.core.validators import ValidationError
 from django.test import TestCase
 
-from core.models import Sample, Membership, Address, Site, Room
+from core.models import Sample, Membership, Address, Site, Room, RoomNodeInstallation
 from core.test.utils import setup_basic_test_data
 
 
-class DataTest(TestCase):
+class DataTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         # Set up data for the whole TestCase.
@@ -22,7 +23,7 @@ class DataTest(TestCase):
         times = range(start_timestamp, stop_timestamp, step)
         samples = [
             Sample.objects.create(
-                node=self.test_data["node"],
+                node=self.test_data["node1"],
                 timestamp_s=ts,
                 co2_ppm=400 + randint(0, 1000),
                 measurement_status=Sample.MEASUREMENT,
@@ -36,14 +37,14 @@ class DataTest(TestCase):
 
         ts = round(datetime.now().timestamp())
         Sample.objects.create(
-            node=self.test_data["node"],
+            node=self.test_data["node1"],
             timestamp_s=ts,
             co2_ppm=400 + randint(0, 1000),
             measurement_status=Sample.MEASUREMENT,
         )
         with self.assertRaises(IntegrityError):
             Sample.objects.create(
-                node=self.test_data["node"],
+                node=self.test_data["node1"],
                 timestamp_s=ts,
                 co2_ppm=400 + randint(0, 1000),
                 measurement_status=Sample.MEASUREMENT,
@@ -53,7 +54,7 @@ class DataTest(TestCase):
         times = sample(range(1604259676), 10)
         for ts in times:
             Sample.objects.create(
-                node=self.test_data["node"],
+                node=self.test_data["node1"],
                 timestamp_s=ts,
                 co2_ppm=400 + randint(0, 1000),
                 measurement_status=Sample.MEASUREMENT,
@@ -67,7 +68,7 @@ class DataTest(TestCase):
             cmp = ts
 
 
-class InventoryTest(TestCase):
+class InventoryTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         # Set up data for the whole TestCase.
@@ -75,8 +76,8 @@ class InventoryTest(TestCase):
 
     def test_unique_membership(self):
         """A user can have a single membership in a given organization only."""
-        org = self.test_data["organization"]
-        user = self.test_data["user"]
+        org = self.test_data["organization1"]
+        user = self.test_data["user1"]
         with self.assertRaises(IntegrityError):
             Membership.objects.create(
                 role=Membership.ASSISTANT, user=user, organization=org
@@ -110,7 +111,7 @@ class InventoryTest(TestCase):
             name="Test-Site",
             description="Nur zum Test",
             address=adr,
-            operator=self.test_data["organization"],
+            operator=self.test_data["organization1"],
         )
         # A second site with the same name and operater must not exist.
         with self.assertRaises(IntegrityError):
@@ -118,7 +119,7 @@ class InventoryTest(TestCase):
                 name="Test-Site",
                 description="Auch zum Test",
                 address=adr,
-                operator=self.test_data["organization"],
+                operator=self.test_data["organization1"],
             )
 
     def test_unique_room(self):
@@ -130,7 +131,7 @@ class InventoryTest(TestCase):
             name="Test-Site",
             description="Nur zum Test",
             address=adr,
-            operator=self.test_data["organization"],
+            operator=self.test_data["organization1"],
         )
         # One room with a given name and site can be created.
         Room.objects.create(
@@ -150,4 +151,26 @@ class InventoryTest(TestCase):
                 height_m=31,
                 max_occupancy=20,
                 site=site,
+            )
+
+    def test_installation(self):
+        """Node and room referenced in a NodeInstallation must pertain to the same owner."""
+        installation = RoomNodeInstallation.objects.create(
+                description="A fine installation",
+                from_timestamp_s=1577836800,
+                to_timestamp_s=2147483647,
+                node=self.test_data["node2"],
+                room=self.test_data["room2"],
+            )
+        self.assertEqual(installation.from_timestamp_s, 1577836800)
+
+    def test_installation_mismatch(self):
+        """Node and room referenced in a NodeInstallation must pertain to the same owner."""
+        with self.assertRaises(ValidationError):
+            RoomNodeInstallation.objects.create(
+                description="An impossible installation",
+                from_timestamp_s=1577836800,
+                to_timestamp_s=2147483647,
+                node=self.test_data["node1"],
+                room=self.test_data["room2"],
             )
