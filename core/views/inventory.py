@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework import permissions
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, PermissionDenied, MethodNotAllowed
 from rest_framework.filters import SearchFilter
 from rest_framework_json_api import filters
 from rest_framework_json_api.views import (
@@ -11,6 +11,7 @@ from rest_framework_json_api.views import (
     generics,
 )
 
+from core.permissions import IsOrganizationOwner
 from core.models import (
     Address,
     Site,
@@ -45,7 +46,7 @@ class SiteNotFoundExceptionView(LoginRequiredMixin, generics.RetrieveAPIView):
 
 
 class UserViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
-    permissions = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = User.objects.all()
     # Use different serializers for different actions.
     # See https://stackoverflow.com/questions/22616973/django-rest-framework-use-different-serializers-in-the-same-modelviewset
@@ -94,7 +95,7 @@ class UserRelationshipView(RelationshipView):
 
 
 class AddressViewSet(LoginRequiredMixin, ModelViewSet):
-    permissions = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
 
@@ -105,7 +106,7 @@ class AddressViewSet(LoginRequiredMixin, ModelViewSet):
 
 
 class SiteViewSet(LoginRequiredMixin, ModelViewSet):
-    permissions = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOrganizationOwner]
     queryset = Site.objects.all()
     serializer_class = SiteSerializer
     filter_backends = (filters.QueryParameterValidationFilter, SearchFilter)
@@ -123,9 +124,17 @@ class SiteViewSet(LoginRequiredMixin, ModelViewSet):
                 queryset = queryset.filter(operator=organization_id)
         return queryset.distinct()
 
+    def perform_create(self, serializer):
+        """Inject permission checking on the validated incoming resource data."""
+        # TODO: Refactor into common base class.
+        if IsOrganizationOwner.has_create_permission(self.request, serializer):
+            super(SiteViewSet, self).perform_create(serializer)
+        else:
+            raise PermissionDenied
+
 
 class RoomViewSet(LoginRequiredMixin, ModelViewSet):
-    permissions = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
     filter_backends = (filters.QueryParameterValidationFilter, SearchFilter)
@@ -148,15 +157,14 @@ class RoomViewSet(LoginRequiredMixin, ModelViewSet):
 
 
 class RoomNodeInstallationViewSet(LoginRequiredMixin, ModelViewSet):
-    permissions = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = RoomNodeInstallation.objects
     serializer_class = RoomNodeInstallationSerializer
 
     def get_queryset(self):
         """Restrict to logged-in user"""
         queryset = super(RoomNodeInstallationViewSet, self).get_queryset()
-        queryset = queryset.filter(
-            room__site__operator__users=self.request.user)
+        queryset = queryset.filter(room__site__operator__users=self.request.user)
         if self.action == "list":
             organization_id = self.request.query_params.get(
                 "filter[organization]", None

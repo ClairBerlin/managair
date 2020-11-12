@@ -51,18 +51,15 @@ class NodeSerializer(serializers.HyperlinkedModelSerializer):
     }
 
     protocol = ResourceRelatedField(
-        queryset=NodeProtocol.objects.all(),
-        related_link_view_name="node-related"
+        queryset=NodeProtocol.objects.all(), related_link_view_name="node-related"
     )
 
     model = ResourceRelatedField(
-        queryset=NodeModel.objects.all(),
-        related_link_view_name="node-related"
+        queryset=NodeModel.objects.all(), related_link_view_name="node-related"
     )
 
     owner = ResourceRelatedField(
-        queryset=Organization.objects.all(),
-        related_link_view_name="node-related"
+        queryset=Organization.objects.all(), related_link_view_name="node-related"
     )
 
     # A Node is installed in one or more rooms over its lifetime.
@@ -107,6 +104,10 @@ class NodeSerializer(serializers.HyperlinkedModelSerializer):
             "samples",
             "url",
         )
+
+    def get_owner(self):
+        """Return the owner of the resource, once data is validated."""
+        return self.validated_data["owner"]
 
 
 class NodeFidelitySerializer(serializers.HyperlinkedModelSerializer):

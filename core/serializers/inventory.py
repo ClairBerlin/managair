@@ -56,6 +56,10 @@ class SiteSerializer(serializers.HyperlinkedModelSerializer):
     class JSONAPIMeta:
         included_resources = ["address"]
 
+    def get_owner(self):
+        """Return the owner of the resource, once data is validated."""
+        return self.validated_data["operator"]
+
 
 class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
     included_serializers = {
@@ -71,9 +75,7 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
         queryset=Room.objects.all(), related_link_view_name="installation-related"
     )
 
-    url = serializers.HyperlinkedIdentityField(
-        view_name='installation-detail'
-    )
+    url = serializers.HyperlinkedIdentityField(view_name="installation-detail")
 
     class Meta:
         model = RoomNodeInstallation
@@ -106,10 +108,10 @@ class RoomSerializer(serializers.HyperlinkedModelSerializer):
         queryset=RoomNodeInstallation.objects.all(),
         related_link_view_name="room-related",
     )
-    
+
     class Meta:
         model = Room
-        
+
         fields = [
             "name",
             "description",
