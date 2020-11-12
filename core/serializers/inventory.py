@@ -103,7 +103,9 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
             room = data["room"]
             node = data["node"]
         except KeyError:
-            raise serializers.ValidationError("Both the Room reference and the node reference must be provided.")
+            raise serializers.ValidationError(
+                "Both the Room reference and the node reference must be provided."
+            )
         if room.site.operator != node.owner:
             raise serializers.ValidationError(
                 "In an installation, Node and room must belong to the same owner."
@@ -186,6 +188,10 @@ class MembershipSerializer(serializers.ModelSerializer):
             "role",
             "url",
         )
+
+    def get_owner(self):
+        """Return the owner of the resource, once data is validated."""
+        return self.validated_data["organization"]
 
 
 class OrganizationSerializer(serializers.HyperlinkedModelSerializer):

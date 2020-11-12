@@ -60,6 +60,10 @@ class Membership(models.Model):
         """Return True if the membership role is OWNER."""
         return self.role == self.OWNER
 
+    def get_owner(self):
+        """Return the organization that is target of the present membership."""
+        return self.organization
+
     class Meta:
         constraints = [
             # Memberships must be unique.

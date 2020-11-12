@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework import permissions
-from rest_framework.exceptions import NotFound, PermissionDenied, MethodNotAllowed
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.filters import SearchFilter
 from rest_framework_json_api import filters
 from rest_framework_json_api.views import (
@@ -226,7 +226,7 @@ class OrganizationRelationshipView(LoginRequiredMixin, RelationshipView):
 
 
 class MembershipViewSet(LoginRequiredMixin, ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOrganizationOwner]
     queryset = Membership.objects.all()
     serializer_class = MembershipSerializer
 
@@ -247,3 +247,12 @@ class MembershipViewSet(LoginRequiredMixin, ModelViewSet):
             if user_id is not None:
                 queryset = queryset.filter(user=user_id)
         return queryset.distinct()
+
+    def perform_create(self, serializer):
+        """Inject permission checking on the validated incoming resource data."""
+        # TODO: Refactor into common base class.
+        # TODO: Allow ASSISTANTS to change rooms.
+        if IsOrganizationOwner.has_create_permission(self.request, serializer):
+            super().perform_create(serializer)
+        else:
+            raise PermissionDenied
