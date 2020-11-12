@@ -95,6 +95,22 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
         owner = site.operator
         return owner
 
+    def validate(self, data):
+        """
+        Ensure that the node is owned by the same organization as the room.
+        """
+        try:
+            room = data["room"]
+            node = data["node"]
+        except KeyError:
+            raise serializers.ValidationError("Both the Room reference and the node reference must be provided.")
+        if room.site.operator != node.owner:
+            raise serializers.ValidationError(
+                "In an installation, Node and room must belong to the same owner."
+            )
+        else:
+            return data
+
 
 class RoomSerializer(serializers.HyperlinkedModelSerializer):
     related_serializers = {

@@ -281,6 +281,21 @@ class InstallationsTestCase(APITestCase):
                 "type": format_resource_type("RoomNodeInstallation"),
                 "id": 2,
                 "attributes": {"from_timestamp_s": 1601510000},  # Predate
+                "relationships": {
+                    # Node and room must always be provided, to make sure owners match.
+                    "node": {
+                        "data": {
+                            "type": format_resource_type("Node"),
+                            "id": self.node_id,
+                        }
+                    },
+                    "room": {
+                        "data": {
+                            "type": format_resource_type("Room"),
+                            "id": 3,
+                        }
+                    },
+                },
             }
         }
         response = self.client.patch(self.detail_url, data=request_data)
@@ -340,6 +355,40 @@ class InstallationsTestCase(APITestCase):
         response4 = self.client.get(response_url)
         self.assertEqual(response4.status_code, 404)
 
+    def test_node_room_owner_mismatch(self):
+        """POST /installations/ where the owner of the room and the node differ."""
+        # Clairchen Rot belongs to Test-Team
+        incorrect_node_id = "c727b2f8-8377-d4cb-0e95-ac03200b8c93"
+        request_data = {
+            "data": {
+                "type": format_resource_type("RoomNodeInstallation"),
+                "attributes": {
+                    "from_timestamp_s": 1601500000,
+                    "to_timestamp_s": 2147483647,
+                    "description": "Testinstallation",
+                },
+                "relationships": {
+                    # Try to install Clairchen Rot in Prüfstube (id=4).
+                    "node": {
+                        "data": {
+                            "type": format_resource_type("Node"),
+                            "id": incorrect_node_id,
+                        }
+                    },
+                    "room": {
+                        "data": {
+                            "type": format_resource_type("Room"),
+                            "id": self.room_id,
+                        }
+                    },
+                },
+            }
+        }
+        response = self.client.post(self.collection_url, data=request_data)
+        # Expect a HTTP 400 (Bad Request) error code, because the request data is
+        # inconsistent.
+        self.assertEqual(response.status_code, 400)
+
     def test_get_installation_room(self):
         """GET /installations/<installations_id>/room/"""
         url = reverse("installation-related", kwargs={"pk": 2, "related_field": "room"})
@@ -356,6 +405,7 @@ class InstallationsTestCase(APITestCase):
 
     def test_unauthorized_create_no_member(self):
         """POST /installations/ for an organization the user ist not a member of."""
+        node_id = "c727b2f8-8377-d4cb-0e95-ac03200b8c93"
         request_data = {
             "data": {
                 "type": format_resource_type("RoomNodeInstallation"),
@@ -365,13 +415,13 @@ class InstallationsTestCase(APITestCase):
                     "description": "Testinstallation",
                 },
                 "relationships": {
-                    # Install the ERS Test-Node (id=9d02faee-4260-1377-22ec-936428b572ee) in Testraum 1 (pk=1).
+                    # Install Clairchen Rot in Testraum 1 (pk=1).
                     # The currently logged-in user VeraVersuch is not a member of the
-                    # organization that owns Testraum 1.
+                    # organization that owns Testraum 1 and Clairchen Rot.
                     "node": {
                         "data": {
                             "type": format_resource_type("Node"),
-                            "id": self.node2_id,
+                            "id": node_id,
                         }
                     },
                     "room": {
