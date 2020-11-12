@@ -38,7 +38,7 @@ class SampleListView(LoginRequiredMixin, generics.ListAPIView):
         """
         Optionally restricts the returned samples to a given time slice and node.
         """
-        queryset = super(SampleListView, self).get_queryset()
+        queryset = super().get_queryset()
         # Restrict to samples from nodes commanded by the currently logged-in user.
         authorized_nodes = queryset.filter(owner__users=self.request.user)
 
@@ -74,7 +74,7 @@ class TimeSeriesViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
     serializer_class = TimeseriesSerializer  # fallback
 
     def get_queryset(self):
-        queryset = super(TimeSeriesViewSet, self).get_queryset()
+        queryset = super().get_queryset()
         # Restrict to samples from nodes commanded by the currently logged-in user.
         authorized_nodes = queryset.filter(owner__users=self.request.user)
 
@@ -149,7 +149,7 @@ class SampleViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
         """
         Optionally restricts the returned samples to a given time slice and node.
         """
-        queryset = super(SampleViewSet, self).get_queryset()
+        queryset = super().get_queryset()
         # Restrict to samples from nodes commanded by the currently logged-in user.
         nodes = Node.objects.filter(owner__users=self.request.user)
         queryset = queryset.filter(node__in=nodes)

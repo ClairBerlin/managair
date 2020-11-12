@@ -56,7 +56,7 @@ class UserViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
     search_fields = ("username", "email")
 
     def get_queryset(self):
-        queryset = super(UserViewSet, self).get_queryset()
+        queryset = super().get_queryset()
 
         # If this viewset is accessed via the 'organization-related' route,
         # it will have been passed the `user_pk` kwarg, and the queryset
@@ -101,7 +101,7 @@ class AddressViewSet(LoginRequiredMixin, ModelViewSet):
 
     def get_queryset(self):
         """Restrict to logged-in user"""
-        queryset = super(AddressViewSet, self).get_queryset()
+        queryset = super().get_queryset()
         return queryset.filter(sites__operator__users=self.request.user).distinct()
 
 
@@ -114,7 +114,7 @@ class SiteViewSet(LoginRequiredMixin, ModelViewSet):
 
     def get_queryset(self):
         """Restrict to logged-in user"""
-        queryset = super(SiteViewSet, self).get_queryset()
+        queryset = super().get_queryset()
         queryset = queryset.filter(operator__users=self.request.user)
         if self.action == "list":
             organization_id = self.request.query_params.get(
@@ -128,7 +128,7 @@ class SiteViewSet(LoginRequiredMixin, ModelViewSet):
         """Inject permission checking on the validated incoming resource data."""
         # TODO: Refactor into common base class.
         if IsOrganizationOwner.has_create_permission(self.request, serializer):
-            super(SiteViewSet, self).perform_create(serializer)
+            super().perform_create(serializer)
         else:
             raise PermissionDenied
 
@@ -142,7 +142,7 @@ class RoomViewSet(LoginRequiredMixin, ModelViewSet):
 
     def get_queryset(self):
         """Restrict to logged-in user"""
-        queryset = super(RoomViewSet, self).get_queryset()
+        queryset = super().get_queryset()
         queryset = queryset.filter(site__operator__users=self.request.user)
         if self.action == "list":
             organization_id = self.request.query_params.get(
@@ -160,7 +160,7 @@ class RoomViewSet(LoginRequiredMixin, ModelViewSet):
         # TODO: Refactor into common base class.
         # TODO: Allow ASSISTANTS to change rooms.
         if IsOrganizationOwner.has_create_permission(self.request, serializer):
-            super(RoomViewSet, self).perform_create(serializer)
+            super().perform_create(serializer)
         else:
             raise PermissionDenied
 
@@ -172,7 +172,7 @@ class RoomNodeInstallationViewSet(LoginRequiredMixin, ModelViewSet):
 
     def get_queryset(self):
         """Restrict to logged-in user"""
-        queryset = super(RoomNodeInstallationViewSet, self).get_queryset()
+        queryset = super().get_queryset()
         queryset = queryset.filter(room__site__operator__users=self.request.user)
         if self.action == "list":
             organization_id = self.request.query_params.get(
@@ -196,7 +196,7 @@ class RoomNodeInstallationViewSet(LoginRequiredMixin, ModelViewSet):
         # TODO: Refactor into common base class.
         # TODO: Allow ASSISTANTS to change rooms.
         if IsOrganizationOwner.has_create_permission(self.request, serializer):
-            super(RoomNodeInstallationViewSet, self).perform_create(serializer)
+            super().perform_create(serializer)
         else:
             raise PermissionDenied
 
@@ -208,7 +208,7 @@ class OrganizationViewSet(LoginRequiredMixin, ModelViewSet):
 
     def get_queryset(self):
         """Restrict to logged-in user"""
-        queryset = super(OrganizationViewSet, self).get_queryset()
+        queryset = super().get_queryset()
         return queryset.filter(users=self.request.user)
 
     def perform_create(self, serializer):
@@ -231,7 +231,7 @@ class MembershipViewSet(LoginRequiredMixin, ModelViewSet):
 
     def get_queryset(self):
         """Restrict to users in the same organization."""
-        queryset = super(MembershipViewSet, self).get_queryset()
+        queryset = super().get_queryset()
         queryset = queryset.filter(organization__users=self.request.user)
         if self.action == "list":
             organization_id = self.request.query_params.get(

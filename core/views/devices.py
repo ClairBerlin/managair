@@ -53,7 +53,7 @@ class NodeViewSet(LoginRequiredMixin, ModelViewSet):
 
     def get_queryset(self):
         """Restrict to logged-in user"""
-        queryset = super(NodeViewSet, self).get_queryset()
+        queryset = super().get_queryset()
         queryset = queryset.filter(owner__users=self.request.user)
         if self.action == "list":
             organization_id = self.request.query_params.get(
@@ -66,7 +66,7 @@ class NodeViewSet(LoginRequiredMixin, ModelViewSet):
     def perform_create(self, serializer):
         """Inject permission checking on the validated incoming resource data."""
         if IsOrganizationOwner.has_create_permission(self.request, serializer):
-            super(NodeViewSet, self).perform_create(serializer)
+            super().perform_create(serializer)
         else:
             raise PermissionDenied
 
