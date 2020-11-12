@@ -12,10 +12,9 @@ class RoomsTestCase(APITestCase):
         # Versuchs-Site has room Versuchsraum 1 (pk=3),
         # Prüf-Site has room Prüfstuge (pk=4).
         self.client.login(username="veraVersuch", password="versuch")
-        # Versuchsverbund owns
-        # Clairchen Schwarz (id=3b95a1b2-74e7-9e98-52c4-4acae441f0ae) and
-        # ERS Test-Node (id=9d02faee-4260-1377-22ec-936428b572ee).
-        self.detail_url = reverse("room-detail", kwargs={"pk": 3})
+        # Versuchsverbund owns Versuchsraum 1 with pk=3
+        self.room_id = 3
+        self.detail_url = reverse("room-detail", kwargs={"pk": self.room_id})
         self.collection_url = reverse("room-list")
 
     def tearDown(self):
@@ -55,7 +54,7 @@ class RoomsTestCase(APITestCase):
         request_data = {
             "data": {
                 "type": format_resource_type("Room"),
-                "id": 3,
+                "id": self.room_id,
                 "attributes": {
                     "description": "Ein Raum für Versuche.",
                     "height_m": "2.7",
@@ -80,7 +79,7 @@ class RoomsTestCase(APITestCase):
                     "max_occupancy": 1,
                 },
                 "relationships": {
-                    "site": {"data": {"type": "Site", "id": "3"}},
+                    "site": {"data": {"type": "Site", "id": self.room_id}},
                 },
             }
         }
@@ -116,16 +115,107 @@ class RoomsTestCase(APITestCase):
     def test_get_room_installations(self):
         """GET /rooms/<room_id>/installations/"""
         url = reverse(
-            "room-related", kwargs={"pk": 3, "related_field": "installations"}
+            "room-related",
+            kwargs={"pk": self.room_id, "related_field": "installations"},
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
 
+    def test_unauthorized_create_no_member(self):
+        """POST /rooms/ for an organization the user ist not a member of."""
+        request_data = {
+            "data": {
+                "type": format_resource_type("Room"),
+                "attributes": {
+                    "name": "Räumchen",
+                    "description": "Nur zum Test",
+                    "size_sqm": "5",
+                    "height_m": "2.6",
+                    "max_occupancy": 1,
+                },
+                "relationships": {
+                    # The currently logged-in user VeraVersuch is not a member of the
+                    # organization Test-Team with Site Test-Site (pk=1).
+                    "site": {"data": {"type": "Site", "id": "1"}},
+                },
+            }
+        }
+        response = self.client.post(self.collection_url, data=request_data)
+        self.assertEqual(response.status_code, 403)
+
+    def test_unauthorized_create_no_owner(self):
+        """POST /rooms/ for an organization where the user is not an OWNER."""
+        # Need a different user for this test case.
+        self.client.logout()
+        # User horstHilfsarbeiter is ASSISTANT in Versuchsverbung (pk=2).
+        self.client.login(username="horstHilfsarbeiter", password="horst")
+        request_data = {
+            "data": {
+                "type": format_resource_type("Room"),
+                "attributes": {
+                    "name": "Räumchen",
+                    "description": "Nur zum Test",
+                    "size_sqm": "5",
+                    "height_m": "2.6",
+                    "max_occupancy": 1,
+                },
+                "relationships": {
+                    # The currently logged-in user horstHilfsarbeiter is not an OWNER
+                    # of the organization Versuchsverbund with Versuchs-Site (pk=2).
+                    "site": {"data": {"type": "Site", "id": "2"}},
+                },
+            }
+        }
+        response = self.client.post(self.collection_url, data=request_data)
+        self.assertEqual(response.status_code, 403)
+
+    def test_unauthorized_patch_no_member(self):
+        """PATCH /rooms/ of an organization of which the use ist not a member."""
+        room_id = 1  # Testraum 1 belongs to Organization Test-Team.
+        detail_url = reverse("room-detail", kwargs={"pk": room_id})
+        request_data = {
+            "data": {
+                "type": format_resource_type("Room"),
+                "id": room_id,
+                "attributes": {
+                    "description": "Ein Raum für Versuche.",
+                    "height_m": "2.7",
+                },
+            }
+        }
+        response = self.client.patch(detail_url, data=request_data)
+        # Expect a HTTP 404 error code, because the object to be patched should not be
+        # accessible to the logged-in user.
+        self.assertEqual(response.status_code, 404)
+
+    def test_unauthorized_patch_no_owner(self):
+        """PATCH /rooms/ of an organization where the user ist not an OWNER."""
+        # Need a different user for this test case.
+        self.client.logout()
+        # User horstHilfsarbeiter is ASSISTANT in Versuchsverbung (pk=2).
+        self.client.login(username="horstHilfsarbeiter", password="horst")
+        request_data = {
+            "data": {
+                "type": format_resource_type("Room"),
+                "id": self.room_id,
+                "attributes": {
+                    "description": "Ein Raum für Versuche.",
+                    "height_m": "2.7",
+                },
+            }
+        }
+        response = self.client.patch(self.detail_url, data=request_data)
+        # Expect a HTTP 403 error code, because the user has access to the Node but is
+        # not sufficiently privileged to alter it.
+        self.assertEqual(response.status_code, 403)
+
 
 class InstallationsTestCase(APITestCase):
     fixtures = ["user-fixtures.json", "inventory-fixtures.json"]
-    node_id = "3b95a1b2-74e7-9e98-52c4-4acae441f0ae"
+    node_id = "3b95a1b2-74e7-9e98-52c4-4acae441f0ae"  # Clairchen Schwarz
+    node2_id = "9d02faee-4260-1377-22ec-936428b572ee"  # ERS Test-Node
+    room_id = 4  # Prüfstube
 
     def setUp(self):
         # veraVersuch is owner of the organization Versuchsverbund with pk=2.
@@ -191,6 +281,21 @@ class InstallationsTestCase(APITestCase):
                 "type": format_resource_type("RoomNodeInstallation"),
                 "id": 2,
                 "attributes": {"from_timestamp_s": 1601510000},  # Predate
+                "relationships": {
+                    # Node and room must always be provided, to make sure owners match.
+                    "node": {
+                        "data": {
+                            "type": format_resource_type("Node"),
+                            "id": self.node_id,
+                        }
+                    },
+                    "room": {
+                        "data": {
+                            "type": format_resource_type("Room"),
+                            "id": 3,
+                        }
+                    },
+                },
             }
         }
         response = self.client.patch(self.detail_url, data=request_data)
@@ -213,13 +318,13 @@ class InstallationsTestCase(APITestCase):
                     "node": {
                         "data": {
                             "type": format_resource_type("Node"),
-                            "id": "9d02faee-4260-1377-22ec-936428b572ee",
+                            "id": self.node2_id,
                         }
                     },
                     "room": {
                         "data": {
                             "type": format_resource_type("Room"),
-                            "id": "4",
+                            "id": self.room_id,
                         }
                     },
                 },
@@ -239,9 +344,7 @@ class InstallationsTestCase(APITestCase):
         response2 = self.client.get(response_url)
         self.assertEqual(response2.status_code, 200)
         self.assertEqual(response2.data["from_timestamp_s"], 1601500000)
-        self.assertEqual(
-            response2.data["node"]["id"], "9d02faee-4260-1377-22ec-936428b572ee"
-        )
+        self.assertEqual(response2.data["node"]["id"], self.node2_id)
         self.assertEqual(response2.data["room"]["id"], "4")
         # Delete the installation.
         # DELETE /installations/<installation_id>/
@@ -251,6 +354,40 @@ class InstallationsTestCase(APITestCase):
         # GET /installations/<installation_id>/
         response4 = self.client.get(response_url)
         self.assertEqual(response4.status_code, 404)
+
+    def test_node_room_owner_mismatch(self):
+        """POST /installations/ where the owner of the room and the node differ."""
+        # Clairchen Rot belongs to Test-Team
+        incorrect_node_id = "c727b2f8-8377-d4cb-0e95-ac03200b8c93"
+        request_data = {
+            "data": {
+                "type": format_resource_type("RoomNodeInstallation"),
+                "attributes": {
+                    "from_timestamp_s": 1601500000,
+                    "to_timestamp_s": 2147483647,
+                    "description": "Testinstallation",
+                },
+                "relationships": {
+                    # Try to install Clairchen Rot in Prüfstube (id=4).
+                    "node": {
+                        "data": {
+                            "type": format_resource_type("Node"),
+                            "id": incorrect_node_id,
+                        }
+                    },
+                    "room": {
+                        "data": {
+                            "type": format_resource_type("Room"),
+                            "id": self.room_id,
+                        }
+                    },
+                },
+            }
+        }
+        response = self.client.post(self.collection_url, data=request_data)
+        # Expect a HTTP 400 (Bad Request) error code, because the request data is
+        # inconsistent.
+        self.assertEqual(response.status_code, 400)
 
     def test_get_installation_room(self):
         """GET /installations/<installations_id>/room/"""
@@ -264,4 +401,105 @@ class InstallationsTestCase(APITestCase):
         url = reverse("installation-related", kwargs={"pk": 2, "related_field": "node"})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["id"], "3b95a1b2-74e7-9e98-52c4-4acae441f0ae")
+        self.assertEqual(response.data["id"], self.node_id)
+
+    def test_unauthorized_create_no_member(self):
+        """POST /installations/ for an organization the user ist not a member of."""
+        node_id = "c727b2f8-8377-d4cb-0e95-ac03200b8c93"
+        request_data = {
+            "data": {
+                "type": format_resource_type("RoomNodeInstallation"),
+                "attributes": {
+                    "from_timestamp_s": 1601500000,
+                    "to_timestamp_s": 2147483647,
+                    "description": "Testinstallation",
+                },
+                "relationships": {
+                    # Install Clairchen Rot in Testraum 1 (pk=1).
+                    # The currently logged-in user VeraVersuch is not a member of the
+                    # organization that owns Testraum 1 and Clairchen Rot.
+                    "node": {
+                        "data": {
+                            "type": format_resource_type("Node"),
+                            "id": node_id,
+                        }
+                    },
+                    "room": {
+                        "data": {
+                            "type": format_resource_type("Room"),
+                            "id": 1,
+                        }
+                    },
+                },
+            }
+        }
+        response = self.client.post(self.collection_url, data=request_data)
+        self.assertEqual(response.status_code, 403)
+
+    def test_unauthorized_create_no_owner(self):
+        """POST /installations/ for an organization where the user is not an OWNER."""
+        # Need a different user for this test case.
+        self.client.logout()
+        # User horstHilfsarbeiter is ASSISTANT in Versuchsverbung (pk=2).
+        self.client.login(username="horstHilfsarbeiter", password="horst")
+        request_data = {
+            "data": {
+                "type": format_resource_type("RoomNodeInstallation"),
+                "attributes": {
+                    "from_timestamp_s": 1601500000,
+                    "to_timestamp_s": 2147483647,
+                    "description": "Testinstallation",
+                },
+                "relationships": {
+                    # Install the ERS Test-Node (id=9d02faee-4260-1377-22ec-936428b572ee) in Prüfstube (id=4).
+                    "node": {
+                        "data": {
+                            "type": format_resource_type("Node"),
+                            "id": self.node2_id,
+                        }
+                    },
+                    "room": {
+                        "data": {
+                            "type": format_resource_type("Room"),
+                            "id": self.room_id,
+                        }
+                    },
+                },
+            }
+        }
+        response = self.client.post(self.collection_url, data=request_data)
+        self.assertEqual(response.status_code, 403)
+
+    def test_unauthorized_patch_no_member(self):
+        """PATCH /installations/ of an organization of which the use ist not a member."""
+        installation_id = 1  # Installation of Clairchen Rot in Testraum 2 (Test-Team)
+        detail_url = reverse("installation-detail", kwargs={"pk": installation_id})
+        request_data = {
+            "data": {
+                "type": format_resource_type("RoomNodeInstallation"),
+                "id": installation_id,
+                "attributes": {"from_timestamp_s": 1601510000},  # Predate
+            }
+        }
+        response = self.client.patch(detail_url, data=request_data)
+        # Expect a HTTP 404 error code, because the object to be patched should not be
+        # accessible to the logged-in user.
+        self.assertEqual(response.status_code, 404)
+
+    def test_unauthorized_patch_no_owner(self):
+        """PATCH /installations/ of an organization where the user ist not an OWNER."""
+        # Need a different user for this test case.
+        self.client.logout()
+        # User horstHilfsarbeiter is ASSISTANT in Versuchsverbung (pk=2).
+        self.client.login(username="horstHilfsarbeiter", password="horst")
+        request_data = {
+            "data": {
+                "type": format_resource_type("RoomNodeInstallation"),
+                "id": 2,
+                "attributes": {"from_timestamp_s": 1601510000},  # Predate
+            }
+        }
+        response = self.client.patch(self.detail_url, data=request_data)
+        # Expect a HTTP 403 error code, because the user has access to the Node but is
+        # not sufficiently privileged to alter it.
+        self.assertEqual(response.status_code, 403)

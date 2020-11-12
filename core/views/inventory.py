@@ -134,7 +134,7 @@ class SiteViewSet(LoginRequiredMixin, ModelViewSet):
 
 
 class RoomViewSet(LoginRequiredMixin, ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOrganizationOwner]
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
     filter_backends = (filters.QueryParameterValidationFilter, SearchFilter)
@@ -155,9 +155,18 @@ class RoomViewSet(LoginRequiredMixin, ModelViewSet):
                 queryset = queryset.filter(site=site_id)
         return queryset.distinct()
 
+    def perform_create(self, serializer):
+        """Inject permission checking on the validated incoming resource data."""
+        # TODO: Refactor into common base class.
+        # TODO: Allow ASSISTANTS to change rooms.
+        if IsOrganizationOwner.has_create_permission(self.request, serializer):
+            super(RoomViewSet, self).perform_create(serializer)
+        else:
+            raise PermissionDenied
+
 
 class RoomNodeInstallationViewSet(LoginRequiredMixin, ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOrganizationOwner]
     queryset = RoomNodeInstallation.objects
     serializer_class = RoomNodeInstallationSerializer
 
@@ -181,6 +190,15 @@ class RoomNodeInstallationViewSet(LoginRequiredMixin, ModelViewSet):
             if node_id is not None:
                 queryset = queryset.filter(node=node_id)
         return queryset.distinct()
+
+    def perform_create(self, serializer):
+        """Inject permission checking on the validated incoming resource data."""
+        # TODO: Refactor into common base class.
+        # TODO: Allow ASSISTANTS to change rooms.
+        if IsOrganizationOwner.has_create_permission(self.request, serializer):
+            super(RoomNodeInstallationViewSet, self).perform_create(serializer)
+        else:
+            raise PermissionDenied
 
 
 class OrganizationViewSet(LoginRequiredMixin, ModelViewSet):

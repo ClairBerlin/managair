@@ -26,7 +26,7 @@ class IsOrganizationOwner(permissions.BasePermission):
                 membership = request.user.memberships.get(organization__id=owner.id)
             except Membership.DoesNotExist:
                 raise PermissionDenied
-            return membership.isOwner()
+            return membership.isOwner() # TODO: Make role parameterizable.
         else:
             # Should never happen.
             raise MethodNotAllowed(request.method)
