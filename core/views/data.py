@@ -1,9 +1,10 @@
+import logging
 from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions
-from rest_framework.exceptions import MethodNotAllowed, NotFound
+from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
 from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 from rest_framework_json_api.views import ReadOnlyModelViewSet, generics
@@ -16,6 +17,8 @@ from core.serializers import (
     SampleListSerializer,
     TimeseriesSerializer,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class PagesizeLimitedPagination(JsonApiPageNumberPagination):
@@ -47,6 +50,7 @@ class SampleListView(LoginRequiredMixin, generics.ListAPIView):
             # If the view is accessed via the `node-samples-list` route, it will have
             # been passed the node-pk as lookup_field.
             node_id = self.kwargs[self.lookup_field]
+            logger.debug("Building a sample-query for node %s.", node_id)
             node = get_object_or_404(authorized_nodes, pk=node_id)
             queryset = node.samples
         else:
@@ -56,6 +60,7 @@ class SampleListView(LoginRequiredMixin, generics.ListAPIView):
         to_limit = self.request.query_params.get(
             "filter[to]", round(datetime.now().timestamp())
         )
+        logger.debug("Time-slicing samples from %d to %d", from_limit, to_limit)
         queryset = queryset.filter(
             timestamp_s__gte=from_limit, timestamp_s__lte=to_limit
         )
@@ -73,7 +78,7 @@ class TimeSeriesViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
     }
     serializer_class = TimeseriesSerializer  # fallback
 
-    def get_queryset(self):
+    def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset()
         # Restrict to samples from nodes commanded by the currently logged-in user.
         authorized_nodes = queryset.filter(owner__users=self.request.user)
@@ -84,15 +89,18 @@ class TimeSeriesViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
                 # If the view is accessed via the `node-samples-list` route, it will
                 # have been passed the node_pk as lookup_field.
                 node_id = self.kwargs["node_pk"]
-                return get_object_or_404(authorized_nodes, pk=node_id)
             elif "pk" in self.kwargs:
                 # If the view is accessed via the `timeseries-details` route, it will have
                 # been passed the pk as lookup_field.
                 node_id = self.kwargs["pk"]
-                return get_object_or_404(authorized_nodes, pk=node_id)
             else:
                 raise MethodNotAllowed
+
+            logger.debug("Retrieve time series for individual node %s", node_id)
+            return get_object_or_404(authorized_nodes, pk=node_id)
+
         elif self.action == "list":
+            logger.debug("Retrieve time series overview of all accessible nodes.")
             return authorized_nodes
         else:
             raise MethodNotAllowed
@@ -121,6 +129,11 @@ class TimeSeriesViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
         to_limit = self.request.query_params.get(
             "filter[to]", round(datetime.now().timestamp())
         )
+        logger.debug(
+            "Limiting the time series to the time slice from %d to %d",
+            from_limit,
+            to_limit,
+        )
         samples = queryset.filter(
             timestamp_s__gte=from_limit, timestamp_s__lte=to_limit
         )
@@ -145,7 +158,7 @@ class SampleViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
     queryset = Sample.objects.all()
     pagination_class = PagesizeLimitedPagination
 
-    def get_queryset(self):
+    def get_queryset(self, *args, **kwargs):
         """
         Optionally restricts the returned samples to a given time slice and node.
         """
@@ -158,16 +171,19 @@ class SampleViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
             queryset = queryset.filter(node__in=nodes)
             node_id = self.request.query_params.get("filter[node]", None)
             if node_id is not None:
-                query_node = get_object_or_404(nodes, pk=node_id)
-                if query_node is not None:
-                    queryset = queryset.filter(node=node_id)
-                else:
-                    raise NotFound
+                logger.debug("Restrict samples to node %s.", node_id)
+                get_object_or_404(nodes, pk=node_id)  # Check if node exists.
+                queryset = queryset.filter(node=node_id)
             queryset = queryset.filter(node__in=nodes)
             # Time-slicing query parameter
             from_limit = self.request.query_params.get("filter[from]", 0)
             to_limit = self.request.query_params.get(
                 "filter[to]", round(datetime.now().timestamp())
+            )
+            logger.debug(
+                "Limiting the sample set to the time slice from %d to %d",
+                from_limit,
+                to_limit,
             )
             queryset = queryset.filter(
                 timestamp_s__gte=from_limit, timestamp_s__lte=to_limit

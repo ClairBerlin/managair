@@ -13,10 +13,10 @@ class TimeseriesViewModel:
     ):
         self.pk = pk
         self.alias = alias
+        self.sample_count = sample_count
         self.query_timestamp = query_timestamp
         self.from_timestamp = from_timestamp
         self.to_timestamp = to_timestamp
-        self.sample_count = sample_count
 
     class JSONAPIMeta:
         resource_name = "node-timeseries"
@@ -33,9 +33,9 @@ class SamplePageViewModel:
         to_timestamp: int = round(datetime.now().timestamp()),
     ):
         self.pk = pk
+        self.alias = alias
         self.samples = samples
         self.sample_count = len(samples)
-        self.alias = alias
         self.query_timestamp = query_timestamp
         self.from_timestamp = from_timestamp
         self.to_timestamp = to_timestamp

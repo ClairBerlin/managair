@@ -1,5 +1,4 @@
 from rest_framework_json_api import serializers
-from rest_framework_json_api.relations import HyperlinkedRelatedField
 
 from core.data_viewmodels import TimeseriesViewModel
 from core.models import Sample
@@ -43,9 +42,7 @@ class TimeseriesSerializer(serializers.Serializer):
     to_timestamp = serializers.IntegerField()
     sample_count = serializers.IntegerField()
 
-    url = serializers.HyperlinkedIdentityField(
-        view_name='timeseries-detail'
-    )
+    url = serializers.HyperlinkedIdentityField(view_name="timeseries-detail")
 
     class Meta:
         model = TimeseriesViewModel

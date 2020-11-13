@@ -15,6 +15,10 @@ from core.models import (
     RoomNodeInstallation,
 )
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 User = get_user_model()
 
 
@@ -95,13 +99,16 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
         owner = site.operator
         return owner
 
-    def validate(self, data):
+    def validate(self, attrs):
         """
         Ensure that the node is owned by the same organization as the room.
         """
+        logger.debug(
+            "For a new or updated installation, validate that node and room belong to the same owner."
+        )
         try:
-            room = data["room"]
-            node = data["node"]
+            room = attrs["room"]
+            node = attrs["node"]
         except KeyError:
             raise serializers.ValidationError(
                 "Both the Room reference and the node reference must be provided."
@@ -110,8 +117,7 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
             raise serializers.ValidationError(
                 "In an installation, Node and room must belong to the same owner."
             )
-        else:
-            return data
+        return attrs
 
 
 class RoomSerializer(serializers.HyperlinkedModelSerializer):

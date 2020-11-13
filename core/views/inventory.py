@@ -1,3 +1,4 @@
+import logging
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework import permissions
@@ -33,6 +34,8 @@ from core.serializers import (
 
 User = get_user_model()
 
+logger = logging.getLogger(__name__)
+
 
 class SiteNotFoundExceptionView(LoginRequiredMixin, generics.RetrieveAPIView):
     """This view returns a 404 Not Found exception."""
@@ -55,13 +58,13 @@ class UserViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
     filter_backends = (filters.QueryParameterValidationFilter, SearchFilter)
     search_fields = ("username", "email")
 
-    def get_queryset(self):
+    def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset()
 
-        # If this viewset is accessed via the 'organization-related' route,
-        # it will have been passed the `user_pk` kwarg, and the queryset
-        # needs to be filtered accordingly;
         if "user_pk" in self.kwargs:
+            # If this viewset is accessed via the 'organization-related' route,
+            # it will have been passed the `user_pk` kwarg, and the queryset
+            # needs to be filtered accordingly;
             user_pk = self.kwargs["user_pk"]
             queryset = queryset.filter(pk=user_pk)
         else:
@@ -72,12 +75,19 @@ class UserViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
                     "filter[organization]", None
                 )
                 if organization_id is not None:
+                    logger.debug(
+                        "Restrict query to members of organization #%d.",
+                        organization_id,
+                    )
                     queryset = queryset.filter(organizations=organization_id)
             else:
                 # Otherwise, return those users only that are in an organization
                 # accessible by the logged-in user. Need to make the filter result
                 # distinct because the underlying JOIN might return the same user
                 # multiple times if it is a member of several organizations.
+                logger.debug(
+                    "Restrict query to members of the logged-in users' organizations."
+                )
                 queryset = queryset.filter(
                     organizations__users=self.request.user.id
                 ).distinct()
@@ -99,7 +109,7 @@ class AddressViewSet(LoginRequiredMixin, ModelViewSet):
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
 
-    def get_queryset(self):
+    def get_queryset(self, *args, **kwargs):
         """Restrict to logged-in user"""
         queryset = super().get_queryset()
         return queryset.filter(sites__operator__users=self.request.user).distinct()
@@ -112,7 +122,7 @@ class SiteViewSet(LoginRequiredMixin, ModelViewSet):
     filter_backends = (filters.QueryParameterValidationFilter, SearchFilter)
     search_fields = ("name", "description")
 
-    def get_queryset(self):
+    def get_queryset(self, *args, **kwargs):
         """Restrict to logged-in user"""
         queryset = super().get_queryset()
         queryset = queryset.filter(operator__users=self.request.user)
@@ -121,6 +131,9 @@ class SiteViewSet(LoginRequiredMixin, ModelViewSet):
                 "filter[organization]", None
             )
             if organization_id is not None:
+                logger.debug(
+                    "Restrict query to sites of organization #%d.", organization_id
+                )
                 queryset = queryset.filter(operator=organization_id)
         return queryset.distinct()
 
@@ -140,7 +153,7 @@ class RoomViewSet(LoginRequiredMixin, ModelViewSet):
     filter_backends = (filters.QueryParameterValidationFilter, SearchFilter)
     search_fields = ("name", "description")
 
-    def get_queryset(self):
+    def get_queryset(self, *args, **kwargs):
         """Restrict to logged-in user"""
         queryset = super().get_queryset()
         queryset = queryset.filter(site__operator__users=self.request.user)
@@ -149,9 +162,13 @@ class RoomViewSet(LoginRequiredMixin, ModelViewSet):
                 "filter[organization]", None
             )
             if organization_id is not None:
+                logger.debug(
+                    "Restrict query to rooms of organization #%d.", organization_id
+                )
                 queryset = queryset.filter(site__operator=organization_id)
             site_id = self.request.query_params.get("filter[site]", None)
             if site_id is not None:
+                logger.debug("Restrict query to rooms of site #%d.", site_id)
                 queryset = queryset.filter(site=site_id)
         return queryset.distinct()
 
@@ -170,7 +187,7 @@ class RoomNodeInstallationViewSet(LoginRequiredMixin, ModelViewSet):
     queryset = RoomNodeInstallation.objects
     serializer_class = RoomNodeInstallationSerializer
 
-    def get_queryset(self):
+    def get_queryset(self, *args, **kwargs):
         """Restrict to logged-in user"""
         queryset = super().get_queryset()
         queryset = queryset.filter(room__site__operator__users=self.request.user)
@@ -179,15 +196,22 @@ class RoomNodeInstallationViewSet(LoginRequiredMixin, ModelViewSet):
                 "filter[organization]", None
             )
             if organization_id is not None:
+                logger.debug(
+                    "Restrict query to installations of organization #%d.",
+                    organization_id,
+                )
                 queryset = queryset.filter(room__site__operator=organization_id)
             site_id = self.request.query_params.get("filter[site]", None)
             if site_id is not None:
+                logger.debug("Restrict query to installations at site #%d.", site_id)
                 queryset = queryset.filter(room__site=site_id)
             room_id = self.request.query_params.get("filter[room]", None)
             if room_id is not None:
+                logger.debug("Restrict query to installations in room #%d.", room_id)
                 queryset = queryset.filter(room=room_id)
             node_id = self.request.query_params.get("filter[node]", None)
             if node_id is not None:
+                logger.debug("Restrict query to installations of node %s.", node_id)
                 queryset = queryset.filter(node=node_id)
         return queryset.distinct()
 
@@ -206,7 +230,7 @@ class OrganizationViewSet(LoginRequiredMixin, ModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
 
-    def get_queryset(self):
+    def get_queryset(self, *args, **kwargs):
         """Restrict to logged-in user"""
         queryset = super().get_queryset()
         return queryset.filter(users=self.request.user)
@@ -230,7 +254,7 @@ class MembershipViewSet(LoginRequiredMixin, ModelViewSet):
     queryset = Membership.objects.all()
     serializer_class = MembershipSerializer
 
-    def get_queryset(self):
+    def get_queryset(self, *args, **kwargs):
         """Restrict to users in the same organization."""
         queryset = super().get_queryset()
         queryset = queryset.filter(organization__users=self.request.user)
@@ -239,12 +263,20 @@ class MembershipViewSet(LoginRequiredMixin, ModelViewSet):
                 "filter[organization]", None
             )
             if organization_id is not None:
+                logger.debug(
+                    "Restrict query to memberships of organization #%s.",
+                    organization_id,
+                )
                 queryset = queryset.filter(organization=organization_id)
             username = self.request.query_params.get("filter[username]", None)
             if username is not None:
+                logger.debug("Restrict query to memberships of user %s.", username)
                 queryset = queryset.filter(user__username=username)
             user_id = self.request.query_params.get("filter[user]", None)
             if user_id is not None:
+                logger.debug(
+                    "Restricti query to memberships of the user with id %d.", username
+                )
                 queryset = queryset.filter(user=user_id)
         return queryset.distinct()
 
