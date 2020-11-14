@@ -1,6 +1,7 @@
+import logging
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework import permissions
-from rest_framework.exceptions import PermissionDenied, MethodNotAllowed
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.filters import SearchFilter
 from rest_framework_json_api import filters
 from rest_framework_json_api.views import (
@@ -15,7 +16,6 @@ from core.models import (
     NodeModel,
     Node,
     NodeFidelity,
-    Membership,
 )
 from core.serializers import (
     QuantitySerializer,
@@ -24,6 +24,8 @@ from core.serializers import (
     NodeSerializer,
     NodeFidelitySerializer,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class QuantityViewSet(LoginRequiredMixin, ModelViewSet):
@@ -51,7 +53,7 @@ class NodeViewSet(LoginRequiredMixin, ModelViewSet):
     filter_backends = (filters.QueryParameterValidationFilter, SearchFilter)
     search_fields = ("alias", "eui64")
 
-    def get_queryset(self):
+    def get_queryset(self, *args, **kwargs):
         """Restrict to logged-in user"""
         queryset = super().get_queryset()
         queryset = queryset.filter(owner__users=self.request.user)
@@ -60,6 +62,7 @@ class NodeViewSet(LoginRequiredMixin, ModelViewSet):
                 "filter[organization]", None
             )
             if organization_id is not None:
+                logger.debug("Restrict to nodes of organization #%d.", organization_id)
                 queryset = queryset.filter(owner=organization_id)
         return queryset.distinct()
 

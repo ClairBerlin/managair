@@ -1,8 +1,9 @@
+import logging
 from datetime import datetime
-
 from django.db import models
-
 from .inventory import Organization
+
+logger = logging.getLogger(__name__)
 
 
 class Quantity(models.Model):
@@ -61,6 +62,7 @@ class Node(models.Model):
     def check_fidelity(self, lookback_interval_s: int):
         """Check if a message was received within the lookback interval."""
         check_time_s = round(datetime.now().timestamp())
+        logger.info("Run fidelity check for node %s.", self.id)
         fidelity = {"node": self, "last_check_s": check_time_s}
         latest_sample = self.samples.latest()
         if latest_sample is None:

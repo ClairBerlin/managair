@@ -1,8 +1,12 @@
+import logging
 from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.db import models
 from django.core.validators import ValidationError
+
+
+logger = logging.getLogger(__name__)
 
 
 class Organization(models.Model):
@@ -179,14 +183,21 @@ class RoomNodeInstallation(models.Model):
         """Return the organization that owns the present installation."""
         return self.room.site.operator
 
-    def save(self, *args, **kwargs):
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
         self.full_clean()  # Ensure that our custom validation is run.
-        super().save(*args, **kwargs)
+        super().save(force_insert, force_update, using, update_fields)
 
     def clean(self, *args, **kwargs):
         """Custom validation: Ensure that a node and room belong to the same owner."""
         node_owner = self.node.owner
         room_owner = self.room.site.operator
+        logger.info(
+            "Ensure that the installation of node %s in room %s is admissible.",
+            self.node.id,
+            self.room.id,
+        )
         if node_owner != room_owner:
             raise ValidationError(
                 "Room and Node of an Installation must have the same owner. "
