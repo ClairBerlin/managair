@@ -27,7 +27,7 @@ class IsOrganizationOwner(permissions.BasePermission):
             # is to be added?
             owner = serializer.get_owner()
             logger.debug(
-                "Check create permission for user #%d in organization #%d.",
+                "Check create permission for user #%s in organization #%s.",
                 request.user.id,
                 owner.id,
             )

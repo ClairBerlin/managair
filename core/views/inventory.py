@@ -76,7 +76,7 @@ class UserViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
                 )
                 if organization_id is not None:
                     logger.debug(
-                        "Restrict query to members of organization #%d.",
+                        "Restrict query to members of organization #%s.",
                         organization_id,
                     )
                     queryset = queryset.filter(organizations=organization_id)
@@ -132,7 +132,7 @@ class SiteViewSet(LoginRequiredMixin, ModelViewSet):
             )
             if organization_id is not None:
                 logger.debug(
-                    "Restrict query to sites of organization #%d.", organization_id
+                    "Restrict query to sites of organization #%s.", organization_id
                 )
                 queryset = queryset.filter(operator=organization_id)
         return queryset.distinct()
@@ -163,12 +163,12 @@ class RoomViewSet(LoginRequiredMixin, ModelViewSet):
             )
             if organization_id is not None:
                 logger.debug(
-                    "Restrict query to rooms of organization #%d.", organization_id
+                    "Restrict query to rooms of organization #%s.", organization_id
                 )
                 queryset = queryset.filter(site__operator=organization_id)
             site_id = self.request.query_params.get("filter[site]", None)
             if site_id is not None:
-                logger.debug("Restrict query to rooms of site #%d.", site_id)
+                logger.debug("Restrict query to rooms of site #%s.", site_id)
                 queryset = queryset.filter(site=site_id)
         return queryset.distinct()
 
@@ -197,17 +197,17 @@ class RoomNodeInstallationViewSet(LoginRequiredMixin, ModelViewSet):
             )
             if organization_id is not None:
                 logger.debug(
-                    "Restrict query to installations of organization #%d.",
+                    "Restrict query to installations of organization #%s.",
                     organization_id,
                 )
                 queryset = queryset.filter(room__site__operator=organization_id)
             site_id = self.request.query_params.get("filter[site]", None)
             if site_id is not None:
-                logger.debug("Restrict query to installations at site #%d.", site_id)
+                logger.debug("Restrict query to installations at site #%s.", site_id)
                 queryset = queryset.filter(room__site=site_id)
             room_id = self.request.query_params.get("filter[room]", None)
             if room_id is not None:
-                logger.debug("Restrict query to installations in room #%d.", room_id)
+                logger.debug("Restrict query to installations in room #%s.", room_id)
                 queryset = queryset.filter(room=room_id)
             node_id = self.request.query_params.get("filter[node]", None)
             if node_id is not None:
@@ -275,7 +275,7 @@ class MembershipViewSet(LoginRequiredMixin, ModelViewSet):
             user_id = self.request.query_params.get("filter[user]", None)
             if user_id is not None:
                 logger.debug(
-                    "Restricti query to memberships of the user with id %d.", username
+                    "Restrict query to memberships of the user with id %s.", username
                 )
                 queryset = queryset.filter(user=user_id)
         return queryset.distinct()

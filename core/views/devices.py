@@ -62,7 +62,7 @@ class NodeViewSet(LoginRequiredMixin, ModelViewSet):
                 "filter[organization]", None
             )
             if organization_id is not None:
-                logger.debug("Restrict to nodes of organization #%d.", organization_id)
+                logger.debug("Restrict to nodes of organization #%s.", organization_id)
                 queryset = queryset.filter(owner=organization_id)
         return queryset.distinct()
 
