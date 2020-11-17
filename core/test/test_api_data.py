@@ -1,9 +1,8 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
-from rest_framework_json_api.utils import format_resource_type
 
 
-class TimeseriesTestCase(APITestCase):
+class NodeTimeseriesTestCase(APITestCase):
     fixtures = ["user-fixtures.json", "inventory-fixtures.json", "data-fixtures.json"]
     node_id = "3b95a1b2-74e7-9e98-52c4-4acae441f0ae"
 
@@ -12,24 +11,31 @@ class TimeseriesTestCase(APITestCase):
         # Versuchserbund commands the sites Versuchs-Site (pk=2) and Prüf-Site (pk=3).
         # Versuchs-Site has room Versuchsraum 1 (pk=3),
         # Prüf-Site has room Prüfstuge (pk=4).
-        self.client.login(username="veraVersuch", password="versuch")
+        self.assertTrue(self.client.login(username="veraVersuch", password="versuch"))
         # Versuchsverbund owns
         # Clairchen Schwarz (id=3b95a1b2-74e7-9e98-52c4-4acae441f0ae) and
         # ERS Test-Node (id=9d02faee-4260-1377-22ec-936428b572ee).
-        self.detail_url = reverse("timeseries-detail", kwargs={"pk": self.node_id})
-        self.collection_url = reverse("timeseries-list")
+        self.detail_url = reverse("node-timeseries-detail", kwargs={"pk": self.node_id})
+        self.collection_url = reverse("node-timeseries-list")
 
     def tearDown(self):
         self.client.logout()
 
-    def test_get_timeseries_list(self):
-        """GET /timeseries/"""
+    def test_get_node_timeseries_list(self):
+        """GET /node-timeseries/"""
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
 
-    def test_get_timeseries(self):
-        """GET /timeseries/<node_id>"""
+    def test_get_node_timeseries_list_unauthenticated(self):
+        """GET /node-timeseries/ without authentication."""
+        # Make sure we are not logged in.
+        self.client.logout()
+        response = self.client.get(self.collection_url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_get_node_timeseries(self):
+        """GET /node-timeseries/<node_id>"""
         response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["sample_count"], 589)
@@ -54,8 +60,8 @@ class TimeseriesTestCase(APITestCase):
         )
         self.assertEqual(response.data["sample_count"], 39)
         self.assertEqual(len(response.data["samples"]), 39)
-        self.assertEqual(response.data["from_timestamp"], 1601725200)
-        self.assertEqual(response.data["to_timestamp"], 1601795400)
+        self.assertEqual(response.data["from_timestamp_s"], 1601725200)
+        self.assertEqual(response.data["to_timestamp_s"], 1601795400)
 
 
 class SamplesTestCase(APITestCase):
@@ -79,6 +85,13 @@ class SamplesTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 100)  # Result is paged.
         self.assertEqual(response.data["meta"]["pagination"]["count"], 1554)
+
+    def test_get_samples_list_unauthenticated(self):
+        """GET /samples/ without authentication."""
+        # Make sure we are not logged in.
+        self.client.logout()
+        response = self.client.get(self.collection_url)
+        self.assertEqual(response.status_code, 403)
 
     def test_get_sample_per_node(self):
         """GET /samples/?filter[node]=<node_id>"""

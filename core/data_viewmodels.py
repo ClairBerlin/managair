@@ -1,41 +1,89 @@
 from datetime import datetime
 
 
-class TimeseriesViewModel:
+class NodeTimeseriesListViewModel:
     def __init__(
         self,
         pk,
-        alias: str,
+        node_alias: str,
         sample_count: int,
-        query_timestamp: int = round(datetime.now().timestamp()),
-        from_timestamp: int = 0,
-        to_timestamp: int = round(datetime.now().timestamp()),
+        query_timestamp_s: int = round(datetime.now().timestamp()),
+        from_timestamp_s: int = 0,
+        to_timestamp_s: int = round(datetime.now().timestamp()),
     ):
         self.pk = pk
-        self.alias = alias
+        self.node_alias = node_alias
         self.sample_count = sample_count
-        self.query_timestamp = query_timestamp
-        self.from_timestamp = from_timestamp
-        self.to_timestamp = to_timestamp
+        self.query_timestamp_s = query_timestamp_s
+        self.from_timestamp_s = from_timestamp_s
+        self.to_timestamp_s = to_timestamp_s
 
     class JSONAPIMeta:
         resource_name = "node-timeseries"
 
 
-class SamplePageViewModel:
+class NodeTimeseriesViewModel(NodeTimeseriesListViewModel):
     def __init__(
         self,
         pk,
-        alias: str,
+        node_alias: str,
         samples,
-        query_timestamp: int = round(datetime.now().timestamp()),
-        from_timestamp: int = 0,
-        to_timestamp: int = round(datetime.now().timestamp()),
+        query_timestamp_s: int = round(datetime.now().timestamp()),
+        from_timestamp_s: int = 0,
+        to_timestamp_s: int = round(datetime.now().timestamp()),
+    ):
+        super().__init__(
+            pk=pk,
+            node_alias=node_alias,
+            sample_count=len(samples),
+            query_timestamp_s=query_timestamp_s,
+            from_timestamp_s=from_timestamp_s,
+            to_timestamp_s=to_timestamp_s,
+        )
+        self.samples = samples
+
+
+class InstallationTimeseriesListViewModel:
+    def __init__(
+        self,
+        pk,
+        node_id,
+        node_alias: str,
+        sample_count: int,
+        query_timestamp_s: int = round(datetime.now().timestamp()),
+        from_timestamp_s: int = 0,
+        to_timestamp_s: int = round(datetime.now().timestamp()),
     ):
         self.pk = pk
-        self.alias = alias
+        self.node_id = node_id
+        self.node_alias = node_alias
+        self.sample_count = sample_count
+        self.query_timestamp_s = query_timestamp_s
+        self.from_timestamp_s = from_timestamp_s
+        self.to_timestamp_s = to_timestamp_s
+
+    class JSONAPIMeta:
+        resource_name = "installation-timeseries"
+
+
+class InstallationTimeseriesViewModel(InstallationTimeseriesListViewModel):
+    def __init__(
+        self,
+        pk,
+        node_id,
+        node_alias: str,
+        samples,
+        query_timestamp_s: int = round(datetime.now().timestamp()),
+        from_timestamp_s: int = 0,
+        to_timestamp_s: int = round(datetime.now().timestamp()),
+    ):
+        super().__init__(
+            pk=pk,
+            node_id=node_id,
+            node_alias=node_alias,
+            sample_count=len(samples),
+            query_timestamp_s=query_timestamp_s,
+            from_timestamp_s=from_timestamp_s,
+            to_timestamp_s=to_timestamp_s,
+        )
         self.samples = samples
-        self.sample_count = len(samples)
-        self.query_timestamp = query_timestamp
-        self.from_timestamp = from_timestamp
-        self.to_timestamp = to_timestamp

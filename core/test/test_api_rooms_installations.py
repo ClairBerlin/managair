@@ -11,7 +11,7 @@ class RoomsTestCase(APITestCase):
         # Versuchserbund commands the sites Versuchs-Site (pk=2) and Prüf-Site (pk=3).
         # Versuchs-Site has room Versuchsraum 1 (pk=3),
         # Prüf-Site has room Prüfstuge (pk=4).
-        self.client.login(username="veraVersuch", password="versuch")
+        self.assertTrue(self.client.login(username="veraVersuch", password="versuch"))
         # Versuchsverbund owns Versuchsraum 1 with pk=3
         self.room_id = 3
         self.detail_url = reverse("room-detail", kwargs={"pk": self.room_id})
@@ -25,6 +25,15 @@ class RoomsTestCase(APITestCase):
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
+
+    def test_get_rooms_public(self):
+        """GET /rooms/ without being logged-in"""
+        # Ensure that we are logged out.
+        self.client.logout()
+        response = self.client.get(self.collection_url)
+        self.assertEqual(response.status_code, 200)
+        # There is one room in the test data set that contains a public installation.
+        self.assertEqual(len(response.data["results"]), 1)
 
     def test_get_rooms_per_organization(self):
         """GET /rooms/?filter[organization]=<organization_id>"""
@@ -238,6 +247,15 @@ class InstallationsTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
 
+    def test_get_installations_public(self):
+        """ GET /installations/ without authentication."""
+        # Make sure that we are not logged-in.
+        self.client.logout()
+        response = self.client.get(self.collection_url)
+        self.assertEqual(response.status_code, 200)
+        # There is exactly one public node installation in the test data.
+        self.assertEqual(len(response.data["results"]), 1)
+
     def test_get_installations_per_organization(self):
         """GET /installations/?filter[organization]=<organization_id>"""
         # Need a different user for this test case.
@@ -280,7 +298,7 @@ class InstallationsTestCase(APITestCase):
             "data": {
                 "type": format_resource_type("RoomNodeInstallation"),
                 "id": 2,
-                "attributes": {"from_timestamp_s": 1601510000},  # Predate
+                "attributes": {"from_timestamp_s": 1601510000, "is_public": True},
                 "relationships": {
                     # Node and room must always be provided, to make sure owners match.
                     "node": {
@@ -301,6 +319,7 @@ class InstallationsTestCase(APITestCase):
         response = self.client.patch(self.detail_url, data=request_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["from_timestamp_s"], 1601510000)
+        self.assertEqual(response.data["is_public"], True)
 
     # TODO: Test illegal time-slice overlaps
 
@@ -312,6 +331,7 @@ class InstallationsTestCase(APITestCase):
                     "from_timestamp_s": 1601500000,
                     "to_timestamp_s": 2147483647,
                     "description": "Testinstallation",
+                    "is_public": False,
                 },
                 "relationships": {
                     # Install the ERS Test-Node (id=9d02faee-4260-1377-22ec-936428b572ee) in Prüfstube (id=4).
@@ -366,6 +386,7 @@ class InstallationsTestCase(APITestCase):
                     "from_timestamp_s": 1601500000,
                     "to_timestamp_s": 2147483647,
                     "description": "Testinstallation",
+                    "is_public": True,
                 },
                 "relationships": {
                     # Try to install Clairchen Rot in Prüfstube (id=4).
@@ -413,6 +434,7 @@ class InstallationsTestCase(APITestCase):
                     "from_timestamp_s": 1601500000,
                     "to_timestamp_s": 2147483647,
                     "description": "Testinstallation",
+                    "is_public": True,
                 },
                 "relationships": {
                     # Install Clairchen Rot in Testraum 1 (pk=1).
@@ -449,6 +471,7 @@ class InstallationsTestCase(APITestCase):
                     "from_timestamp_s": 1601500000,
                     "to_timestamp_s": 2147483647,
                     "description": "Testinstallation",
+                    "is_public": False,
                 },
                 "relationships": {
                     # Install the ERS Test-Node (id=9d02faee-4260-1377-22ec-936428b572ee) in Prüfstube (id=4).
@@ -478,7 +501,7 @@ class InstallationsTestCase(APITestCase):
             "data": {
                 "type": format_resource_type("RoomNodeInstallation"),
                 "id": installation_id,
-                "attributes": {"from_timestamp_s": 1601510000},  # Predate
+                "attributes": {"from_timestamp_s": 1601510000, "is_public": True},
             }
         }
         response = self.client.patch(detail_url, data=request_data)
@@ -496,7 +519,7 @@ class InstallationsTestCase(APITestCase):
             "data": {
                 "type": format_resource_type("RoomNodeInstallation"),
                 "id": 2,
-                "attributes": {"from_timestamp_s": 1601510000},  # Predate
+                "attributes": {"from_timestamp_s": 1601510000, "is_public": False},
             }
         }
         response = self.client.patch(self.detail_url, data=request_data)

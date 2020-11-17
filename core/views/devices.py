@@ -1,6 +1,5 @@
 import logging
-from django.contrib.auth.mixins import LoginRequiredMixin
-from rest_framework import permissions
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.filters import SearchFilter
 from rest_framework_json_api import filters
@@ -28,26 +27,26 @@ from core.serializers import (
 logger = logging.getLogger(__name__)
 
 
-class QuantityViewSet(LoginRequiredMixin, ModelViewSet):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+class QuantityViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = Quantity.objects.all()
     serializer_class = QuantitySerializer
 
 
-class NodeProtocolViewSet(LoginRequiredMixin, ModelViewSet):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+class NodeProtocolViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = NodeProtocol.objects.all()
     serializer_class = NodeProtocolSerializer
 
 
-class NodeModelViewSet(LoginRequiredMixin, ModelViewSet):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+class NodeModelViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = NodeModel.objects.all()
     serializer_class = NodeModelSerializer
 
 
-class NodeViewSet(LoginRequiredMixin, ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated, IsOrganizationOwner]
+class NodeViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated & IsOrganizationOwner]
     queryset = Node.objects.all()
     serializer_class = NodeSerializer
     filter_backends = (filters.QueryParameterValidationFilter, SearchFilter)
@@ -74,7 +73,7 @@ class NodeViewSet(LoginRequiredMixin, ModelViewSet):
             raise PermissionDenied
 
 
-class NodeFidelityViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+class NodeFidelityViewSet(ReadOnlyModelViewSet):
+    permission_classes = [IsAuthenticated]
     queryset = NodeFidelity.objects.all()
     serializer_class = NodeFidelitySerializer

@@ -14,7 +14,7 @@ class UsersTestCase(APITestCase):
         # pk 4: Horst Hilfsarbeiter
         # pk 6: Ingo Inspekteur
         # pk 7: Priska Prüferin
-        self.client.login(username="veraVersuch", password="versuch")
+        self.assertTrue(self.client.login(username="veraVersuch", password="versuch"))
         # Versuchsverbund owns
         # Clairchen Schwarz (id=3b95a1b2-74e7-9e98-52c4-4acae441f0ae) and
         # ERS Test-Node (id=9d02faee-4260-1377-22ec-936428b572ee).

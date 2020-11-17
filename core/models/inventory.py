@@ -168,6 +168,7 @@ class RoomNodeInstallation(models.Model):
     # An ongoing association does not have an end-timestamp set.
     to_timestamp_s = models.PositiveIntegerField(null=True)
     description = models.TextField(null=True, blank=True)
+    is_public = models.BooleanField(default=False)
 
     class Meta:
         constraints = [

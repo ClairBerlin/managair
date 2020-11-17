@@ -1,8 +1,10 @@
 from .data import (
     SampleSerializer,
     SimpleSampleSerializer,
-    SampleListSerializer,
-    TimeseriesSerializer
+    NodeTimeseriesListSerializer,
+    NodeTimeseriesSerializer,
+    InstallationTimeseriesListSerializer,
+    InstallationTimeSeriesSerializer
 )
 from .devices import (
     QuantitySerializer,

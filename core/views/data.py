@@ -1,21 +1,27 @@
 import logging
 from datetime import datetime
 
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
 from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 from rest_framework_json_api.views import ReadOnlyModelViewSet, generics
 
-from core.data_viewmodels import SamplePageViewModel, TimeseriesViewModel
-from core.models import Sample, Node
+from core.data_viewmodels import (
+    NodeTimeseriesListViewModel,
+    NodeTimeseriesViewModel,
+    InstallationTimeseriesListViewModel,
+    InstallationTimeseriesViewModel,
+)
+from core.models import Sample, Node, RoomNodeInstallation
 from core.serializers import (
     SampleSerializer,
     SimpleSampleSerializer,
-    SampleListSerializer,
-    TimeseriesSerializer,
+    NodeTimeseriesListSerializer,
+    NodeTimeseriesSerializer,
+    InstallationTimeseriesListSerializer,
+    InstallationTimeSeriesSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -27,13 +33,14 @@ class PagesizeLimitedPagination(JsonApiPageNumberPagination):
     page_size = 100
 
 
-class SampleListView(LoginRequiredMixin, generics.ListAPIView):
+class SampleListView(generics.ListAPIView):
     """Samples reported by the node on the resource path.
     The currently logged-in user must have access to the given node. That is, the user must be part of the organization that owns the node.
 
     Samples will be returned in ascending order according to their time stamp.
     """
 
+    permission_classes = [IsAuthenticated]
     serializer_class = SimpleSampleSerializer
     queryset = Node.objects.all()
 
@@ -67,16 +74,16 @@ class SampleListView(LoginRequiredMixin, generics.ListAPIView):
         return queryset
 
 
-class TimeSeriesViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
-    permissions = [permissions.IsAuthenticated]
+class NodeTimeSeriesViewSet(ReadOnlyModelViewSet):
+    permission_classes = [IsAuthenticated]
     queryset = Node.objects.all()
     # Use different serializers for different actions.
     # See https://stackoverflow.com/questions/22616973/django-rest-framework-use-different-serializers-in-the-same-modelviewset
     serializer_classes = {
-        "list": TimeseriesSerializer,
-        "retrieve": SampleListSerializer,
+        "list": NodeTimeseriesListSerializer,
+        "retrieve": NodeTimeseriesSerializer,
     }
-    serializer_class = TimeseriesSerializer  # fallback
+    serializer_class = NodeTimeseriesListSerializer  # fallback
 
     def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset()
@@ -90,8 +97,8 @@ class TimeSeriesViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
                 # have been passed the node_pk as lookup_field.
                 node_id = self.kwargs["node_pk"]
             elif "pk" in self.kwargs:
-                # If the view is accessed via the `timeseries-details` route, it will have
-                # been passed the pk as lookup_field.
+                # If the view is accessed via the `timeseries-details` route, it will
+                # have been passed the pk as lookup_field.
                 node_id = self.kwargs["pk"]
             else:
                 raise MethodNotAllowed
@@ -113,8 +120,8 @@ class TimeSeriesViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
     def list(self, request):
         queryset = self.get_queryset()
         ts_info = [
-            TimeseriesViewModel(
-                pk=node.pk, alias=node.alias, sample_count=node.samples.count()
+            NodeTimeseriesListViewModel(
+                pk=node.pk, node_alias=node.alias, sample_count=node.samples.count()
             )
             for node in queryset
         ]
@@ -130,23 +137,136 @@ class TimeSeriesViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
             "filter[to]", round(datetime.now().timestamp())
         )
         logger.debug(
-            "Limiting the time series to the time slice from %d to %d",
+            "Limiting the time series to the time slice from %s to %s",
             from_limit,
             to_limit,
         )
         samples = queryset.filter(
             timestamp_s__gte=from_limit, timestamp_s__lte=to_limit
         )
-        return SamplePageViewModel(
+        return NodeTimeseriesViewModel(
             pk=node.pk,
-            alias=node.alias,
-            from_timestamp=from_limit,
-            to_timestamp=to_limit,
+            node_alias=node.alias,
+            from_timestamp_s=from_limit,
+            to_timestamp_s=to_limit,
             samples=samples,
         )
 
 
-class SampleViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
+class InstallationTimeSeriesViewSet(ReadOnlyModelViewSet):
+    """A view for time series accessed by installation. Each installation has its own time series, constrained by the time slice of the installation."""
+
+    queryset = RoomNodeInstallation.objects.all()
+    # Use different serializers for different actions.
+    # See https://stackoverflow.com/questions/22616973/django-rest-framework-use-different-serializers-in-the-same-modelviewset
+    serializer_classes = {
+        "list": InstallationTimeseriesListSerializer,
+        "retrieve": InstallationTimeSeriesSerializer,
+    }
+    serializer_class = InstallationTimeseriesListSerializer  # fallback
+
+    def get_queryset(self, *args, **kwargs):
+        queryset = super().get_queryset()
+
+        if not self.request.user.is_authenticated:
+            # Public API access. Restrict the listed installations to those that are
+            # publicly visible.
+            authorized_installations = queryset.filter(is_public=True)
+        else:
+            # Otherwise, Restrict to samples from installations commanded by the
+            # currently logged-in user.
+            authorized_installations = queryset.filter(
+                node__owner__users=self.request.user
+            )
+
+        if self.action == "retrieve":
+            # Restrict the samples to a specific installation, if one is given.
+            if "installation_pk" in self.kwargs:
+                # If the view is accessed via the `installations-samples-list` route,
+                # it will have been passed the installation_pk as lookup_field.
+                installation_id = self.kwargs["installation_pk"]
+            elif "pk" in self.kwargs:
+                # If the view is accessed via the `installation-timeseries-details`
+                # route, it will have been passed the pk as lookup_field.
+                installation_id = self.kwargs["pk"]
+            else:
+                raise MethodNotAllowed
+
+            logger.debug(
+                "Retrieve time series for individual node installation %s",
+                installation_id,
+            )
+            return get_object_or_404(authorized_installations, pk=installation_id)
+
+        elif self.action == "list":
+            logger.debug(
+                "Retrieve time series overview of all accessible node installations."
+            )
+            return authorized_installations
+        else:
+            raise MethodNotAllowed
+
+    def get_serializer_class(self):
+        # TODO: Does not work for related fields because of this upstream bug:
+        # https://github.com/django-json-api/django-rest-framework-json-api/issues/859
+        return self.serializer_classes.get(self.action, self.serializer_class)
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        ts_info = [
+            InstallationTimeseriesListViewModel(
+                pk=installation.pk,
+                node_id=installation.node.id,
+                node_alias=installation.node.alias,
+                from_timestamp_s=installation.from_timestamp_s,
+                to_timestamp_s=installation.to_timestamp_s,
+                sample_count=installation.node.samples.filter(
+                    timestamp_s__gte=installation.from_timestamp_s,
+                    timestamp_s__lte=installation.to_timestamp_s,
+                ).count(),
+            )
+            for installation in queryset
+        ]
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(ts_info, many=True, context={"request": request})
+        return Response(serializer.data)
+
+    def get_object(self):
+        installation = self.get_queryset()
+        install_from_s = installation.from_timestamp_s
+        install_to_s = installation.to_timestamp_s
+        queryset = installation.node.samples.filter(
+            timestamp_s__gte=install_from_s,
+            timestamp_s__lte=install_to_s,
+        )
+        filter_from_s = int(self.request.query_params.get("filter[from]", 0))
+        filter_to_s = int(
+            self.request.query_params.get(
+                "filter[to]", round(datetime.now().timestamp())
+            )
+        )
+        samples = queryset.filter(
+            timestamp_s__gte=filter_from_s, timestamp_s__lte=filter_to_s
+        ).distinct()
+
+        from_max_s = max(install_from_s, filter_from_s)
+        to_min_s = min(install_to_s, filter_to_s)
+        logger.debug(
+            "Limiting the time series to the time slice from %s to %s",
+            from_max_s,
+            to_min_s,
+        )
+        return InstallationTimeseriesViewModel(
+            pk=installation.pk,
+            node_id=installation.node.id,
+            node_alias=installation.node.alias,
+            from_timestamp_s=from_max_s,
+            to_timestamp_s=to_min_s,
+            samples=samples,
+        )
+
+
+class SampleViewSet(ReadOnlyModelViewSet):
     """
     Retrieve individual samples and lists of samples.
 
@@ -154,6 +274,7 @@ class SampleViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
     Samples are returned in a verbose JSON:API format, with a maximum page size of 100 entries by default.
     """
 
+    permission_classes = [IsAuthenticated]
     serializer_class = SampleSerializer
     queryset = Sample.objects.all()
     pagination_class = PagesizeLimitedPagination
@@ -181,7 +302,7 @@ class SampleViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
                 "filter[to]", round(datetime.now().timestamp())
             )
             logger.debug(
-                "Limiting the sample set to the time slice from %d to %d",
+                "Limiting the sample set to the time slice from %s to %s",
                 from_limit,
                 to_limit,
             )

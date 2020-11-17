@@ -43,7 +43,7 @@ class IsOrganizationOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         """Permissions at the object-level are important for existing nodes."""
 
-        if request.method in ["PUT", "PATCH", "DELETE"]:
+        if request.method not in permissions.SAFE_METHODS:
             # Is the authorized user an OWNER of the organization that owns the resource
             # that is to be modified?
             logger.debug("Check modification permission on %s.", type(obj).__name__)
