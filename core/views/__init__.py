@@ -1,6 +1,4 @@
 from .data import (
-    SampleListView,
-    SampleViewSet,
     NodeTimeSeriesViewSet,
     InstallationTimeSeriesViewSet,
 )

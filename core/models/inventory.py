@@ -179,6 +179,9 @@ class RoomNodeInstallation(models.Model):
         ]
         ordering = ["-from_timestamp_s"]
         get_latest_by = "from_timestamp_s"
+    
+    class JSONAPIMeta:
+        resource_name = "Installation"
 
     def get_owner(self):
         """Return the organization that owns the present installation."""

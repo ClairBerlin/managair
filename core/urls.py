@@ -21,7 +21,6 @@ router.register(
     r"installations", inventory.RoomNodeInstallationViewSet, basename="installation"
 )
 # Data views
-router.register(r"samples", data.SampleViewSet, basename="sample")
 router.register(
     r"node-timeseries", data.NodeTimeSeriesViewSet, basename="node-timeseries"
 )
@@ -92,9 +91,6 @@ urlpatterns = [
         "installations/<pk>/<related_field>/",
         inventory.RoomNodeInstallationViewSet.as_view({"get": "retrieve_related"}),
         name="installation-related",
-    ),
-    path(
-        "nodes/<pk>/samples/", data.SampleListView.as_view(), name="node-samples-list"
     ),
     path(
         "nodes/<node_pk>/timeseries/",

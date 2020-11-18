@@ -1,5 +1,4 @@
 from .data import (
-    SampleSerializer,
     SimpleSampleSerializer,
     NodeTimeseriesListSerializer,
     NodeTimeseriesSerializer,
