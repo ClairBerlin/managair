@@ -1,10 +1,11 @@
 import logging
+import re
 from datetime import datetime
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.filters import SearchFilter
-from rest_framework_json_api import filters
+from rest_framework_json_api.filters import QueryParameterValidationFilter
 from rest_framework_json_api.views import (
     ModelViewSet,
     ReadOnlyModelViewSet,
@@ -28,6 +29,11 @@ from core.serializers import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+class IncludeTimeseriesQPValidator(QueryParameterValidationFilter):
+    """Query parameter validator that admits an extra `include_timeseries` parameter."""
+    query_regex = re.compile(r'^(sort|include|include_timeseries)$|^(?P<type>filter|fields|page)(\[[\w\.\-]+\])?$')
 
 
 class QuantityViewSet(ModelViewSet):
@@ -55,7 +61,7 @@ class NodeViewSet(ModelViewSet):
     # See https://stackoverflow.com/questions/22616973/django-rest-framework-use-different-serializers-in-the-same-modelviewset
     serializer_classes = {"list": NodeSerializer, "retrieve": NodeDetailSerializer}
     serializer_class = NodeSerializer  # fallback
-    filter_backends = (filters.QueryParameterValidationFilter, SearchFilter)
+    filter_backends = (IncludeTimeseriesQPValidator, SearchFilter)
     search_fields = ("alias", "eui64")
 
     def get_queryset(self, *args, **kwargs):
@@ -122,12 +128,16 @@ class NodeViewSet(ModelViewSet):
         to_simtestamp_s = (
             last_sample.timestamp_s if last_sample is not None else to_limit
         )
-        instance.timeseries = sample_queryset
         instance.sample_count = sample_queryset.count()
         instance.from_timestamp_s = from_timestamp_s
         instance.to_timestamp_s = to_simtestamp_s
         instance.query_timestamp_s = round(datetime.now().timestamp())
-        serializer = self.get_serializer(instance)
+        include_queryparam = self.request.query_params.get("include_timeseries", False)
+        if include_queryparam:
+            instance.timeseries = sample_queryset
+            serializer = self.get_serializer(instance, include_timeseries=True)
+        else:
+            serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
 

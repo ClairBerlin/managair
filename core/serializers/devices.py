@@ -113,6 +113,7 @@ class NodeSerializer(serializers.HyperlinkedModelSerializer):
         """Return the owner of the resource, once data is validated."""
         return self.validated_data["owner"]
 
+
 class NodeDetailSerializer(serializers.HyperlinkedModelSerializer):
     related_serializers = {
         "protocol": "core.serializers.NodeProtocolSerializer",
@@ -165,6 +166,14 @@ class NodeDetailSerializer(serializers.HyperlinkedModelSerializer):
             "url",
         )
 
+    def __init__(self, *args, **kwargs):
+        # Don't pass the "include_timeseries" arg up to the superclass
+        include_timeseries = kwargs.pop("include_timeseries", None)
+        # Instantiate the superclass normally
+        super().__init__(*args, **kwargs)
+
+        if not include_timeseries:
+            self.fields.pop("timeseries")
 
 
 class NodeFidelitySerializer(serializers.HyperlinkedModelSerializer):
