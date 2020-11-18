@@ -1,7 +1,8 @@
 Django
 psycopg2-binary
 djangorestframework
-djangorestframework-jsonapi
+https://github.com/django-json-api/django-rest-framework-json-api/archive/master.zip
+# djangorestframework-jsonapi
 dj-rest-auth[with_social]
 django-allauth
 django-cors-headers
