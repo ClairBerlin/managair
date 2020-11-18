@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth import get_user_model
 from rest_framework_json_api import serializers
 from rest_framework_json_api.relations import (
@@ -14,8 +16,8 @@ from core.models import (
     Node,
     RoomNodeInstallation,
 )
+from core.serializers import SimpleSampleSerializer
 
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -80,14 +82,18 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
         queryset=Room.objects.all(), related_link_view_name="installation-related"
     )
 
-    timeseries = HyperlinkedRelatedField(
-        source="node",
-        many=False,
-        read_only=True,
-        related_link_url_kwarg="installation_pk",
-        related_link_view_name="installation-timeseries",
-    )
+    # timeseries = HyperlinkedRelatedField(
+    #     source="node",
+    #     many=False,
+    #     read_only=True,
+    #     related_link_url_kwarg="installation_pk",
+    #     related_link_view_name="installation-timeseries",
+    # )
 
+    # Additional fields to merge the node installation with its samples.
+    timeseries = serializers.ListField(child=SimpleSampleSerializer(), read_only=True)
+    query_timestamp_s = serializers.IntegerField(read_only=True)
+    sample_count = serializers.IntegerField(read_only=True)
     url = serializers.HyperlinkedIdentityField(view_name="installation-detail")
 
     class Meta:
@@ -96,12 +102,23 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
             "room",
             "node",
             "timeseries",
+            "query_timestamp_s",
             "from_timestamp_s",
             "to_timestamp_s",
+            "sample_count",
             "description",
             "is_public",
             "url",
         ]
+
+    def __init__(self, *args, **kwargs):
+        # Don't pass the "include_timeseries" arg up to the superclass
+        include_timeseries = kwargs.pop("include_timeseries", None)
+        # Instantiate the superclass normally
+        super().__init__(*args, **kwargs)
+
+        if not include_timeseries:
+            self.fields.pop("timeseries")
 
     def get_owner(self):
         """Return the owner of the resource, once data is validated."""

@@ -1,11 +1,9 @@
 import logging
-import re
 from datetime import datetime
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.filters import SearchFilter
-from rest_framework_json_api.filters import QueryParameterValidationFilter
 from rest_framework_json_api.views import (
     ModelViewSet,
     ReadOnlyModelViewSet,
@@ -26,16 +24,9 @@ from core.serializers import (
     NodeSerializer,
     NodeFidelitySerializer,
 )
+from core.queryfilters import IncludeTimeseriesQPValidator
 
 logger = logging.getLogger(__name__)
-
-
-class IncludeTimeseriesQPValidator(QueryParameterValidationFilter):
-    """Query parameter validator that admits an extra `include_timeseries` parameter."""
-
-    query_regex = re.compile(
-        r"^(sort|include|include_timeseries)$|^(?P<type>filter|fields|page)(\[[\w\.\-]+\])?$"
-    )
 
 
 class QuantityViewSet(ModelViewSet):
@@ -102,10 +93,10 @@ class NodeViewSet(ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         sample_queryset = instance.samples.all()
-        from_limit = self.request.query_params.get("filter[from]", 0)
-        to_limit = self.request.query_params.get(
+        from_limit = int(self.request.query_params.get("filter[from]", 0))
+        to_limit = int(self.request.query_params.get(
             "filter[to]", round(datetime.now().timestamp())
-        )
+        ))
         logger.debug(
             "Limiting the time series to the time slice from %s to %s",
             from_limit,

@@ -1,8 +1,10 @@
 import logging
+from datetime import datetime
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.filters import SearchFilter
+from rest_framework.response import Response
 from rest_framework_json_api import filters
 from rest_framework_json_api.views import (
     ModelViewSet,
@@ -31,9 +33,12 @@ from core.serializers import (
     UserSerializer,
 )
 
-User = get_user_model()
+from core.queryfilters import IncludeTimeseriesQPValidator
 
 logger = logging.getLogger(__name__)
+
+
+User = get_user_model()
 
 
 class SiteNotFoundExceptionView(generics.RetrieveAPIView):
@@ -194,9 +199,10 @@ class RoomViewSet(ModelViewSet):
 
 
 class RoomNodeInstallationViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticatedOrReadOnly, IsOrganizationOwner]
+    permission_classes = [IsAuthenticatedOrReadOnly & IsOrganizationOwner]
     queryset = RoomNodeInstallation.objects
     serializer_class = RoomNodeInstallationSerializer
+    filter_backends = [IncludeTimeseriesQPValidator]
 
     def get_queryset(self, *args, **kwargs):
         """Restrict to logged-in user or to node installations marked as public."""
@@ -242,6 +248,58 @@ class RoomNodeInstallationViewSet(ModelViewSet):
             super().perform_create(serializer)
         else:
             raise PermissionDenied
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        installations = []
+        for installation in queryset:
+            installation.sample_count = (
+                installation.node.samples.filter(
+                    timestamp_s__gte=installation.from_timestamp_s,
+                    timestamp_s__lte=installation.to_timestamp_s,
+                ).count()
+            )
+            installation.query_timestamp_s = round(datetime.now().timestamp())
+            installations.append(installation)
+        page = self.paginate_queryset(installations)
+        # TODO: Simplify to use the parent list method and simply inject the modified
+        # queryset.
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+        installation = self.get_object()
+        # Limit time-slice to node installation and query.
+        install_from_s = installation.from_timestamp_s
+        install_to_s = installation.to_timestamp_s
+        filter_from_s = int(self.request.query_params.get("filter[from]", 0))
+        filter_to_s = int(self.request.query_params.get(
+            "filter[to]", round(datetime.now().timestamp())
+        ))
+        from_max_s = max(install_from_s, filter_from_s)
+        to_min_s = min(install_to_s, filter_to_s)
+        logger.debug(
+            "Limiting the time series to the time slice from %s to %s",
+            from_max_s,
+            to_min_s,
+        )
+        sample_queryset = installation.node.samples.filter(
+            timestamp_s__gte=from_max_s,
+            timestamp_s__lte=to_min_s,
+        ).distinct()
+        installation.sample_count = sample_queryset.count()
+        installation.query_timestamp_s = round(datetime.now().timestamp())
+        include_queryparam = self.request.query_params.get("include_timeseries", False)
+        if include_queryparam:
+            installation.timeseries = sample_queryset
+            serializer = self.get_serializer(installation, include_timeseries=True)
+        else:
+            serializer = self.get_serializer(installation)
+        return Response(serializer.data)
 
 
 class OrganizationViewSet(ModelViewSet):
