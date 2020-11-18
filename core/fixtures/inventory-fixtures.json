@@ -262,7 +262,8 @@
             "room": 4,
             "from_timestamp_s": 1602720001,
             "to_timestamp_s": 2147483647,
-            "description": ""
+            "description": "öffentlich zugänglich",
+            "is_public": true
         }
     },
     {

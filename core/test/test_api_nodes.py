@@ -9,7 +9,7 @@ class NodeTestCase(APITestCase):
 
     def setUp(self):
         # veraVersuch is owner of the organization Versuchsverbund with pk=2.
-        self.client.login(username="veraVersuch", password="versuch")
+        self.assertTrue(self.client.login(username="veraVersuch", password="versuch"))
         # Versuchsverbund owns
         # Clairchen Schwarz (id=3b95a1b2-74e7-9e98-52c4-4acae441f0ae) and
         # ERS Test-Node (id=9d02faee-4260-1377-22ec-936428b572ee).
@@ -24,6 +24,13 @@ class NodeTestCase(APITestCase):
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
+    
+    def test_get_nodes_unauthenticated(self):
+        """GET /nodes/ without authentication."""
+        # Make sure we are not logged in.
+        self.client.logout()
+        response = self.client.get(self.collection_url)
+        self.assertEqual(response.status_code, 403)
 
     def test_get_nodes_per_organization(self):
         """GET /nodes/?filter[organization]=<organization_id>"""

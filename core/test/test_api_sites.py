@@ -10,7 +10,7 @@ class SitesTestCase(APITestCase):
     def setUp(self):
         # veraVersuch is owner of the organization Versuchsverbund with pk=2.
         # Versuchserbund commands the sites Versuchs-Site (pk=2) and Prüf-Site (pk=3).
-        self.client.login(username="veraVersuch", password="versuch")
+        self.assertTrue(self.client.login(username="veraVersuch", password="versuch"))
         # Versuchsverbund owns
         # Clairchen Schwarz (id=3b95a1b2-74e7-9e98-52c4-4acae441f0ae) and
         # ERS Test-Node (id=9d02faee-4260-1377-22ec-936428b572ee).
@@ -25,6 +25,16 @@ class SitesTestCase(APITestCase):
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
+
+    def test_get_sites_public(self):
+        """GET /sites/ available to a non-authenticated user."""
+        # Make sure we are not logged-in.
+        self.client.logout()
+        response = self.client.get(self.collection_url)
+        self.assertEqual(response.status_code, 200)
+        # There is exactly one site that contains a public node installation in the 
+        # test data set.
+        self.assertEqual(len(response.data["results"]), 1)
 
     def test_get_sites_per_organization(self):
         """GET /sites/?filter[organization]=<organization_id>"""

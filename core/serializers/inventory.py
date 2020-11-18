@@ -69,6 +69,7 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
     included_serializers = {
         "node": "core.serializers.NodeSerializer",
         "room": "core.serializers.RoomSerializer",
+        # "timeseries": "core.serializers.TimeseriesSerializer",
     }
 
     node = ResourceRelatedField(
@@ -79,6 +80,14 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
         queryset=Room.objects.all(), related_link_view_name="installation-related"
     )
 
+    timeseries = HyperlinkedRelatedField(
+        source="node",
+        many=False,
+        read_only=True,
+        related_link_url_kwarg="installation_pk",
+        related_link_view_name="installation-timeseries",
+    )
+
     url = serializers.HyperlinkedIdentityField(view_name="installation-detail")
 
     class Meta:
@@ -86,9 +95,11 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
         fields = [
             "room",
             "node",
+            "timeseries",
             "from_timestamp_s",
             "to_timestamp_s",
             "description",
+            "is_public",
             "url",
         ]
 

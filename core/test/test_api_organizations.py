@@ -8,7 +8,7 @@ class OrganizationTestCase(APITestCase):
 
     def setUp(self):
         # tomTester is owner of the organization Test-Team with pk=1
-        self.client.login(username="tomTester", password="test")
+        self.assertTrue(self.client.login(username="tomTester", password="test"))
         self.detail_url = reverse("organization-detail", kwargs={"pk": 1})
         self.collection_url = reverse("organization-list")
 
@@ -20,6 +20,15 @@ class OrganizationTestCase(APITestCase):
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
+    
+    def test_get_organizations_public(self):
+        """GET /organizations/ that are publicly visible."""
+        # Make sure we are not logged in.
+        self.client.logout()
+        response = self.client.get(self.collection_url)
+        self.assertEqual(response.status_code, 200)
+        # There is exactly one organization that has a public node installation
+        self.assertEqual(len(response.data["results"]), 1)
 
     # TODO: GET a specific organization via query-parameter.
 

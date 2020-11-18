@@ -1,6 +1,12 @@
 from rest_framework_json_api import serializers
+from rest_framework_json_api.relations import HyperlinkedRelatedField
 
-from core.data_viewmodels import TimeseriesViewModel
+from core.data_viewmodels import (
+    NodeTimeseriesListViewModel,
+    NodeTimeseriesViewModel,
+    InstallationTimeseriesListViewModel,
+    InstallationTimeseriesViewModel,
+)
 from core.models import Sample
 
 
@@ -23,27 +29,50 @@ class SimpleSampleSerializer(serializers.ModelSerializer):
         exclude = ["node"]
 
 
-class SampleListSerializer(serializers.Serializer):
-    query_timestamp = serializers.IntegerField()
-    from_timestamp = serializers.IntegerField()
-    to_timestamp = serializers.IntegerField()
+class NodeTimeseriesListSerializer(serializers.Serializer):
+    node_alias = serializers.CharField(max_length=100)
+    query_timestamp_s = serializers.IntegerField()
+    from_timestamp_s = serializers.IntegerField()
+    to_timestamp_s = serializers.IntegerField()
     sample_count = serializers.IntegerField()
-    samples = serializers.ListField(child=SimpleSampleSerializer(), read_only=True)
+
+    url = serializers.HyperlinkedIdentityField(view_name="node-timeseries-detail")
 
     class Meta:
-        resource_name = "timeseries"
+        model = NodeTimeseriesListViewModel
         fields = ["url"]
 
 
-class TimeseriesSerializer(serializers.Serializer):
-    alias = serializers.CharField(max_length=100)
-    query_timestamp = serializers.IntegerField()
-    from_timestamp = serializers.IntegerField()
-    to_timestamp = serializers.IntegerField()
-    sample_count = serializers.IntegerField()
-
-    url = serializers.HyperlinkedIdentityField(view_name="timeseries-detail")
+class NodeTimeseriesSerializer(NodeTimeseriesListSerializer):
+    samples = serializers.ListField(child=SimpleSampleSerializer(), read_only=True)
 
     class Meta:
-        model = TimeseriesViewModel
+        resource_name = "node-timeseries"
+        model = NodeTimeseriesViewModel
+        fields = ["url"]
+
+
+class InstallationTimeseriesListSerializer(serializers.Serializer):
+    node_id = serializers.CharField()
+    node_alias = serializers.CharField(max_length=100)
+    query_timestamp_s = serializers.IntegerField()
+    from_timestamp_s = serializers.IntegerField()
+    to_timestamp_s = serializers.IntegerField()
+    sample_count = serializers.IntegerField()
+
+    url = serializers.HyperlinkedIdentityField(
+        view_name="installation-timeseries-detail"
+    )
+
+    class Meta:
+        model = InstallationTimeseriesListViewModel
+        fields = ["url"]
+
+
+class InstallationTimeSeriesSerializer(InstallationTimeseriesListSerializer):
+    samples = serializers.ListField(child=SimpleSampleSerializer(), read_only=True)
+
+    class Meta:
+        resource_name = "installation-timeseries"
+        model = InstallationTimeseriesViewModel
         fields = ["url"]

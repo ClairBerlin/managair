@@ -17,10 +17,10 @@ class DataTestCase(TestCase):
 
     def test_insert_valid_samples(self):
         stop_time = datetime.now()
-        start_timestamp = round((stop_time - timedelta(days=1)).timestamp())
-        stop_timestamp = round(stop_time.timestamp())
+        start_timestamp_s = round((stop_time - timedelta(days=1)).timestamp())
+        stop_timestamp_s = round(stop_time.timestamp())
         step = timedelta(minutes=9).seconds
-        times = range(start_timestamp, stop_timestamp, step)
+        times = range(start_timestamp_s, stop_timestamp_s, step)
         samples = [
             Sample.objects.create(
                 node=self.test_data["node1"],
@@ -159,10 +159,12 @@ class InventoryTestCase(TestCase):
                 description="A fine installation",
                 from_timestamp_s=1577836800,
                 to_timestamp_s=2147483647,
+                is_public=True,
                 node=self.test_data["node2"],
                 room=self.test_data["room2"],
             )
         self.assertEqual(installation.from_timestamp_s, 1577836800)
+        self.assertEqual(installation.is_public, True)
 
     def test_installation_mismatch(self):
         """Node and room referenced in a NodeInstallation must pertain to the same owner."""

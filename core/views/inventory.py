@@ -1,7 +1,6 @@
 import logging
 from django.contrib.auth import get_user_model
-from django.contrib.auth.mixins import LoginRequiredMixin
-from rest_framework import permissions
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.filters import SearchFilter
 from rest_framework_json_api import filters
@@ -37,19 +36,19 @@ User = get_user_model()
 logger = logging.getLogger(__name__)
 
 
-class SiteNotFoundExceptionView(LoginRequiredMixin, generics.RetrieveAPIView):
+class SiteNotFoundExceptionView(generics.RetrieveAPIView):
     """This view returns a 404 Not Found exception."""
 
     queryset = Site.objects.all()
-    permissions = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class = SiteSerializer
 
     def get(self, request, *args, **kwargs):
         raise NotFound()  # (detail="Error 404, page not found", code=404)
 
 
-class UserViewSet(LoginRequiredMixin, ReadOnlyModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+class UserViewSet(ReadOnlyModelViewSet):
+    permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
     # Use different serializers for different actions.
     # See https://stackoverflow.com/questions/22616973/django-rest-framework-use-different-serializers-in-the-same-modelviewset
@@ -104,8 +103,8 @@ class UserRelationshipView(RelationshipView):
     self_link_view_name = "user-relationships"
 
 
-class AddressViewSet(LoginRequiredMixin, ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+class AddressViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated]
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
 
@@ -115,27 +114,34 @@ class AddressViewSet(LoginRequiredMixin, ModelViewSet):
         return queryset.filter(sites__operator__users=self.request.user).distinct()
 
 
-class SiteViewSet(LoginRequiredMixin, ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated, IsOrganizationOwner]
+class SiteViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticatedOrReadOnly & IsOrganizationOwner]
     queryset = Site.objects.all()
     serializer_class = SiteSerializer
     filter_backends = (filters.QueryParameterValidationFilter, SearchFilter)
     search_fields = ("name", "description")
 
     def get_queryset(self, *args, **kwargs):
-        """Restrict to logged-in user"""
+        """Restrict to logged-in user or to sites that contain node installations marked as public."""
         queryset = super().get_queryset()
-        queryset = queryset.filter(operator__users=self.request.user)
-        if self.action == "list":
-            organization_id = self.request.query_params.get(
-                "filter[organization]", None
-            )
-            if organization_id is not None:
-                logger.debug(
-                    "Restrict query to sites of organization #%s.", organization_id
+
+        if not self.request.user.is_authenticated:
+            # Public API access. Restrict the listed sites to those that contain public
+            # node installations.
+            return queryset.filter(rooms__installations__is_public=True)
+        else:
+            # User is authenticated.
+            queryset = queryset.filter(operator__users=self.request.user)
+            if self.action == "list":
+                organization_id = self.request.query_params.get(
+                    "filter[organization]", None
                 )
-                queryset = queryset.filter(operator=organization_id)
-        return queryset.distinct()
+                if organization_id is not None:
+                    logger.debug(
+                        "Restrict query to sites of organization #%s.", organization_id
+                    )
+                    queryset = queryset.filter(operator=organization_id)
+            return queryset.distinct()
 
     def perform_create(self, serializer):
         """Inject permission checking on the validated incoming resource data."""
@@ -146,31 +152,36 @@ class SiteViewSet(LoginRequiredMixin, ModelViewSet):
             raise PermissionDenied
 
 
-class RoomViewSet(LoginRequiredMixin, ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated, IsOrganizationOwner]
+class RoomViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticatedOrReadOnly & IsOrganizationOwner]
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
     filter_backends = (filters.QueryParameterValidationFilter, SearchFilter)
     search_fields = ("name", "description")
 
     def get_queryset(self, *args, **kwargs):
-        """Restrict to logged-in user"""
+        """Restrict to logged-in user or to rooms that contain node installations marked as public."""
         queryset = super().get_queryset()
-        queryset = queryset.filter(site__operator__users=self.request.user)
-        if self.action == "list":
-            organization_id = self.request.query_params.get(
-                "filter[organization]", None
-            )
-            if organization_id is not None:
-                logger.debug(
-                    "Restrict query to rooms of organization #%s.", organization_id
+        if not self.request.user.is_authenticated:
+            # Public API access. Restrict the listed rooms to those that contain public
+            # node installations.
+            return queryset.filter(installations__is_public=True)
+        else:
+            queryset = queryset.filter(site__operator__users=self.request.user)
+            if self.action == "list":
+                organization_id = self.request.query_params.get(
+                    "filter[organization]", None
                 )
-                queryset = queryset.filter(site__operator=organization_id)
-            site_id = self.request.query_params.get("filter[site]", None)
-            if site_id is not None:
-                logger.debug("Restrict query to rooms of site #%s.", site_id)
-                queryset = queryset.filter(site=site_id)
-        return queryset.distinct()
+                if organization_id is not None:
+                    logger.debug(
+                        "Restrict query to rooms of organization #%s.", organization_id
+                    )
+                    queryset = queryset.filter(site__operator=organization_id)
+                site_id = self.request.query_params.get("filter[site]", None)
+                if site_id is not None:
+                    logger.debug("Restrict query to rooms of site #%s.", site_id)
+                    queryset = queryset.filter(site=site_id)
+            return queryset.distinct()
 
     def perform_create(self, serializer):
         """Inject permission checking on the validated incoming resource data."""
@@ -182,38 +193,46 @@ class RoomViewSet(LoginRequiredMixin, ModelViewSet):
             raise PermissionDenied
 
 
-class RoomNodeInstallationViewSet(LoginRequiredMixin, ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated, IsOrganizationOwner]
+class RoomNodeInstallationViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOrganizationOwner]
     queryset = RoomNodeInstallation.objects
     serializer_class = RoomNodeInstallationSerializer
 
     def get_queryset(self, *args, **kwargs):
-        """Restrict to logged-in user"""
+        """Restrict to logged-in user or to node installations marked as public."""
         queryset = super().get_queryset()
-        queryset = queryset.filter(room__site__operator__users=self.request.user)
-        if self.action == "list":
-            organization_id = self.request.query_params.get(
-                "filter[organization]", None
-            )
-            if organization_id is not None:
-                logger.debug(
-                    "Restrict query to installations of organization #%s.",
-                    organization_id,
+        if not self.request.user.is_authenticated:
+            # Public API access. Restrict to public node installations.
+            return queryset.filter(is_public=True)
+        else:
+            queryset = queryset.filter(room__site__operator__users=self.request.user)
+            if self.action == "list":
+                organization_id = self.request.query_params.get(
+                    "filter[organization]", None
                 )
-                queryset = queryset.filter(room__site__operator=organization_id)
-            site_id = self.request.query_params.get("filter[site]", None)
-            if site_id is not None:
-                logger.debug("Restrict query to installations at site #%s.", site_id)
-                queryset = queryset.filter(room__site=site_id)
-            room_id = self.request.query_params.get("filter[room]", None)
-            if room_id is not None:
-                logger.debug("Restrict query to installations in room #%s.", room_id)
-                queryset = queryset.filter(room=room_id)
-            node_id = self.request.query_params.get("filter[node]", None)
-            if node_id is not None:
-                logger.debug("Restrict query to installations of node %s.", node_id)
-                queryset = queryset.filter(node=node_id)
-        return queryset.distinct()
+                if organization_id is not None:
+                    logger.debug(
+                        "Restrict query to installations of organization #%s.",
+                        organization_id,
+                    )
+                    queryset = queryset.filter(room__site__operator=organization_id)
+                site_id = self.request.query_params.get("filter[site]", None)
+                if site_id is not None:
+                    logger.debug(
+                        "Restrict query to installations at site #%s.", site_id
+                    )
+                    queryset = queryset.filter(room__site=site_id)
+                room_id = self.request.query_params.get("filter[room]", None)
+                if room_id is not None:
+                    logger.debug(
+                        "Restrict query to installations in room #%s.", room_id
+                    )
+                    queryset = queryset.filter(room=room_id)
+                node_id = self.request.query_params.get("filter[node]", None)
+                if node_id is not None:
+                    logger.debug("Restrict query to installations of node %s.", node_id)
+                    queryset = queryset.filter(node=node_id)
+            return queryset.distinct()
 
     def perform_create(self, serializer):
         """Inject permission checking on the validated incoming resource data."""
@@ -225,15 +244,19 @@ class RoomNodeInstallationViewSet(LoginRequiredMixin, ModelViewSet):
             raise PermissionDenied
 
 
-class OrganizationViewSet(LoginRequiredMixin, ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated, IsOrganizationOwner]
+class OrganizationViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticatedOrReadOnly & IsOrganizationOwner]
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
 
     def get_queryset(self, *args, **kwargs):
-        """Restrict to logged-in user"""
+        """Restrict to logged-in user or to organizations that contain node installations marked as public."""
         queryset = super().get_queryset()
-        return queryset.filter(users=self.request.user)
+        if not self.request.user.is_authenticated:
+            # Public API access. Restrict to public node installations.
+            return queryset.filter(sites__rooms__installations__is_public=True)
+        else:
+            return queryset.filter(users=self.request.user)
 
     def perform_create(self, serializer):
         """The user adding the present organization automatically is its OWNER."""
@@ -243,14 +266,15 @@ class OrganizationViewSet(LoginRequiredMixin, ModelViewSet):
         )
 
 
-class OrganizationRelationshipView(LoginRequiredMixin, RelationshipView):
+class OrganizationRelationshipView(RelationshipView):
+    permission_classes = [IsAuthenticated]
     queryset = Organization.objects
     self_link_view_name = "organization-relationships"
     http_method_names = ["get", "post", "delete", "options", "head"]
 
 
-class MembershipViewSet(LoginRequiredMixin, ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated, IsOrganizationOwner]
+class MembershipViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated & IsOrganizationOwner]
     queryset = Membership.objects.all()
     serializer_class = MembershipSerializer
 
