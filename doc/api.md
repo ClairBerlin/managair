@@ -135,7 +135,10 @@ A **[T]** means that there exists at least on API test for the thus-marked resou
     - See installations of a specific node via the filter `filter[node]=<node_id>`.
   - [POST] Associate an already-registered node with an already-registered room. A node to be associated with a room must not be associated with another room for an overlapping time period.
 - **[T]** `/api/v1/installations/<installation_id>/` Details-resource for the installation of the identified node.
-  - [GET] Provide details about the installation - time slice, photo, and additional installation information.
+  - [GET] Provide details about the installation. Might include time-series data. By default, the installation resource does not return its associated time series. To query for the time series, use the following query-parameters:
+    - `include_timeseries=True` prompts the _Managair_ to add a `timeseries` list to the attributes of the installation resource. The time series of an installation consists of those samples reported by the installed node over the duration of the installation. If the node is subsequently moved to another installation, the thus resulting samples become part of this other installation time series.
+    - `filter[from]`: Start timestamp as Unix epoch. Defaults to `0`; i.e., 1970-01-01T00:00:00Z.
+    - `filter[to]`: End timestamp as Unix epoch. Defaults to the current system time `now()`.
   - [PUT, PATCH] Replace resp. update the association with the room. To end the association with a room, update it with an end timestamp earlier than 2147483647 (2038-01-19T03:14:07Z); this preserves the association history.
   - [DELETE] Removes the association with the room. This removes the association history, as if the node was never associated with the room.
 - **[T]** `/api/v1/installations/<installation_id>/room/` Detail-resource of the room the given installation pertains to.

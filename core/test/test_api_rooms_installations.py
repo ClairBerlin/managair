@@ -221,7 +221,7 @@ class RoomsTestCase(APITestCase):
 
 
 class InstallationsTestCase(APITestCase):
-    fixtures = ["user-fixtures.json", "inventory-fixtures.json"]
+    fixtures = ["user-fixtures.json", "inventory-fixtures.json", "data-fixtures.json"]
     node_id = "3b95a1b2-74e7-9e98-52c4-4acae441f0ae"  # Clairchen Schwarz
     node2_id = "9d02faee-4260-1377-22ec-936428b572ee"  # ERS Test-Node
     room_id = 4  # Prüfstube
@@ -246,6 +246,8 @@ class InstallationsTestCase(APITestCase):
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
+        # Ensure that no timeseries is returned if we do not query for it.
+        self.assertFalse("timeseries" in response.data)
 
     def test_get_installations_public(self):
         """ GET /installations/ without authentication."""
@@ -291,6 +293,25 @@ class InstallationsTestCase(APITestCase):
         response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["from_timestamp_s"], 1601510400)
+
+    def test_get_installation_with_timeseries(self):
+        """GET /installations/<installation_id>/?include_timeseries=true"""
+        response = self.client.get(self.detail_url, {"include_timeseries": True})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["timeseries"]), 468)
+
+    def test_get_installation_with_timeseries_slice(self):
+        """GET /installations/<installation_id>/?include_timeseries=true&filter[from]=1601675365&filter[to]=1601738613"""
+        response = self.client.get(
+            self.detail_url,
+            {
+                "include_timeseries": True,
+                "filter[from]": 1601675365,
+                "filter[to]": 1601738613,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["timeseries"]), 71)
 
     def test_patch_installation(self):
         """PATCH /installations/<installation_id>/"""

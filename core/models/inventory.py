@@ -209,7 +209,7 @@ class RoomNodeInstallation(models.Model):
         """For representation in the Admin UI."""
         end_time = (
             datetime.utcfromtimestamp(self.to_timestamp_s)
-            if self.to_timestamp_s is not None
+            if self.to_timestamp_s
             else "ongoing"
         )
         return f"Node: {self.node}, from: {datetime.utcfromtimestamp(self.from_timestamp_s)} To: {end_time}"

@@ -1,11 +1,9 @@
 import logging
-import re
 from datetime import datetime
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.filters import SearchFilter
-from rest_framework_json_api.filters import QueryParameterValidationFilter
 from rest_framework_json_api.views import (
     ModelViewSet,
     ReadOnlyModelViewSet,
@@ -26,16 +24,9 @@ from core.serializers import (
     NodeSerializer,
     NodeFidelitySerializer,
 )
+from core.queryfilters import IncludeTimeseriesQPValidator
 
 logger = logging.getLogger(__name__)
-
-
-class IncludeTimeseriesQPValidator(QueryParameterValidationFilter):
-    """Query parameter validator that admits an extra `include_timeseries` parameter."""
-
-    query_regex = re.compile(
-        r"^(sort|include|include_timeseries)$|^(?P<type>filter|fields|page)(\[[\w\.\-]+\])?$"
-    )
 
 
 class QuantityViewSet(ModelViewSet):
@@ -71,7 +62,7 @@ class NodeViewSet(ModelViewSet):
             organization_id = self.request.query_params.get(
                 "filter[organization]", None
             )
-            if organization_id is not None:
+            if organization_id:
                 logger.debug("Restrict to nodes of organization #%s.", organization_id)
                 queryset = queryset.filter(owner=organization_id)
         return queryset.distinct()
@@ -92,7 +83,7 @@ class NodeViewSet(ModelViewSet):
         page = self.paginate_queryset(nodes)
         # TODO: Simplify to use the parent list method and simply inject the modified
         # queryset.
-        if page is not None:
+        if page:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
@@ -102,10 +93,10 @@ class NodeViewSet(ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         sample_queryset = instance.samples.all()
-        from_limit = self.request.query_params.get("filter[from]", 0)
-        to_limit = self.request.query_params.get(
+        from_limit = int(self.request.query_params.get("filter[from]", 0))
+        to_limit = int(self.request.query_params.get(
             "filter[to]", round(datetime.now().timestamp())
-        )
+        ))
         logger.debug(
             "Limiting the time series to the time slice from %s to %s",
             from_limit,
@@ -116,11 +107,11 @@ class NodeViewSet(ModelViewSet):
         )
         first_sample = sample_queryset.first()
         from_timestamp_s = (
-            first_sample.timestamp_s if first_sample is not None else from_limit
+            first_sample.timestamp_s if first_sample else from_limit
         )
         last_sample = sample_queryset.last()
         to_simtestamp_s = (
-            last_sample.timestamp_s if last_sample is not None else to_limit
+            last_sample.timestamp_s if last_sample else to_limit
         )
         instance.sample_count = sample_queryset.count()
         instance.from_timestamp_s = from_timestamp_s

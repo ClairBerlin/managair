@@ -63,10 +63,10 @@ class SampleListView(generics.ListAPIView):
         else:
             raise MethodNotAllowed
         # Time-slicing query parameter
-        from_limit = self.request.query_params.get("filter[from]", 0)
-        to_limit = self.request.query_params.get(
+        from_limit = int(self.request.query_params.get("filter[from]", 0))
+        to_limit = int(self.request.query_params.get(
             "filter[to]", round(datetime.now().timestamp())
-        )
+        ))
         logger.debug("Time-slicing samples from %d to %d", from_limit, to_limit)
         queryset = queryset.filter(
             timestamp_s__gte=from_limit, timestamp_s__lte=to_limit
@@ -132,10 +132,10 @@ class NodeTimeSeriesViewSet(ReadOnlyModelViewSet):
     def get_object(self):
         node = self.get_queryset()
         queryset = node.samples
-        from_limit = self.request.query_params.get("filter[from]", 0)
-        to_limit = self.request.query_params.get(
+        from_limit = int(self.request.query_params.get("filter[from]", 0))
+        to_limit = int(self.request.query_params.get(
             "filter[to]", round(datetime.now().timestamp())
-        )
+        ))
         logger.debug(
             "Limiting the time series to the time slice from %s to %s",
             from_limit,
@@ -233,22 +233,14 @@ class InstallationTimeSeriesViewSet(ReadOnlyModelViewSet):
 
     def get_object(self):
         installation = self.get_queryset()
+        queryset = installation.node.samples.all()
+        # Limit time-slice to node installation and query.
         install_from_s = installation.from_timestamp_s
         install_to_s = installation.to_timestamp_s
-        queryset = installation.node.samples.filter(
-            timestamp_s__gte=install_from_s,
-            timestamp_s__lte=install_to_s,
-        )
         filter_from_s = int(self.request.query_params.get("filter[from]", 0))
-        filter_to_s = int(
-            self.request.query_params.get(
-                "filter[to]", round(datetime.now().timestamp())
-            )
-        )
-        samples = queryset.filter(
-            timestamp_s__gte=filter_from_s, timestamp_s__lte=filter_to_s
-        ).distinct()
-
+        filter_to_s = int(self.request.query_params.get(
+            "filter[to]", round(datetime.now().timestamp())
+        ))
         from_max_s = max(install_from_s, filter_from_s)
         to_min_s = min(install_to_s, filter_to_s)
         logger.debug(
@@ -256,6 +248,10 @@ class InstallationTimeSeriesViewSet(ReadOnlyModelViewSet):
             from_max_s,
             to_min_s,
         )
+        samples = queryset.filter(
+            timestamp_s__gte=from_max_s, timestamp_s__lte=to_min_s
+        ).distinct()
+
         return InstallationTimeseriesViewModel(
             pk=installation.pk,
             node_id=installation.node.id,
@@ -291,16 +287,16 @@ class SampleViewSet(ReadOnlyModelViewSet):
         if self.action == "list":
             queryset = queryset.filter(node__in=nodes)
             node_id = self.request.query_params.get("filter[node]", None)
-            if node_id is not None:
+            if node_id:
                 logger.debug("Restrict samples to node %s.", node_id)
                 get_object_or_404(nodes, pk=node_id)  # Check if node exists.
                 queryset = queryset.filter(node=node_id)
             queryset = queryset.filter(node__in=nodes)
             # Time-slicing query parameter
-            from_limit = self.request.query_params.get("filter[from]", 0)
-            to_limit = self.request.query_params.get(
+            from_limit = int(self.request.query_params.get("filter[from]", 0))
+            to_limit = int(self.request.query_params.get(
                 "filter[to]", round(datetime.now().timestamp())
-            )
+            ))
             logger.debug(
                 "Limiting the sample set to the time slice from %s to %s",
                 from_limit,
