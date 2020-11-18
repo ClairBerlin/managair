@@ -15,7 +15,7 @@ router.register(r"users", inventory.UserViewSet)
 router.register(r"organizations", inventory.OrganizationViewSet)
 router.register(r"memberships", inventory.MembershipViewSet)
 router.register(r"sites", inventory.SiteViewSet)
-router.register(r"address", inventory.AddressViewSet)
+router.register(r"addresses", inventory.AddressViewSet)
 router.register(r"rooms", inventory.RoomViewSet)
 router.register(
     r"installations", inventory.RoomNodeInstallationViewSet, basename="installation"
