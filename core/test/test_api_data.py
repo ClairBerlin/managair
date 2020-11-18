@@ -41,7 +41,7 @@ class NodeTimeseriesTestCase(APITestCase):
         self.assertEqual(response.data["sample_count"], 589)
         self.assertEqual(len(response.data["samples"]), 589)
 
-    def test_get_node_timeseries(self):
+    def test_get_nodes_timeseries(self):
         """GET /nodes/<node_id>/timeseries/"""
         url = reverse(
             "node-related", kwargs={"pk": self.node_id, "related_field": "timeseries"}
@@ -50,7 +50,7 @@ class NodeTimeseriesTestCase(APITestCase):
         self.assertEqual(response.data["sample_count"], 589)
         self.assertEqual(len(response.data["samples"]), 589)
 
-    def test_get_node_timeseries_slice(self):
+    def test_get_nodes_timeseries_slice(self):
         """GET /nodes/<node_id>/timeseries/?filter[from]=<from_timestamp>&filter[to]=<to_timestamp>"""
         url = reverse(
             "node-related", kwargs={"pk": self.node_id, "related_field": "timeseries"}

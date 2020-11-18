@@ -16,7 +16,7 @@ All collection-resources support paging. HTTP verbs follow the [standardized sem
 
 ## User
 
-Most of the user-management endpoints are provided by the [dj-rest-auth library](https://dj-rest-auth.readthedocs.io/en/latest/api_endpoints.html). The user must be logged in to access most of the resources, except to register and to log-in.
+Most of the user-management endpoints are provided by the [dj-rest-auth library](https://dj-rest-auth.readthedocs.io/en/latest/api_endpoints.html). The user must be authenticated to access most of the resources, except to register and to log-in.
 
 - `/api/v1/auth/login/` [POST]
 - `/api/v1/auth/logout/` [POST]
@@ -31,23 +31,23 @@ Most of the user-management endpoints are provided by the [dj-rest-auth library]
 
 ## Inventory
 
-The inventory is organized according to organizations that have one or more rooms with installed sensor nodes. All inventory resources require the user to be logged in. Data is organizaed according to the nodes that reported them. Data resources for a given organization are available only for the time-period when the node is or was owned by the organization.
+The inventory is organized according to organizations that have one or more rooms with installed sensor nodes. All inventory resources require the user to be authenticated. Data is organizaed according to the nodes that reported them. Data resources for a given organization are available only for the time-period when the node is or was owned by the organization.
 
 A **[T]** means that there exists at least on API test for the thus-marked resource.
 
 ### Organizations
 
-- **[T]** `/api/v1/organizations/` Collection-resource of all organizations visible to the logged-in user.
+- **[T]** `/api/v1/organizations/` Collection-resource of all organizations visible to the authenticated user.
   - [GET] List the organizations.
-  - [POST] Register a new organization, with the logged-in user as owner.
+  - [POST] Register a new organization, with the authenticated user as owner.
 - **[T]** `/api/v1/organizations/<organization_id>/` Details-resource of the organization with ID `organization_id`.
-  - [GET] Details about the organization. Only available if the logged-in user is a member of this organization.
+  - [GET] Details about the organization. Only available if the authenticated user is a member of this organization.
   - [PUT, PATCH] Replace resp. update organization data. Only available for users that have the OWNER role for the organization.
   - [DELETE] Remove the organization and all assets and data it owns - sites, rooms, nodes, and node time series. Only available for users that have the OWNER role for the organization.
 - **[T]** `/api/v1/organizations/<organization_id>/relationships/users/` Relationship resource to manage the users that form part of the organization. See the [JSON:API specification](https://jsonapi.org/format/#crud-updating-to-many-relationships) for detailed semantics.
   - [GET] List the user-members of the organization.
   - [POST] Add one or more existing users as members of the organization. The default membership role will be _INSPECTOR_, which is the least-privileged role (read-only.)
-  - [DELETE] Delete the member specified in the request body. **WARNING** Allows the logged-in user to be removed from the organization.
+  - [DELETE] Delete the member specified in the request body. **WARNING** Allows the authenticated user to be removed from the organization.
 - **[T]** `/api/v1/organizations/<organization_id>/users/` Collection-resource for the organization's members; that is, the users that are part of the organization.
   - [GET] List the users of the organization, with individual links to the user detail resouces at `/api/v1/users/<user_id>/`.
 - **[T]** `/api/v1/organizations/<organization_id>/memberships/` Collection-resource for the organization's memberships.
@@ -59,22 +59,22 @@ A **[T]** means that there exists at least on API test for the thus-marked resou
 
 ### Users and Organization Membership
 
-- **[T]** `/api/v1/users/` Collection resource of all users visible to the logged-in user.
+- **[T]** `/api/v1/users/` Collection resource of all users visible to the authenticated user.
   - [GET] List all usernames. Filter to limit the collection:
     - Text-search for a specific user by username or email via tha filter `filter[search]=<search-text>`.
     - See members of one specific organization via the filter `filter[organization]=<organization_id>`.
-- **[T]** `/api/v1/users/<user_id>/` Detail resource for a user. Only those users are accessible that are member of an organization where the logged-in user is also a member of.
+- **[T]** `/api/v1/users/<user_id>/` Detail resource for a user. Only those users are accessible that are member of an organization where the authenticated user is also a member of.
   - [GET] Retrieve membership details. The membership contains the user's role and relations, and a nested `/api/v1/auth/user/<user_id>` resource.
-- **[Currently unavailable becaus of an upstream bug]** `/api/v1/users/<user_id>/organizations/` Collection-resource of all organizations that the user is a member of.
+- **[T]** `/api/v1/users/<user_id>/organizations/` Collection-resource of all organizations that the user is a member of.
   - [GET] List all organizations of which the given user is a member, with individual links to organization detail resources at `/api/v1/organizations/<organization_id>/`.
-- **[Currently unavailable becaus of an upstream bug]** `/api/v1/users/<user_id>/memberships/` Collection-resource of all organization-memberships that the user holds. This resource is very similar to `/api/v1/users/<user_id>/organizations/`. However, it does not directly link to the organization the memberhsip pertains to, but includes the membership role instead.
+- **[T]** `/api/v1/users/<user_id>/memberships/` Collection-resource of all organization-memberships that the user holds. This resource is very similar to `/api/v1/users/<user_id>/organizations/`. However, it does not directly link to the organization the memberhsip pertains to, but includes the membership role instead.
   - [GET] List all memberships the given user holds, with individual links to membership detail resources at `/api/v1/memberships/<membership_id>/`.
-- **[T]** `/api/v1/memberships/` Collection resource of all memberships visible to the currently logged-in user; i.e., memberships for all organizations where the currently logged-in user is itself a member.
-  - [GET] List all memberships visible to the currently logged-in user. Narrow-down the result via the following filters:
+- **[T]** `/api/v1/memberships/` Collection resource of all memberships visible to the currently authenticated user; i.e., memberships for all organizations where the currently authenticated user is itself a member.
+  - [GET] List all memberships visible to the currently authenticated user. Narrow-down the result via the following filters:
     - `filter[organization]=<organization_id>`: Return memberships of the given organization only.
-    - `filter[username]=<username>` or `filter[user]=<user_id>`: Return memberships of the given user only. Note that only memberships in organizations will be returned where the currently logged-in user is also a member.
-  - [POST] Register a new member of an organization for which the logged-in user must be an OWNER.
-- **[T]** `/api/v1/memberships/<membership_id>/` Details-resource of the specified membership. Only accessible if the logged-in user is also a member of the membership organization.
+    - `filter[username]=<username>` or `filter[user]=<user_id>`: Return memberships of the given user only. Note that only memberships in organizations will be returned where the currently authenticated user is also a member.
+  - [POST] Register a new member of an organization for which the authenticated user must be an OWNER.
+- **[T]** `/api/v1/memberships/<membership_id>/` Details-resource of the specified membership. Only accessible if the authenticated user is also a member of the membership organization.
   - [GET] Retrieve information about the membership.
   - [PUT, PATCH] Update membership: Use to alter membership role.
   - [DELETE] Cancel the membership. Both user and organization are not affected.
@@ -85,22 +85,25 @@ A **[T]** means that there exists at least on API test for the thus-marked resou
 
 ### Nodes
 
-- **[T]** `/api/v1/nodes/` Collection-resource of the nodes visible to the logged-in user.
+- **[T]** `/api/v1/nodes/` Collection-resource of the nodes visible to the authenticated user.
   - [GET] List the nodes. Filter to narrow down the list:
     - Get nodes of one specific organization only via the filter `filter[organization]=<organization_id>`.
     - Search for nodes with a specific alias or device-EUI via the filter `filter[search]=<search-text>`.
-- **[T]** `/api/v1/nodes/<node_id>/` Details-resource of the specified node. Only accessible if the node is visible to the logged-in user.
-  - [GET] Retrieve information about the node. Might include fidelity information.
-  - [PUT, PATCH] Update node master data; e.g., node alias or tags (feature request).
+- **[T]** `/api/v1/nodes/<node_id>/` Details-resource of the specified node. Only accessible if the node is visible to the authenticated user.
+  - [GET] Retrieve information about the node. Might include fidelity information and time-series data. By default, the node resource does not return its associated time series. To query for the node's time series, use the following query-parameters:
+    - `include_timeseries=True` prompts the _Managair_ to add a `timeseries` list to the attributes of the Node resource.
+    - `filter[from]`: Start timestamp as Unix epoch. Defaults to `0`; i.e., 1970-01-01T00:00:00Z.
+    - `filter[to]`: End timestamp as Unix epoch. Defaults to the current system time `now()`.
+  - [PUT, PATCH] Update node master data; e.g., node alias.
   - [DELETE] Remove the node and all samples reported by this node.
 - **[T]** `/api/v1/nodes/<node_id>/installations/` Collection-resource of all installations a node has ever undergone.
   - [GET] List all present and past installations of the given node, with individual links to installation detail resources at `/api/v1/installations/<installation_id>/`.
-- `/api/v1/nodes/fidelity/` Status list ("fidelity") for all nodes visible to the logged-in user.
+- `/api/v1/nodes/fidelity/` Status list ("fidelity") for all nodes visible to the authenticated user.
   - [GET] The status is updated periodically and indicates if a given node regularly transmits data. Filter to see nodes of one specific organization only via the filter `filter[organization]=<organization_id>`; filter for nodes of a given site via `filter[site]=<site_id>`, and in a given room via `filter[room]=<room_id>`. In the future, additional information might be added, like battery status or error reports.
 
 ### Sites
 
-- **[T]** `/api/v1/sites/` Collection-resource of all sites visible to a logged-in user.
+- **[T]** `/api/v1/sites/` Collection-resource of all sites visible to a authenticated user.
   - [GET] List the sites. Filter to narrow down the list:
     - Get sites of one specific organization only via the filter `filter[organization]=<organization_id>`.
     - Search for sites with a specific name or description via the filter `filter[search]=<search-text>`.
@@ -113,7 +116,7 @@ A **[T]** means that there exists at least on API test for the thus-marked resou
 
 ### Rooms and Node-Installations
 
-- **[T]** `/api/v1/rooms/` Collection-resource of all rooms visible to a logged-in user.
+- **[T]** `/api/v1/rooms/` Collection-resource of all rooms visible to a authenticated user.
   - [GET] List the rooms. Filter to narrow down the list:
     - See sites of one specific organization only via the filter `filter[organization]=<organization_id>`.
     - See the rooms within one specific site only via the filter `filter[site]=<site_id>`.
@@ -124,7 +127,7 @@ A **[T]** means that there exists at least on API test for the thus-marked resou
   - [DELETE] Remove the room resource and the node-installation it might contain. Does not delete the node resources themselves.
 - **[T]** `/api/v1/rooms/<room_id>/installations/` Collection-resource of all node installations in the given room.
   - [GET] List current and past installations, with individual links to the detail-resource at `/api/v1/installations/<installation_id>`.
-- **[T]** `/api/v1/installations/` Collection-resource for the all node installation visible to the logged-in user.
+- **[T]** `/api/v1/installations/` Collection-resource for the all node installation visible to the authenticated user.
   - [GET] List the installations. Filter to narrow down the list
     - See installations of one specific organization with the filter `filter[organization]=<organization_id>`.
     - See installations of one specific site with the filter `filter[site]=<site_id>`.
@@ -147,9 +150,9 @@ Measurement data is what the Clair network is all about. Therefore, the API endp
 ### Time Series
 
 - **[T]** `/api/v1/timeseries/` Collection resource that lists all timeseries.
-  - [GET] Return a list summary for the timeseries reported by all nodes to which the logged-in user has access. The summary counts the number of samples and provides information on the time span of each time series.
+  - [GET] Return a list summary for the timeseries reported by all nodes to which the authenticated user has access. The summary counts the number of samples and provides information on the time span of each time series.
 - **[T]** `/api/v1/timeseries/<node_id>/` Detail resource of the timeseries of node `node_id`
-  - [GET] Retrieve the time series of the specified node. This resource is identical to the resource provided at `/api/v1/nodes/<node_id>/timeseries/`. Only available if the node is visible to the logged-in user. Supports querying for time slices:
+  - [GET] Retrieve the time series of the specified node. This resource is identical to the resource provided at `/api/v1/nodes/<node_id>/timeseries/`. Only available if the node is visible to the authenticated user. Supports querying for time slices:
     - `filter[from]`: Start timestamp as Unix epoch. Defaults to `0`; i.e., 1970-01-01T00:00:00Z.
     - `filter[to]`: End timestamp as Unix epoch. Defaults to the current system time `now()`.
 - **[T]** `/api/v1/nodes/<node_id>/timeseries/` Detail resource for the time-series reported by the specified node.
@@ -160,12 +163,12 @@ Measurement data is what the Clair network is all about. Therefore, the API endp
 ### Samples
 
 - **[T]** `/api/v1/samples/` Collection resource that returns all recorded samples.
-  - [GET] Return a list of all samples recorded by all nodes to which the logged-in user has access. Because the data volume can get quite large, this collection is paged by default. In addition to paging, the selection can be reduced by the following query paramters
+  - [GET] Return a list of all samples recorded by all nodes to which the authenticated user has access. Because the data volume can get quite large, this collection is paged by default. In addition to paging, the selection can be reduced by the following query paramters
     - `filter[node]` Restrict to samples recorded by the given node only.
     - `filter[from]` Start timestamp as Unix epoch. Defaults to `0`; i.e.,1970-01-01T00:00:00Z, if not provided.
     - `filter[to]` End timestamp as Unix epoch. Defaults to the current system time `now()`.
 - **[T]** `/api/v1/samples/<sample_id>` Detail resource of an individual sample.
-  - [GET] Retrieve an individual sample, if it results from a node the logged-in user has access to.
+  - [GET] Retrieve an individual sample, if it results from a node the authenticated user has access to.
 - **[T]** `/api/v1/nodes/<node_id>/samples/` Detail resource for the samples reported by the specified node.
   - [GET] Returns the samples reported by the given node. **Question: How to restrict the time slice to match the attribution between node and organization?** Identical to the resource at `/api/v1/samples/?filter[node]=<node_id>`. Supports querying for time slices:
     - `filter[from]`: Start timestamp as Unix epoch. Defaults to `0`; i.e., 1970-01-01T00:00:00Z.
