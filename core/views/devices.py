@@ -24,7 +24,6 @@ from core.serializers import (
     NodeProtocolSerializer,
     NodeModelSerializer,
     NodeSerializer,
-    # NodeDetailSerializer,
     NodeFidelitySerializer,
 )
 
@@ -33,7 +32,10 @@ logger = logging.getLogger(__name__)
 
 class IncludeTimeseriesQPValidator(QueryParameterValidationFilter):
     """Query parameter validator that admits an extra `include_timeseries` parameter."""
-    query_regex = re.compile(r'^(sort|include|include_timeseries)$|^(?P<type>filter|fields|page)(\[[\w\.\-]+\])?$')
+
+    query_regex = re.compile(
+        r"^(sort|include|include_timeseries)$|^(?P<type>filter|fields|page)(\[[\w\.\-]+\])?$"
+    )
 
 
 class QuantityViewSet(ModelViewSet):
@@ -57,10 +59,7 @@ class NodeModelViewSet(ModelViewSet):
 class NodeViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated & IsOrganizationOwner]
     queryset = Node.objects.all()
-    # Use different serializers for different actions.
-    # See https://stackoverflow.com/questions/22616973/django-rest-framework-use-different-serializers-in-the-same-modelviewset
-    # serializer_classes = {"list": NodeSerializer, "retrieve": NodeDetailSerializer}
-    serializer_class = NodeSerializer  # fallback
+    serializer_class = NodeSerializer
     filter_backends = (IncludeTimeseriesQPValidator, SearchFilter)
     search_fields = ("alias", "eui64")
 
@@ -83,11 +82,6 @@ class NodeViewSet(ModelViewSet):
             super().perform_create(serializer)
         else:
             raise PermissionDenied
-
-    # def get_serializer_class(self):
-    #     # TODO: Does not work for related fields because of this upstream bug:
-    #     # https://github.com/django-json-api/django-rest-framework-json-api/issues/859
-    #     return self.serializer_classes.get(self.action, self.serializer_class)
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())

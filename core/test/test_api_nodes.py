@@ -1,11 +1,10 @@
-from unittest import skip
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework_json_api.utils import format_resource_type
 
 
 class NodeTestCase(APITestCase):
-    fixtures = ["user-fixtures.json", "inventory-fixtures.json"]
+    fixtures = ["user-fixtures.json", "inventory-fixtures.json", "data-fixtures.json"]
     node_id = "3b95a1b2-74e7-9e98-52c4-4acae441f0ae"
 
     def setUp(self):
@@ -48,6 +47,15 @@ class NodeTestCase(APITestCase):
         response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["alias"], "Clairchen Schwarz")
+        # Ensure that no timeseries is returned if we do not query for it.
+        self.assertFalse("timeseries" in response.data)
+
+    def test_get_node_with_timeseries(self):
+        """GET /node/<node_id>?include_timeseries=True"""
+        response = self.client.get(self.detail_url, {"include_timeseries": True})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["alias"], "Clairchen Schwarz")
+        self.assertEqual(len(response.data["timeseries"]), 589)
 
     def test_patch_node(self):
         """PATCH /node/<node_id>/"""
@@ -102,9 +110,6 @@ class NodeTestCase(APITestCase):
         response4 = self.client.get(response_url)
         self.assertEqual(response4.status_code, 404)
 
-    @skip(
-        "Test fails because of upstream bug: https://github.com/django-json-api/django-rest-framework-json-api/issues/859"
-    )
     def test_get_node_installations(self):
         """GET /nodes/<node_id>/installations/"""
         url = reverse(
@@ -205,6 +210,5 @@ class NodeTestCase(APITestCase):
         self.assertEqual(response.status_code, 403)
 
     # TODO: More Failure cases:
-    # - Get Nodes the user does not have access to.
     # - Add incompletely specified nodes.
     # - PUT
