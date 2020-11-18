@@ -41,7 +41,7 @@ class NodeModelSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 
-class NodeSerializer(serializers.HyperlinkedModelSerializer):
+class LegacyNodeSerializer(serializers.HyperlinkedModelSerializer):
     related_serializers = {
         "protocol": "core.serializers.NodeProtocolSerializer",
         "model": "core.serializers.NodeModelSerializer",
@@ -114,7 +114,7 @@ class NodeSerializer(serializers.HyperlinkedModelSerializer):
         return self.validated_data["owner"]
 
 
-class NodeDetailSerializer(serializers.HyperlinkedModelSerializer):
+class NodeSerializer(serializers.HyperlinkedModelSerializer):
     related_serializers = {
         "protocol": "core.serializers.NodeProtocolSerializer",
         "model": "core.serializers.NodeModelSerializer",

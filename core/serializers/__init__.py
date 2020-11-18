@@ -11,7 +11,7 @@ from .devices import (
     NodeProtocolSerializer,
     NodeModelSerializer,
     NodeSerializer,
-    NodeDetailSerializer,
+    # NodeDetailSerializer,
     NodeFidelitySerializer,
 )
 from .inventory import (
