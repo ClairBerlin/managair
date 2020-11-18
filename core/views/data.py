@@ -287,7 +287,7 @@ class SampleViewSet(ReadOnlyModelViewSet):
         if self.action == "list":
             queryset = queryset.filter(node__in=nodes)
             node_id = self.request.query_params.get("filter[node]", None)
-            if node_id is not None:
+            if node_id:
                 logger.debug("Restrict samples to node %s.", node_id)
                 get_object_or_404(nodes, pk=node_id)  # Check if node exists.
                 queryset = queryset.filter(node=node_id)

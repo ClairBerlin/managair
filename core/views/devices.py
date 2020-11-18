@@ -62,7 +62,7 @@ class NodeViewSet(ModelViewSet):
             organization_id = self.request.query_params.get(
                 "filter[organization]", None
             )
-            if organization_id is not None:
+            if organization_id:
                 logger.debug("Restrict to nodes of organization #%s.", organization_id)
                 queryset = queryset.filter(owner=organization_id)
         return queryset.distinct()
@@ -83,7 +83,7 @@ class NodeViewSet(ModelViewSet):
         page = self.paginate_queryset(nodes)
         # TODO: Simplify to use the parent list method and simply inject the modified
         # queryset.
-        if page is not None:
+        if page:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
@@ -107,11 +107,11 @@ class NodeViewSet(ModelViewSet):
         )
         first_sample = sample_queryset.first()
         from_timestamp_s = (
-            first_sample.timestamp_s if first_sample is not None else from_limit
+            first_sample.timestamp_s if first_sample else from_limit
         )
         last_sample = sample_queryset.last()
         to_simtestamp_s = (
-            last_sample.timestamp_s if last_sample is not None else to_limit
+            last_sample.timestamp_s if last_sample else to_limit
         )
         instance.sample_count = sample_queryset.count()
         instance.from_timestamp_s = from_timestamp_s

@@ -78,7 +78,7 @@ class UserViewSet(ReadOnlyModelViewSet):
                 organization_id = self.request.query_params.get(
                     "filter[organization]", None
                 )
-                if organization_id is not None:
+                if organization_id:
                     logger.debug(
                         "Restrict query to members of organization #%s.",
                         organization_id,
@@ -141,7 +141,7 @@ class SiteViewSet(ModelViewSet):
                 organization_id = self.request.query_params.get(
                     "filter[organization]", None
                 )
-                if organization_id is not None:
+                if organization_id:
                     logger.debug(
                         "Restrict query to sites of organization #%s.", organization_id
                     )
@@ -177,13 +177,13 @@ class RoomViewSet(ModelViewSet):
                 organization_id = self.request.query_params.get(
                     "filter[organization]", None
                 )
-                if organization_id is not None:
+                if organization_id:
                     logger.debug(
                         "Restrict query to rooms of organization #%s.", organization_id
                     )
                     queryset = queryset.filter(site__operator=organization_id)
                 site_id = self.request.query_params.get("filter[site]", None)
-                if site_id is not None:
+                if site_id:
                     logger.debug("Restrict query to rooms of site #%s.", site_id)
                     queryset = queryset.filter(site=site_id)
             return queryset.distinct()
@@ -216,26 +216,26 @@ class RoomNodeInstallationViewSet(ModelViewSet):
                 organization_id = self.request.query_params.get(
                     "filter[organization]", None
                 )
-                if organization_id is not None:
+                if organization_id:
                     logger.debug(
                         "Restrict query to installations of organization #%s.",
                         organization_id,
                     )
                     queryset = queryset.filter(room__site__operator=organization_id)
                 site_id = self.request.query_params.get("filter[site]", None)
-                if site_id is not None:
+                if site_id:
                     logger.debug(
                         "Restrict query to installations at site #%s.", site_id
                     )
                     queryset = queryset.filter(room__site=site_id)
                 room_id = self.request.query_params.get("filter[room]", None)
-                if room_id is not None:
+                if room_id:
                     logger.debug(
                         "Restrict query to installations in room #%s.", room_id
                     )
                     queryset = queryset.filter(room=room_id)
                 node_id = self.request.query_params.get("filter[node]", None)
-                if node_id is not None:
+                if node_id:
                     logger.debug("Restrict query to installations of node %s.", node_id)
                     queryset = queryset.filter(node=node_id)
             return queryset.distinct()
@@ -264,7 +264,7 @@ class RoomNodeInstallationViewSet(ModelViewSet):
         page = self.paginate_queryset(installations)
         # TODO: Simplify to use the parent list method and simply inject the modified
         # queryset.
-        if page is not None:
+        if page:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
@@ -344,18 +344,18 @@ class MembershipViewSet(ModelViewSet):
             organization_id = self.request.query_params.get(
                 "filter[organization]", None
             )
-            if organization_id is not None:
+            if organization_id:
                 logger.debug(
                     "Restrict query to memberships of organization #%s.",
                     organization_id,
                 )
                 queryset = queryset.filter(organization=organization_id)
             username = self.request.query_params.get("filter[username]", None)
-            if username is not None:
+            if username:
                 logger.debug("Restrict query to memberships of user %s.", username)
                 queryset = queryset.filter(user__username=username)
             user_id = self.request.query_params.get("filter[user]", None)
-            if user_id is not None:
+            if user_id:
                 logger.debug(
                     "Restrict query to memberships of the user with id %s.", username
                 )
