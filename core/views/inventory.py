@@ -104,6 +104,7 @@ class UserViewSet(ReadOnlyModelViewSet):
 
 
 class UserRelationshipView(RelationshipView):
+    permission_classes = [IsAuthenticated]
     queryset = User.objects
     self_link_view_name = "user-relationships"
 
