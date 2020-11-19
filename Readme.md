@@ -5,10 +5,15 @@
 Managair is the key administrative service of the _Clair Stack_. It is a [Django](https://www.djangoproject.com) web application that manages users, their inventory of sensor nodes, and the measurement samples recorded by these nodes.
 
 - The samples that are received and decoded by specific _protocol handlers_ in the Clair Stack, Managair offers an _ingestion_ API endpoint that takes a sample and persists it in the underlying [PostgrSQL](https://www.postgresql.org) database.
-- A RESTful API offers resources for CRUD operations on all inventory entities, like nodes, rooms, or sensor installations. This API furthermore provides resources to retrieve time series of measured samples for display and analysis.
+- A [RESTful API](doc/api.md) offers resources for CRUD operations on all inventory entities, like nodes, rooms, or sensor installations. This API furthermore provides resources to retrieve time series of measured samples for display and analysis.
 - Administrative access to all entities is possible via the [Django Admin-UI](https://docs.djangoproject.com/en/3.1/ref/contrib/admin/).
 - Managair enforces an access control policy whereby resources and samples are visible to users that are members of a given _organization_ only, but can be made public explicitly.
 - An independent _fidelity service_ checks if data is received regularly from each node.
+  
+## Detailed Documentation
+
+- The [Managair REST API](/doc/api.md)
+- The [Managair data model](/doc/inventory-model.pdf)
 
 ## The Managair Data Model
 
