@@ -3,10 +3,29 @@ info:
   title: ''
   version: 0.0.0
 paths:
-  /api/v1/address/:
+  /api/v1/addresses/:
     get:
-      operationId: api_v1_address_list
-      description: Verify that the current user is authenticated.
+      operationId: api_v1_addresses_list
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - name: page[number]
         required: false
@@ -25,7 +44,6 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -34,8 +52,27 @@ paths:
                 $ref: '#/components/schemas/PaginatedAddressList'
           description: ''
     post:
-      operationId: api_v1_address_create
-      description: Verify that the current user is authenticated.
+      operationId: api_v1_addresses_create
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       tags:
       - api
       requestBody:
@@ -53,18 +90,36 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
-        '200':
+        '201':
           content:
             application/vnd.api+json:
               schema:
                 $ref: '#/components/schemas/Address'
           description: ''
-  /api/v1/address/{id}/:
+  /api/v1/addresses/{id}/:
     get:
-      operationId: api_v1_address_retrieve
-      description: Verify that the current user is authenticated.
+      operationId: api_v1_addresses_retrieve
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -77,7 +132,6 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -86,8 +140,27 @@ paths:
                 $ref: '#/components/schemas/Address'
           description: ''
     patch:
-      operationId: api_v1_address_partial_update
-      description: Verify that the current user is authenticated.
+      operationId: api_v1_addresses_partial_update
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -111,7 +184,6 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -120,8 +192,27 @@ paths:
                 $ref: '#/components/schemas/Address'
           description: ''
     delete:
-      operationId: api_v1_address_destroy
-      description: Verify that the current user is authenticated.
+      operationId: api_v1_addresses_destroy
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -134,14 +225,322 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '204':
           description: No response body
+  /api/v1/auth/login/:
+    post:
+      operationId: api_v1_auth_login_create
+      description: |-
+        Check the credentials and return the REST Token
+        if the credentials are valid and authenticated.
+        Calls Django Auth login method to register User ID
+        in Django session framework
+
+        Accept the following POST parameters: username, password
+        Return the REST Framework Token Object's key.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Token'
+          description: ''
+  /api/v1/auth/logout/:
+    post:
+      operationId: api_v1_auth_logout_create
+      description: |-
+        Calls Django logout method and delete the Token object
+        assigned to the current User object.
+
+        Accepts/Returns nothing.
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /api/v1/auth/password/change/:
+    post:
+      operationId: api_v1_auth_password_change_create
+      description: |-
+        Calls Django Auth SetPasswordForm save method.
+
+        Accepts the following POST parameters: new_password1, new_password2
+        Returns the success/fail message.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /api/v1/auth/password/reset/:
+    post:
+      operationId: api_v1_auth_password_reset_create
+      description: |-
+        Calls Django Auth PasswordResetForm save method.
+
+        Accepts the following POST parameters: email
+        Returns the success/fail message.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /api/v1/auth/password/reset/confirm/:
+    post:
+      operationId: api_v1_auth_password_reset_confirm_create
+      description: |-
+        Password reset e-mail link is confirmed, therefore
+        this resets the user's password.
+
+        Accepts the following POST parameters: token, uid,
+            new_password1, new_password2
+        Returns the success/fail message.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /api/v1/auth/registration/:
+    post:
+      operationId: api_v1_auth_registration_create
+      description: ''
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Register'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Register'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Register'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Token'
+          description: ''
+  /api/v1/auth/registration/verify-email/:
+    post:
+      operationId: api_v1_auth_registration_verify_email_create
+      description: ''
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyEmail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifyEmail'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /api/v1/auth/user/:
+    get:
+      operationId: api_v1_auth_user_retrieve
+      description: |-
+        Reads and updates UserModel fields
+        Accepts GET, PUT, PATCH methods.
+
+        Default accepted fields: username, first_name, last_name
+        Default display fields: pk, username, email, first_name, last_name
+        Read-only fields: pk, email
+
+        Returns UserModel fields.
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/UserDetails'
+          description: ''
+    put:
+      operationId: api_v1_auth_user_update
+      description: |-
+        Reads and updates UserModel fields
+        Accepts GET, PUT, PATCH methods.
+
+        Default accepted fields: username, first_name, last_name
+        Default display fields: pk, username, email, first_name, last_name
+        Read-only fields: pk, email
+
+        Returns UserModel fields.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/UserDetails'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserDetails'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserDetails'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/UserDetails'
+          description: ''
+    patch:
+      operationId: api_v1_auth_user_partial_update
+      description: |-
+        Reads and updates UserModel fields
+        Accepts GET, PUT, PATCH methods.
+
+        Default accepted fields: username, first_name, last_name
+        Default display fields: pk, username, email, first_name, last_name
+        Read-only fields: pk, email
+
+        Returns UserModel fields.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserDetails'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserDetails'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserDetails'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/UserDetails'
+          description: ''
   /api/v1/fidelity/:
     get:
       operationId: api_v1_fidelity_list
-      description: Verify that the current user is authenticated.
+      description: This mixin handles all related entities, whose Serializers are
+        declared in "related_serializers"
       parameters:
       - name: page[number]
         required: false
@@ -170,7 +569,8 @@ paths:
   /api/v1/fidelity/{node}/:
     get:
       operationId: api_v1_fidelity_retrieve
-      description: Verify that the current user is authenticated.
+      description: This mixin handles all related entities, whose Serializers are
+        declared in "related_serializers"
       parameters:
       - in: path
         name: node
@@ -191,10 +591,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/NodeFidelity'
           description: ''
-  /api/v1/installations/:
+  /api/v1/installation-timeseries/:
     get:
-      operationId: api_v1_installations_list
-      description: Verify that the current user is authenticated.
+      operationId: api_v1_installation_timeseries_list
+      description: A view for time series accessed by installation. Each installation
+        has its own time series, constrained by the time slice of the installation.
       parameters:
       - name: page[number]
         required: false
@@ -219,11 +620,103 @@ paths:
           content:
             application/vnd.api+json:
               schema:
+                $ref: '#/components/schemas/PaginatedInstallationTimeseriesListList'
+          description: ''
+  /api/v1/installation-timeseries/{id}/:
+    get:
+      operationId: api_v1_installation_timeseries_retrieve
+      description: A view for time series accessed by installation. Each installation
+        has its own time series, constrained by the time slice of the installation.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this room node installation.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/InstallationTimeSeries'
+          description: ''
+  /api/v1/installations/:
+    get:
+      operationId: api_v1_installations_list
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
                 $ref: '#/components/schemas/PaginatedRoomNodeInstallationList'
           description: ''
     post:
       operationId: api_v1_installations_create
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       tags:
       - api
       requestBody:
@@ -241,18 +734,60 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/RoomNodeInstallation'
+          description: ''
+  /api/v1/installations/{installation_pk}/timeseries/:
+    get:
+      operationId: api_v1_installations_timeseries_retrieve
+      description: A view for time series accessed by installation. Each installation
+        has its own time series, constrained by the time slice of the installation.
+      parameters:
+      - in: path
+        name: installation_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
       - {}
       responses:
         '200':
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/RoomNodeInstallation'
+                $ref: '#/components/schemas/InstallationTimeSeries'
           description: ''
   /api/v1/installations/{id}/:
     get:
       operationId: api_v1_installations_retrieve
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -265,7 +800,6 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -275,7 +809,26 @@ paths:
           description: ''
     patch:
       operationId: api_v1_installations_partial_update
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -299,7 +852,6 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -309,7 +861,26 @@ paths:
           description: ''
     delete:
       operationId: api_v1_installations_destroy
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -322,14 +893,351 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '204':
           description: No response body
+  /api/v1/installations/{id}/{related_field}/:
+    get:
+      operationId: api_v1_installations_retrieve_2
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this room node installation.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/RoomNodeInstallation'
+          description: ''
+  /api/v1/memberships/:
+    get:
+      operationId: api_v1_memberships_list
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMembershipList'
+          description: ''
+    post:
+      operationId: api_v1_memberships_create
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Membership'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Membership'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Membership'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Membership'
+          description: ''
+  /api/v1/memberships/{id}/:
+    get:
+      operationId: api_v1_memberships_retrieve
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this membership.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Membership'
+          description: ''
+    patch:
+      operationId: api_v1_memberships_partial_update
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this membership.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/PatchedMembership'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMembership'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMembership'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Membership'
+          description: ''
+    delete:
+      operationId: api_v1_memberships_destroy
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this membership.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/memberships/{id}/{related_field}/:
+    get:
+      operationId: api_v1_memberships_retrieve_2
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this membership.
+        required: true
+      - in: path
+        name: related_field
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Membership'
+          description: ''
   /api/v1/models/:
     get:
       operationId: api_v1_models_list
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - name: page[number]
         required: false
@@ -358,7 +1266,26 @@ paths:
           description: ''
     post:
       operationId: api_v1_models_create
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       tags:
       - api
       requestBody:
@@ -377,7 +1304,7 @@ paths:
       - cookieAuth: []
       - tokenAuth: []
       responses:
-        '200':
+        '201':
           content:
             application/vnd.api+json:
               schema:
@@ -386,7 +1313,26 @@ paths:
   /api/v1/models/{id}/:
     get:
       operationId: api_v1_models_retrieve
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -409,7 +1355,26 @@ paths:
           description: ''
     patch:
       operationId: api_v1_models_partial_update
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -442,7 +1407,26 @@ paths:
           description: ''
     delete:
       operationId: api_v1_models_destroy
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -455,15 +1439,94 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '204':
           description: No response body
+  /api/v1/node-timeseries/:
+    get:
+      operationId: api_v1_node_timeseries_list
+      description: This mixin handles all related entities, whose Serializers are
+        declared in "related_serializers"
+      parameters:
+      - name: page[number]
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page[size]
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNodeTimeseriesListList'
+          description: ''
+  /api/v1/node-timeseries/{id}/:
+    get:
+      operationId: api_v1_node_timeseries_retrieve
+      description: This mixin handles all related entities, whose Serializers are
+        declared in "related_serializers"
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this node.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeTimeseries'
+          description: ''
   /api/v1/nodes/:
     get:
       operationId: api_v1_nodes_list
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
+      - name: filter[search]
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
       - name: page[number]
         required: false
         in: query
@@ -490,7 +1553,26 @@ paths:
           description: ''
     post:
       operationId: api_v1_nodes_create
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       tags:
       - api
       requestBody:
@@ -509,16 +1591,58 @@ paths:
       - cookieAuth: []
       - tokenAuth: []
       responses:
-        '200':
+        '201':
           content:
             application/vnd.api+json:
               schema:
                 $ref: '#/components/schemas/Node'
           description: ''
+  /api/v1/nodes/{node_pk}/timeseries/:
+    get:
+      operationId: api_v1_nodes_timeseries_retrieve
+      description: This mixin handles all related entities, whose Serializers are
+        declared in "related_serializers"
+      parameters:
+      - in: path
+        name: node_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/NodeTimeseries'
+          description: ''
   /api/v1/nodes/{id}/:
     get:
       operationId: api_v1_nodes_retrieve
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -541,7 +1665,26 @@ paths:
           description: ''
     patch:
       operationId: api_v1_nodes_partial_update
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -575,7 +1718,26 @@ paths:
           description: ''
     delete:
       operationId: api_v1_nodes_destroy
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -595,7 +1757,26 @@ paths:
   /api/v1/nodes/{id}/{related_field}/:
     get:
       operationId: api_v1_nodes_retrieve_2
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -621,178 +1802,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/Node'
           description: ''
-  /api/v1/nodes/{id}/relationships/{related_field}/:
-    get:
-      operationId: api_v1_nodes_relationships_retrieve
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        description: A UUID string identifying this node.
-        required: true
-      - in: path
-        name: related_field
-        schema:
-          type: string
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          description: No response body
-    post:
-      operationId: api_v1_nodes_relationships_create
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        description: A UUID string identifying this node.
-        required: true
-      - in: path
-        name: related_field
-        schema:
-          type: string
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          description: No response body
-    patch:
-      operationId: api_v1_nodes_relationships_partial_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        description: A UUID string identifying this node.
-        required: true
-      - in: path
-        name: related_field
-        schema:
-          type: string
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          description: No response body
-    delete:
-      operationId: api_v1_nodes_relationships_destroy
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        description: A UUID string identifying this node.
-        required: true
-      - in: path
-        name: related_field
-        schema:
-          type: string
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '204':
-          description: No response body
-  /api/v1/nodes/{id}/samples/:
-    get:
-      operationId: api_v1_nodes_samples_list
-      description: |-
-        Samples reported by the node on the resource path.
-
-        The currently logged-in user must have access to the given node. That is, the user must be part of the organization that owns the node.
-
-        Samples will be returned in ascending order according to their time stamp.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        description: A UUID string identifying this node.
-        required: true
-      - name: page[number]
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      - name: page[size]
-        required: false
-        in: query
-        description: Number of results to return per page.
-        schema:
-          type: integer
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/PaginatedSimpleSampleList'
-          description: ''
-  /api/v1/nodes/{id}/timeseries/:
-    get:
-      operationId: api_v1_nodes_timeseries_retrieve
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        description: A UUID string identifying this node.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/SampleList'
-          description: ''
   /api/v1/organizations/:
     get:
       operationId: api_v1_organizations_list
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - name: page[number]
         required: false
@@ -820,7 +1852,26 @@ paths:
           description: ''
     post:
       operationId: api_v1_organizations_create
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       tags:
       - api
       requestBody:
@@ -839,7 +1890,7 @@ paths:
       - cookieAuth: []
       - tokenAuth: []
       responses:
-        '200':
+        '201':
           content:
             application/vnd.api+json:
               schema:
@@ -848,7 +1899,26 @@ paths:
   /api/v1/organizations/{id}/:
     get:
       operationId: api_v1_organizations_retrieve
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -870,7 +1940,26 @@ paths:
           description: ''
     patch:
       operationId: api_v1_organizations_partial_update
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -903,7 +1992,26 @@ paths:
           description: ''
     delete:
       operationId: api_v1_organizations_destroy
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -922,7 +2030,26 @@ paths:
   /api/v1/organizations/{id}/{related_field}/:
     get:
       operationId: api_v1_organizations_retrieve_2
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -950,7 +2077,7 @@ paths:
   /api/v1/organizations/{id}/relationships/{related_field}/:
     get:
       operationId: api_v1_organizations_relationships_retrieve
-      description: Verify that the current user is authenticated.
+      description: ''
       parameters:
       - in: path
         name: id
@@ -968,13 +2095,12 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           description: No response body
     post:
       operationId: api_v1_organizations_relationships_create
-      description: Verify that the current user is authenticated.
+      description: ''
       parameters:
       - in: path
         name: id
@@ -992,37 +2118,12 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          description: No response body
-    patch:
-      operationId: api_v1_organizations_relationships_partial_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this organization.
-        required: true
-      - in: path
-        name: related_field
-        schema:
-          type: string
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
       responses:
         '200':
           description: No response body
     delete:
       operationId: api_v1_organizations_relationships_destroy
-      description: Verify that the current user is authenticated.
+      description: ''
       parameters:
       - in: path
         name: id
@@ -1040,14 +2141,101 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '204':
           description: No response body
+  /api/v1/organizations/{id}/relationships/memberships/:
+    get:
+      operationId: api_v1_organizations_relationships_memberships_retrieve
+      description: This view returns a 404 Not Found exception.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Site'
+          description: ''
+  /api/v1/organizations/{id}/relationships/nodes/:
+    get:
+      operationId: api_v1_organizations_relationships_nodes_retrieve
+      description: This view returns a 404 Not Found exception.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Site'
+          description: ''
+  /api/v1/organizations/{id}/relationships/sites/:
+    get:
+      operationId: api_v1_organizations_relationships_sites_retrieve
+      description: This view returns a 404 Not Found exception.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/Site'
+          description: ''
   /api/v1/protocols/:
     get:
       operationId: api_v1_protocols_list
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - name: page[number]
         required: false
@@ -1076,7 +2264,26 @@ paths:
           description: ''
     post:
       operationId: api_v1_protocols_create
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       tags:
       - api
       requestBody:
@@ -1095,7 +2302,7 @@ paths:
       - cookieAuth: []
       - tokenAuth: []
       responses:
-        '200':
+        '201':
           content:
             application/vnd.api+json:
               schema:
@@ -1104,7 +2311,26 @@ paths:
   /api/v1/protocols/{id}/:
     get:
       operationId: api_v1_protocols_retrieve
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -1127,7 +2353,26 @@ paths:
           description: ''
     patch:
       operationId: api_v1_protocols_partial_update
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -1160,7 +2405,26 @@ paths:
           description: ''
     delete:
       operationId: api_v1_protocols_destroy
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -1173,14 +2437,32 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '204':
           description: No response body
   /api/v1/quantities/:
     get:
       operationId: api_v1_quantities_list
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - name: page[number]
         required: false
@@ -1209,7 +2491,26 @@ paths:
           description: ''
     post:
       operationId: api_v1_quantities_create
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       tags:
       - api
       requestBody:
@@ -1228,7 +2529,7 @@ paths:
       - cookieAuth: []
       - tokenAuth: []
       responses:
-        '200':
+        '201':
           content:
             application/vnd.api+json:
               schema:
@@ -1237,7 +2538,26 @@ paths:
   /api/v1/quantities/{id}/:
     get:
       operationId: api_v1_quantities_retrieve
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -1260,7 +2580,26 @@ paths:
           description: ''
     patch:
       operationId: api_v1_quantities_partial_update
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -1293,7 +2632,26 @@ paths:
           description: ''
     delete:
       operationId: api_v1_quantities_destroy
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -1306,15 +2664,39 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '204':
           description: No response body
   /api/v1/rooms/:
     get:
       operationId: api_v1_rooms_list
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
+      - name: filter[search]
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
       - name: page[number]
         required: false
         in: query
@@ -1332,7 +2714,6 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -1342,7 +2723,26 @@ paths:
           description: ''
     post:
       operationId: api_v1_rooms_create
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       tags:
       - api
       requestBody:
@@ -1360,9 +2760,8 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
-        '200':
+        '201':
           content:
             application/vnd.api+json:
               schema:
@@ -1371,7 +2770,26 @@ paths:
   /api/v1/rooms/{id}/:
     get:
       operationId: api_v1_rooms_retrieve
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -1384,7 +2802,6 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -1394,7 +2811,26 @@ paths:
           description: ''
     patch:
       operationId: api_v1_rooms_partial_update
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -1418,7 +2854,6 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -1428,7 +2863,26 @@ paths:
           description: ''
     delete:
       operationId: api_v1_rooms_destroy
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -1441,14 +2895,32 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '204':
           description: No response body
   /api/v1/rooms/{id}/{related_field}/:
     get:
       operationId: api_v1_rooms_retrieve_2
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -1466,172 +2938,12 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           content:
             application/vnd.api+json:
               schema:
                 $ref: '#/components/schemas/Room'
-          description: ''
-  /api/v1/rooms/{id}/relationships/{related_field}/:
-    get:
-      operationId: api_v1_rooms_relationships_retrieve
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this room.
-        required: true
-      - in: path
-        name: related_field
-        schema:
-          type: string
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          description: No response body
-    post:
-      operationId: api_v1_rooms_relationships_create
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this room.
-        required: true
-      - in: path
-        name: related_field
-        schema:
-          type: string
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          description: No response body
-    patch:
-      operationId: api_v1_rooms_relationships_partial_update
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this room.
-        required: true
-      - in: path
-        name: related_field
-        schema:
-          type: string
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          description: No response body
-    delete:
-      operationId: api_v1_rooms_relationships_destroy
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this room.
-        required: true
-      - in: path
-        name: related_field
-        schema:
-          type: string
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '204':
-          description: No response body
-  /api/v1/samples/:
-    get:
-      operationId: api_v1_samples_list
-      description: |-
-        Retrieve individual samples and lists of samples.
-
-        Filtering is possible by time-slice and node-id.
-        Samples are returned in a verbose JSON:API format, with a maximum page size of 100 entries by default.
-      parameters:
-      - name: page[number]
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      - name: page[size]
-        required: false
-        in: query
-        description: Number of results to return per page.
-        schema:
-          type: integer
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/PaginatedSampleList'
-          description: ''
-  /api/v1/samples/{id}/:
-    get:
-      operationId: api_v1_samples_retrieve
-      description: |-
-        Retrieve individual samples and lists of samples.
-
-        Filtering is possible by time-slice and node-id.
-        Samples are returned in a verbose JSON:API format, with a maximum page size of 100 entries by default.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this sample.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Sample'
           description: ''
   /api/v1/schema/:
     get:
@@ -1779,8 +3091,33 @@ paths:
   /api/v1/sites/:
     get:
       operationId: api_v1_sites_list
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
+      - name: filter[search]
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
       - name: page[number]
         required: false
         in: query
@@ -1798,7 +3135,6 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -1808,7 +3144,26 @@ paths:
           description: ''
     post:
       operationId: api_v1_sites_create
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       tags:
       - api
       requestBody:
@@ -1826,9 +3181,8 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
-        '200':
+        '201':
           content:
             application/vnd.api+json:
               schema:
@@ -1837,7 +3191,26 @@ paths:
   /api/v1/sites/{id}/:
     get:
       operationId: api_v1_sites_retrieve
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -1850,7 +3223,6 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -1860,7 +3232,26 @@ paths:
           description: ''
     patch:
       operationId: api_v1_sites_partial_update
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -1884,7 +3275,6 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -1894,7 +3284,26 @@ paths:
           description: ''
     delete:
       operationId: api_v1_sites_destroy
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -1907,14 +3316,32 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '204':
           description: No response body
   /api/v1/sites/{id}/{related_field}/:
     get:
       operationId: api_v1_sites_retrieve_2
-      description: Verify that the current user is authenticated.
+      description: |-
+        This mixin provides a helper attributes to select or prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'category.section': ['category']
+                }
+                select_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                }
       parameters:
       - in: path
         name: id
@@ -1932,7 +3359,6 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -1940,163 +3366,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/Site'
           description: ''
-  /api/v1/sites/{id}/relationships/{related_field}/:
-    get:
-      operationId: api_v1_sites_relationships_retrieve
-      description: ''
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this site.
-        required: true
-      - in: path
-        name: related_field
-        schema:
-          type: string
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          description: No response body
-    post:
-      operationId: api_v1_sites_relationships_create
-      description: ''
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this site.
-        required: true
-      - in: path
-        name: related_field
-        schema:
-          type: string
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          description: No response body
-    patch:
-      operationId: api_v1_sites_relationships_partial_update
-      description: ''
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this site.
-        required: true
-      - in: path
-        name: related_field
-        schema:
-          type: string
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          description: No response body
-    delete:
-      operationId: api_v1_sites_relationships_destroy
-      description: ''
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this site.
-        required: true
-      - in: path
-        name: related_field
-        schema:
-          type: string
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '204':
-          description: No response body
-  /api/v1/timeseries/:
-    get:
-      operationId: api_v1_timeseries_list
-      description: Verify that the current user is authenticated.
-      parameters:
-      - name: page[number]
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      - name: page[size]
-        required: false
-        in: query
-        description: Number of results to return per page.
-        schema:
-          type: integer
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/PaginatedTimeseriesList'
-          description: ''
-  /api/v1/timeseries/{id}/:
-    get:
-      operationId: api_v1_timeseries_retrieve
-      description: Verify that the current user is authenticated.
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        description: A UUID string identifying this node.
-        required: true
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/SampleList'
-          description: ''
   /api/v1/users/:
     get:
       operationId: api_v1_users_list
-      description: Verify that the current user is authenticated.
+      description: This mixin handles all related entities, whose Serializers are
+        declared in "related_serializers"
       parameters:
+      - name: filter[search]
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
       - name: page[number]
         required: false
         in: query
@@ -2114,18 +3395,18 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/PaginatedUserList'
+                $ref: '#/components/schemas/PaginatedUsernameList'
           description: ''
   /api/v1/users/{id}/:
     get:
       operationId: api_v1_users_retrieve
-      description: Verify that the current user is authenticated.
+      description: This mixin handles all related entities, whose Serializers are
+        declared in "related_serializers"
       parameters:
       - in: path
         name: id
@@ -2138,7 +3419,6 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -2149,7 +3429,8 @@ paths:
   /api/v1/users/{id}/{related_field}/:
     get:
       operationId: api_v1_users_retrieve_2
-      description: Verify that the current user is authenticated.
+      description: This mixin handles all related entities, whose Serializers are
+        declared in "related_serializers"
       parameters:
       - in: path
         name: id
@@ -2167,7 +3448,6 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -2196,7 +3476,6 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           description: No response body
@@ -2220,7 +3499,6 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           description: No response body
@@ -2244,7 +3522,6 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '200':
           description: No response body
@@ -2268,318 +3545,9 @@ paths:
       security:
       - cookieAuth: []
       - tokenAuth: []
-      - {}
       responses:
         '204':
           description: No response body
-  /auth/login/:
-    post:
-      operationId: auth_login_create
-      description: |-
-        Check the credentials and return the REST Token
-        if the credentials are valid and authenticated.
-        Calls Django Auth login method to register User ID
-        in Django session framework
-
-        Accept the following POST parameters: username, password
-        Return the REST Framework Token Object's key.
-      tags:
-      - auth
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/Login'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Login'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Login'
-        required: true
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Token'
-          description: ''
-  /auth/logout/:
-    post:
-      operationId: auth_logout_create
-      description: |-
-        Calls Django logout method and delete the Token object
-        assigned to the current User object.
-
-        Accepts/Returns nothing.
-      tags:
-      - auth
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/RestAuthDetail'
-          description: ''
-  /auth/password/change/:
-    post:
-      operationId: auth_password_change_create
-      description: |-
-        Calls Django Auth SetPasswordForm save method.
-
-        Accepts the following POST parameters: new_password1, new_password2
-        Returns the success/fail message.
-      tags:
-      - auth
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/PasswordChange'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PasswordChange'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PasswordChange'
-        required: true
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/RestAuthDetail'
-          description: ''
-  /auth/password/reset/:
-    post:
-      operationId: auth_password_reset_create
-      description: |-
-        Calls Django Auth PasswordResetForm save method.
-
-        Accepts the following POST parameters: email
-        Returns the success/fail message.
-      tags:
-      - auth
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/PasswordReset'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PasswordReset'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PasswordReset'
-        required: true
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/RestAuthDetail'
-          description: ''
-  /auth/password/reset/confirm/:
-    post:
-      operationId: auth_password_reset_confirm_create
-      description: |-
-        Password reset e-mail link is confirmed, therefore
-        this resets the user's password.
-
-        Accepts the following POST parameters: token, uid,
-            new_password1, new_password2
-        Returns the success/fail message.
-      tags:
-      - auth
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/PasswordResetConfirm'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PasswordResetConfirm'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PasswordResetConfirm'
-        required: true
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/RestAuthDetail'
-          description: ''
-  /auth/registration/:
-    post:
-      operationId: auth_registration_create
-      description: ''
-      tags:
-      - auth
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/Register'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Register'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Register'
-        required: true
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/Token'
-          description: ''
-  /auth/registration/verify-email/:
-    post:
-      operationId: auth_registration_verify_email_create
-      description: ''
-      tags:
-      - auth
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/VerifyEmail'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/VerifyEmail'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/VerifyEmail'
-        required: true
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/RestAuthDetail'
-          description: ''
-  /auth/user/:
-    get:
-      operationId: auth_user_retrieve
-      description: |-
-        Reads and updates UserModel fields
-        Accepts GET, PUT, PATCH methods.
-
-        Default accepted fields: username, first_name, last_name
-        Default display fields: pk, username, email, first_name, last_name
-        Read-only fields: pk, email
-
-        Returns UserModel fields.
-      tags:
-      - auth
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/UserDetails'
-          description: ''
-    put:
-      operationId: auth_user_update
-      description: |-
-        Reads and updates UserModel fields
-        Accepts GET, PUT, PATCH methods.
-
-        Default accepted fields: username, first_name, last_name
-        Default display fields: pk, username, email, first_name, last_name
-        Read-only fields: pk, email
-
-        Returns UserModel fields.
-      tags:
-      - auth
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/UserDetails'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/UserDetails'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/UserDetails'
-        required: true
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/UserDetails'
-          description: ''
-    patch:
-      operationId: auth_user_partial_update
-      description: |-
-        Reads and updates UserModel fields
-        Accepts GET, PUT, PATCH methods.
-
-        Default accepted fields: username, first_name, last_name
-        Default display fields: pk, username, email, first_name, last_name
-        Read-only fields: pk, email
-
-        Returns UserModel fields.
-      tags:
-      - auth
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: '#/components/schemas/PatchedUserDetails'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedUserDetails'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedUserDetails'
-      security:
-      - cookieAuth: []
-      - tokenAuth: []
-      responses:
-        '200':
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/UserDetails'
-          description: ''
   /ingest/v1/ingest/:
     get:
       operationId: ingest_v1_ingest_list
@@ -2683,6 +3651,92 @@ components:
       - M
       - D
       type: string
+    InstallationTimeSeries:
+      type: object
+      description: |-
+        A `Serializer` is a model-less serializer class with additional
+        support for json:api spec features.
+
+        As in json:api specification a type is always required you need to
+        make sure that you define `resource_name` in your `Meta` class
+        when deriving from this class.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        node_id:
+          type: string
+        node_alias:
+          type: string
+          maxLength: 100
+        query_timestamp_s:
+          type: integer
+        from_timestamp_s:
+          type: integer
+        to_timestamp_s:
+          type: integer
+        sample_count:
+          type: integer
+        url:
+          type: string
+          format: uri
+          readOnly: true
+        samples:
+          type: array
+          items:
+            $ref: '#/components/schemas/SimpleSample'
+          readOnly: true
+      required:
+      - from_timestamp_s
+      - node_alias
+      - node_id
+      - query_timestamp_s
+      - sample_count
+      - samples
+      - to_timestamp_s
+      - url
+    InstallationTimeseriesList:
+      type: object
+      description: |-
+        A `Serializer` is a model-less serializer class with additional
+        support for json:api spec features.
+
+        As in json:api specification a type is always required you need to
+        make sure that you define `resource_name` in your `Meta` class
+        when deriving from this class.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        node_id:
+          type: string
+        node_alias:
+          type: string
+          maxLength: 100
+        query_timestamp_s:
+          type: integer
+        from_timestamp_s:
+          type: integer
+        to_timestamp_s:
+          type: integer
+        sample_count:
+          type: integer
+        url:
+          type: string
+          format: uri
+          readOnly: true
+      required:
+      - from_timestamp_s
+      - node_alias
+      - node_id
+      - query_timestamp_s
+      - sample_count
+      - to_timestamp_s
+      - url
     Login:
       type: object
       properties:
@@ -2701,6 +3755,53 @@ components:
       - R
       - E
       type: string
+    Membership:
+      type: object
+      description: |-
+        A `ModelSerializer` is just a regular `Serializer`, except that:
+
+        * A set of default fields are automatically populated.
+        * A set of default validators are automatically populated.
+        * Default `.create()` and `.update()` implementations are provided.
+
+        The process of automatically determining a set of serializer fields
+        based on the model fields is reasonably complex, but you almost certainly
+        don't need to dig into the implementation.
+
+        If the `ModelSerializer` class *doesn't* generate the set of fields that
+        you need you should either declare the extra/differing fields explicitly on
+        the serializer class, or simply use a `Serializer` class.
+
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        organization:
+          type: integer
+        user:
+          type: integer
+        user_name:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          readOnly: true
+        organization_name:
+          type: string
+          readOnly: true
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        url:
+          type: string
+          format: uri
+          readOnly: true
+      required:
+      - organization
+      - organization_name
+      - url
+      - user
+      - user_name
     Node:
       type: object
       description: |-
@@ -2718,32 +3819,34 @@ components:
         id:
           type: string
           format: uuid
-        device_id:
+        eui64:
           type: string
           maxLength: 32
         alias:
           type: string
           maxLength: 100
+        query_timestamp_s:
+          type: integer
+          readOnly: true
+        from_timestamp_s:
+          type: integer
+          readOnly: true
+        to_timestamp_s:
+          type: integer
+          readOnly: true
+        sample_count:
+          type: integer
+          readOnly: true
         protocol:
-          type: string
-          format: uri
+          type: integer
         model:
-          type: string
-          format: uri
+          type: integer
+        owner:
+          type: integer
         installations:
           type: array
           items:
             type: string
-            nullable: true
-        timeseries:
-          type: string
-          readOnly: true
-          nullable: true
-        samples:
-          type: array
-          items:
-            type: string
-            nullable: true
           readOnly: true
         url:
           type: string
@@ -2751,12 +3854,16 @@ components:
           readOnly: true
       required:
       - alias
-      - device_id
+      - eui64
+      - from_timestamp_s
       - id
+      - installations
       - model
+      - owner
       - protocol
-      - samples
-      - timeseries
+      - query_timestamp_s
+      - sample_count
+      - to_timestamp_s
       - url
     NodeFidelity:
       type: object
@@ -2868,6 +3975,86 @@ components:
       required:
       - identifier
       - url
+    NodeTimeseries:
+      type: object
+      description: |-
+        A `Serializer` is a model-less serializer class with additional
+        support for json:api spec features.
+
+        As in json:api specification a type is always required you need to
+        make sure that you define `resource_name` in your `Meta` class
+        when deriving from this class.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        node_alias:
+          type: string
+          maxLength: 100
+        query_timestamp_s:
+          type: integer
+        from_timestamp_s:
+          type: integer
+        to_timestamp_s:
+          type: integer
+        sample_count:
+          type: integer
+        url:
+          type: string
+          format: uri
+          readOnly: true
+        samples:
+          type: array
+          items:
+            $ref: '#/components/schemas/SimpleSample'
+          readOnly: true
+      required:
+      - from_timestamp_s
+      - node_alias
+      - query_timestamp_s
+      - sample_count
+      - samples
+      - to_timestamp_s
+      - url
+    NodeTimeseriesList:
+      type: object
+      description: |-
+        A `Serializer` is a model-less serializer class with additional
+        support for json:api spec features.
+
+        As in json:api specification a type is always required you need to
+        make sure that you define `resource_name` in your `Meta` class
+        when deriving from this class.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        node_alias:
+          type: string
+          maxLength: 100
+        query_timestamp_s:
+          type: integer
+        from_timestamp_s:
+          type: integer
+        to_timestamp_s:
+          type: integer
+        sample_count:
+          type: integer
+        url:
+          type: string
+          format: uri
+          readOnly: true
+      required:
+      - from_timestamp_s
+      - node_alias
+      - query_timestamp_s
+      - sample_count
+      - to_timestamp_s
+      - url
     Organization:
       type: object
       description: |-
@@ -2891,25 +4078,36 @@ components:
         users:
           type: array
           items:
+            type: integer
+            nullable: true
+        memberships:
+          type: array
+          items:
             type: string
+            nullable: true
+          readOnly: true
         sites:
           type: array
           items:
             type: string
             nullable: true
+          readOnly: true
         nodes:
           type: array
           items:
             type: string
             nullable: true
+          readOnly: true
         url:
           type: string
           format: uri
           readOnly: true
       required:
+      - memberships
       - name
+      - nodes
+      - sites
       - url
-      - users
     PaginatedAddressList:
       type: object
       properties:
@@ -2930,6 +4128,46 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Address'
+    PaginatedInstallationTimeseriesListList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/InstallationTimeseriesList'
+    PaginatedMembershipList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Membership'
     PaginatedNodeFidelityList:
       type: object
       properties:
@@ -3010,6 +4248,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/NodeProtocol'
+    PaginatedNodeTimeseriesListList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page[number]=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/NodeTimeseriesList'
     PaginatedOrganizationList:
       type: object
       properties:
@@ -3110,46 +4368,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SampleIngest'
-    PaginatedSampleList:
-      type: object
-      properties:
-        count:
-          type: integer
-          example: 123
-        next:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page[number]=4
-        previous:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page[number]=2
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/Sample'
-    PaginatedSimpleSampleList:
-      type: object
-      properties:
-        count:
-          type: integer
-          example: 123
-        next:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page[number]=4
-        previous:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page[number]=2
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/SimpleSample'
     PaginatedSiteList:
       type: object
       properties:
@@ -3170,7 +4388,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Site'
-    PaginatedTimeseriesList:
+    PaginatedUsernameList:
       type: object
       properties:
         count:
@@ -3189,27 +4407,7 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/Timeseries'
-    PaginatedUserList:
-      type: object
-      properties:
-        count:
-          type: integer
-          example: 123
-        next:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page[number]=4
-        previous:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page[number]=2
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
+            $ref: '#/components/schemas/Username'
     PasswordChange:
       type: object
       properties:
@@ -3281,6 +4479,47 @@ components:
           type: string
           format: uri
           readOnly: true
+    PatchedMembership:
+      type: object
+      description: |-
+        A `ModelSerializer` is just a regular `Serializer`, except that:
+
+        * A set of default fields are automatically populated.
+        * A set of default validators are automatically populated.
+        * Default `.create()` and `.update()` implementations are provided.
+
+        The process of automatically determining a set of serializer fields
+        based on the model fields is reasonably complex, but you almost certainly
+        don't need to dig into the implementation.
+
+        If the `ModelSerializer` class *doesn't* generate the set of fields that
+        you need you should either declare the extra/differing fields explicitly on
+        the serializer class, or simply use a `Serializer` class.
+
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        organization:
+          type: integer
+        user:
+          type: integer
+        user_name:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          readOnly: true
+        organization_name:
+          type: string
+          readOnly: true
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        url:
+          type: string
+          format: uri
+          readOnly: true
     PatchedNode:
       type: object
       description: |-
@@ -3298,32 +4537,34 @@ components:
         id:
           type: string
           format: uuid
-        device_id:
+        eui64:
           type: string
           maxLength: 32
         alias:
           type: string
           maxLength: 100
+        query_timestamp_s:
+          type: integer
+          readOnly: true
+        from_timestamp_s:
+          type: integer
+          readOnly: true
+        to_timestamp_s:
+          type: integer
+          readOnly: true
+        sample_count:
+          type: integer
+          readOnly: true
         protocol:
-          type: string
-          format: uri
+          type: integer
         model:
-          type: string
-          format: uri
+          type: integer
+        owner:
+          type: integer
         installations:
           type: array
           items:
             type: string
-            nullable: true
-        timeseries:
-          type: string
-          readOnly: true
-          nullable: true
-        samples:
-          type: array
-          items:
-            type: string
-            nullable: true
           readOnly: true
         url:
           type: string
@@ -3416,17 +4657,26 @@ components:
         users:
           type: array
           items:
+            type: integer
+            nullable: true
+        memberships:
+          type: array
+          items:
             type: string
+            nullable: true
+          readOnly: true
         sites:
           type: array
           items:
             type: string
             nullable: true
+          readOnly: true
         nodes:
           type: array
           items:
             type: string
             nullable: true
+          readOnly: true
         url:
           type: string
           format: uri
@@ -3475,15 +4725,25 @@ components:
         description:
           type: string
           nullable: true
-        site:
+        size_sqm:
           type: string
-          format: uri
-        nodes:
-          type: array
-          items:
-            type: string
-            format: uri
-          readOnly: true
+          format: decimal
+          maximum: 10000
+          minimum: -10000
+          nullable: true
+        height_m:
+          type: string
+          format: decimal
+          maximum: 100
+          minimum: -100
+          nullable: true
+        max_occupancy:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        site:
+          type: integer
         installations:
           type: array
           items:
@@ -3508,11 +4768,13 @@ components:
         * A mixin class to enable validation of included resources is included
       properties:
         room:
-          type: string
-          format: uri
+          type: integer
         node:
           type: string
-          format: uri
+          format: uuid
+        query_timestamp_s:
+          type: integer
+          readOnly: true
         from_timestamp_s:
           type: integer
           maximum: 2147483647
@@ -3522,9 +4784,18 @@ components:
           maximum: 2147483647
           nullable: true
           minimum: 0
+        sample_count:
+          type: integer
+          readOnly: true
         description:
           type: string
           nullable: true
+        is_public:
+          type: boolean
+        url:
+          type: string
+          format: uri
+          readOnly: true
     PatchedSite:
       type: object
       description: |-
@@ -3546,8 +4817,9 @@ components:
           type: string
           nullable: true
         address:
-          type: string
-          format: uri
+          type: integer
+        operator:
+          type: integer
         rooms:
           type: array
           items:
@@ -3568,7 +4840,7 @@ components:
           type: string
           description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
             only.
-          pattern: ^[\w.@+-]+\Z
+          pattern: ^[\w.@+-]+$
           maxLength: 150
         email:
           type: string
@@ -3636,6 +4908,12 @@ components:
           readOnly: true
       required:
       - detail
+    RoleEnum:
+      enum:
+      - O
+      - A
+      - I
+      type: string
     Room:
       type: object
       description: |-
@@ -3656,15 +4934,25 @@ components:
         description:
           type: string
           nullable: true
-        site:
+        size_sqm:
           type: string
-          format: uri
-        nodes:
-          type: array
-          items:
-            type: string
-            format: uri
-          readOnly: true
+          format: decimal
+          maximum: 10000
+          minimum: -10000
+          nullable: true
+        height_m:
+          type: string
+          format: decimal
+          maximum: 100
+          minimum: -100
+          nullable: true
+        max_occupancy:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        site:
+          type: integer
         installations:
           type: array
           items:
@@ -3676,7 +4964,6 @@ components:
           readOnly: true
       required:
       - name
-      - nodes
       - site
       - url
     RoomNodeInstallation:
@@ -3694,11 +4981,13 @@ components:
         * A mixin class to enable validation of included resources is included
       properties:
         room:
-          type: string
-          format: uri
+          type: integer
         node:
           type: string
-          format: uri
+          format: uuid
+        query_timestamp_s:
+          type: integer
+          readOnly: true
         from_timestamp_s:
           type: integer
           maximum: 2147483647
@@ -3708,57 +4997,24 @@ components:
           maximum: 2147483647
           nullable: true
           minimum: 0
+        sample_count:
+          type: integer
+          readOnly: true
         description:
           type: string
           nullable: true
-      required:
-      - from_timestamp_s
-      - node
-      - room
-    Sample:
-      type: object
-      description: |-
-        A type of `ModelSerializer` that uses hyperlinked relationships instead
-        of primary key relationships. Specifically:
-
-        * A 'url' field is included instead of the 'id' field.
-        * Relationships to other instances are hyperlinks, instead of primary keys.
-
-        Included Mixins:
-
-        * A mixin class to enable sparse fieldsets is included
-        * A mixin class to enable validation of included resources is included
-      properties:
-        node:
-          type: string
-          format: uri
-        timestamp_s:
-          type: integer
-          maximum: 2147483647
-          minimum: 0
-        co2_ppm:
-          type: integer
-          maximum: 32767
-          minimum: 0
-        temperature_celsius:
-          type: string
-          format: decimal
-          maximum: 100
-          minimum: -100
-          nullable: true
-        rel_humidity_percent:
-          type: integer
-          maximum: 32767
-          nullable: true
-          minimum: 0
+        is_public:
+          type: boolean
         url:
           type: string
           format: uri
           readOnly: true
       required:
-      - co2_ppm
+      - from_timestamp_s
       - node
-      - timestamp_s
+      - query_timestamp_s
+      - room
+      - sample_count
       - url
     SampleIngest:
       type: object
@@ -3809,28 +5065,6 @@ components:
       - co2_ppm
       - node
       - timestamp_s
-    SampleList:
-      type: object
-      properties:
-        query_timestamp:
-          type: integer
-        from_timestamp:
-          type: integer
-        to_timestamp:
-          type: integer
-        sample_count:
-          type: integer
-        samples:
-          type: array
-          items:
-            $ref: '#/components/schemas/SimpleSample'
-          readOnly: true
-      required:
-      - from_timestamp
-      - query_timestamp
-      - sample_count
-      - samples
-      - to_timestamp
     SimpleSample:
       type: object
       description: |-
@@ -3903,8 +5137,9 @@ components:
           type: string
           nullable: true
         address:
-          type: string
-          format: uri
+          type: integer
+        operator:
+          type: integer
         rooms:
           type: array
           items:
@@ -3917,27 +5152,8 @@ components:
       required:
       - address
       - name
+      - operator
       - url
-    Timeseries:
-      type: object
-      properties:
-        alias:
-          type: string
-          maxLength: 100
-        query_timestamp:
-          type: integer
-        from_timestamp:
-          type: integer
-        to_timestamp:
-          type: integer
-        sample_count:
-          type: integer
-      required:
-      - alias
-      - from_timestamp
-      - query_timestamp
-      - sample_count
-      - to_timestamp
     Token:
       type: object
       description: Serializer for Token model.
@@ -3965,7 +5181,7 @@ components:
           type: string
           description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
             only.
-          pattern: ^[\w.@+-]+\Z
+          pattern: ^[\w.@+-]+$
           maxLength: 150
         email:
           type: string
@@ -3982,11 +5198,18 @@ components:
           items:
             type: string
             nullable: true
+        memberships:
+          type: array
+          items:
+            type: string
+            nullable: true
+          readOnly: true
         url:
           type: string
           format: uri
           readOnly: true
       required:
+      - memberships
       - url
       - username
     UserDetails:
@@ -4000,7 +5223,7 @@ components:
           type: string
           description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
             only.
-          pattern: ^[\w.@+-]+\Z
+          pattern: ^[\w.@+-]+$
           maxLength: 150
         email:
           type: string
@@ -4015,6 +5238,33 @@ components:
       required:
       - email
       - pk
+      - username
+    Username:
+      type: object
+      description: |-
+        A type of `ModelSerializer` that uses hyperlinked relationships instead
+        of primary key relationships. Specifically:
+
+        * A 'url' field is included instead of the 'id' field.
+        * Relationships to other instances are hyperlinks, instead of primary keys.
+
+        Included Mixins:
+
+        * A mixin class to enable sparse fieldsets is included
+        * A mixin class to enable validation of included resources is included
+      properties:
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        url:
+          type: string
+          format: uri
+          readOnly: true
+      required:
+      - url
       - username
     VerifyEmail:
       type: object
