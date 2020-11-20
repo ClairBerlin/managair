@@ -9,19 +9,6 @@ from core.data_viewmodels import (
 from core.models import Sample
 
 
-class SampleSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Sample
-        fields = (
-            "node",
-            "timestamp_s",
-            "co2_ppm",
-            "temperature_celsius",
-            "rel_humidity_percent",
-            "url",
-        )
-
-
 class SimpleSampleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sample
@@ -41,14 +28,19 @@ class NodeTimeseriesListSerializer(serializers.Serializer):
         model = NodeTimeseriesListViewModel
         fields = ["url"]
 
+    class JSONAPIMeta:
+        resource_name = "Node-Timeseries"
+
 
 class NodeTimeseriesSerializer(NodeTimeseriesListSerializer):
     samples = serializers.ListField(child=SimpleSampleSerializer(), read_only=True)
 
     class Meta:
-        resource_name = "node-timeseries"
         model = NodeTimeseriesViewModel
         fields = ["url"]
+
+    class JSONAPIMeta:
+        resource_name = "Node-Timeseries"
 
 
 class InstallationTimeseriesListSerializer(serializers.Serializer):
@@ -67,11 +59,16 @@ class InstallationTimeseriesListSerializer(serializers.Serializer):
         model = InstallationTimeseriesListViewModel
         fields = ["url"]
 
+    class JSONAPIMeta:
+        resource_name = "Installation-Timeseries"
+
 
 class InstallationTimeSeriesSerializer(InstallationTimeseriesListSerializer):
     samples = serializers.ListField(child=SimpleSampleSerializer(), read_only=True)
 
     class Meta:
-        resource_name = "installation-timeseries"
         model = InstallationTimeseriesViewModel
         fields = ["url"]
+
+    class JSONAPIMeta:
+        resource_name = "Installation-Timeseries"

@@ -83,8 +83,8 @@ class NodeTestCase(APITestCase):
                     "alias": "Test Node",
                 },
                 "relationships": {
-                    "protocol": {"data": {"type": "NodeProtocol", "id": "1"}},
-                    "model": {"data": {"type": "NodeModel", "id": "1"}},
+                    "protocol": {"data": {"type": "Protocol", "id": "1"}},
+                    "model": {"data": {"type": "Model", "id": "1"}},
                     "owner": {"data": {"type": "Organization", "id": "2"}},
                 },
             }
@@ -131,8 +131,8 @@ class NodeTestCase(APITestCase):
                     "alias": "Test Node",
                 },
                 "relationships": {
-                    "protocol": {"data": {"type": "NodeProtocol", "id": "1"}},
-                    "model": {"data": {"type": "NodeModel", "id": "1"}},
+                    "protocol": {"data": {"type": "Protocol", "id": "1"}},
+                    "model": {"data": {"type": "Model", "id": "1"}},
                     # The currently logged-in user VeraVersuch is not a member of the
                     # # organization Test-Team with pk=1.
                     "owner": {"data": {"type": "Organization", "id": "1"}},
@@ -157,8 +157,8 @@ class NodeTestCase(APITestCase):
                     "alias": "Test Node",
                 },
                 "relationships": {
-                    "protocol": {"data": {"type": "NodeProtocol", "id": "1"}},
-                    "model": {"data": {"type": "NodeModel", "id": "1"}},
+                    "protocol": {"data": {"type": "Protocol", "id": "1"}},
+                    "model": {"data": {"type": "Model", "id": "1"}},
                     # The currently logged-in user horstHilfsarbeiter is not an OWNER
                     # of the organization Versuchsverbund with pk=2.
                     "owner": {"data": {"type": "Organization", "id": "2"}},

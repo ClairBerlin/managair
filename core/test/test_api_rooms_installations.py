@@ -317,7 +317,7 @@ class InstallationsTestCase(APITestCase):
         """PATCH /installations/<installation_id>/"""
         request_data = {
             "data": {
-                "type": format_resource_type("RoomNodeInstallation"),
+                "type": format_resource_type("Installation"),
                 "id": 2,
                 "attributes": {"from_timestamp_s": 1601510000, "is_public": True},
                 "relationships": {
@@ -347,7 +347,7 @@ class InstallationsTestCase(APITestCase):
     def test_create_get_delete_installation(self):
         request_data = {
             "data": {
-                "type": format_resource_type("RoomNodeInstallation"),
+                "type": format_resource_type("Installation"),
                 "attributes": {
                     "from_timestamp_s": 1601500000,
                     "to_timestamp_s": 2147483647,
@@ -402,7 +402,7 @@ class InstallationsTestCase(APITestCase):
         incorrect_node_id = "c727b2f8-8377-d4cb-0e95-ac03200b8c93"
         request_data = {
             "data": {
-                "type": format_resource_type("RoomNodeInstallation"),
+                "type": format_resource_type("Installation"),
                 "attributes": {
                     "from_timestamp_s": 1601500000,
                     "to_timestamp_s": 2147483647,
@@ -450,7 +450,7 @@ class InstallationsTestCase(APITestCase):
         node_id = "c727b2f8-8377-d4cb-0e95-ac03200b8c93"
         request_data = {
             "data": {
-                "type": format_resource_type("RoomNodeInstallation"),
+                "type": format_resource_type("Installation"),
                 "attributes": {
                     "from_timestamp_s": 1601500000,
                     "to_timestamp_s": 2147483647,
@@ -487,7 +487,7 @@ class InstallationsTestCase(APITestCase):
         self.client.login(username="horstHilfsarbeiter", password="horst")
         request_data = {
             "data": {
-                "type": format_resource_type("RoomNodeInstallation"),
+                "type": format_resource_type("Installation"),
                 "attributes": {
                     "from_timestamp_s": 1601500000,
                     "to_timestamp_s": 2147483647,
@@ -520,7 +520,7 @@ class InstallationsTestCase(APITestCase):
         detail_url = reverse("installation-detail", kwargs={"pk": installation_id})
         request_data = {
             "data": {
-                "type": format_resource_type("RoomNodeInstallation"),
+                "type": format_resource_type("Installation"),
                 "id": installation_id,
                 "attributes": {"from_timestamp_s": 1601510000, "is_public": True},
             }
@@ -538,7 +538,7 @@ class InstallationsTestCase(APITestCase):
         self.client.login(username="horstHilfsarbeiter", password="horst")
         request_data = {
             "data": {
-                "type": format_resource_type("RoomNodeInstallation"),
+                "type": format_resource_type("Installation"),
                 "id": 2,
                 "attributes": {"from_timestamp_s": 1601510000, "is_public": False},
             }

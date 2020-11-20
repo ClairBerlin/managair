@@ -23,6 +23,9 @@ class NodeProtocol(models.Model):
     def __str__(self):
         """String for representing the Model object."""
         return f"{self.identifier}"
+    
+    class JSONAPIMeta:
+        resource_name = "Protocol"
 
 
 class NodeModel(models.Model):
@@ -36,6 +39,8 @@ class NodeModel(models.Model):
         """String for representing the Model object."""
         return f"{self.name}"
 
+    class JSONAPIMeta:
+        resource_name = "Model"
 
 class Node(models.Model):
     id = models.UUIDField(primary_key=True)
@@ -115,3 +120,6 @@ class NodeFidelity(models.Model):
 
     def last_check_iso(self):
         return datetime.fromtimestamp(self.last_check_s)
+    
+    class JSONAPIMeta:
+        resource_name = "Fidelity"

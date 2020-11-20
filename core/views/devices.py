@@ -94,9 +94,11 @@ class NodeViewSet(ModelViewSet):
         instance = self.get_object()
         sample_queryset = instance.samples.all()
         from_limit = int(self.request.query_params.get("filter[from]", 0))
-        to_limit = int(self.request.query_params.get(
-            "filter[to]", round(datetime.now().timestamp())
-        ))
+        to_limit = int(
+            self.request.query_params.get(
+                "filter[to]", round(datetime.now().timestamp())
+            )
+        )
         logger.debug(
             "Limiting the time series to the time slice from %s to %s",
             from_limit,
@@ -106,13 +108,9 @@ class NodeViewSet(ModelViewSet):
             timestamp_s__gte=from_limit, timestamp_s__lte=to_limit
         )
         first_sample = sample_queryset.first()
-        from_timestamp_s = (
-            first_sample.timestamp_s if first_sample else from_limit
-        )
+        from_timestamp_s = first_sample.timestamp_s if first_sample else from_limit
         last_sample = sample_queryset.last()
-        to_simtestamp_s = (
-            last_sample.timestamp_s if last_sample else to_limit
-        )
+        to_simtestamp_s = last_sample.timestamp_s if last_sample else to_limit
         instance.sample_count = sample_queryset.count()
         instance.from_timestamp_s = from_timestamp_s
         instance.to_timestamp_s = to_simtestamp_s
