@@ -14,7 +14,8 @@ class SitesTestCase(APITestCase):
         # Versuchsverbund owns
         # Clairchen Schwarz (id=3b95a1b2-74e7-9e98-52c4-4acae441f0ae) and
         # ERS Test-Node (id=9d02faee-4260-1377-22ec-936428b572ee).
-        self.detail_url = reverse("site-detail", kwargs={"pk": 2})
+        self.site_pk = 2
+        self.detail_url = reverse("site-detail", kwargs={"pk": self.site_pk})
         self.collection_url = reverse("site-list")
 
     def tearDown(self):
@@ -32,7 +33,7 @@ class SitesTestCase(APITestCase):
         self.client.logout()
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
-        # There is exactly one site that contains a public node installation in the 
+        # There is exactly one site that contains a public node installation in the
         # test data set.
         self.assertEqual(len(response.data["results"]), 1)
 
@@ -108,11 +109,11 @@ class SitesTestCase(APITestCase):
         self.assertEqual(response4.status_code, 404)
 
     def test_get_site_rooms(self):
-        """GET /sites/<site_id>/rooms/"""
-        url = reverse("site-related", kwargs={"pk": 2, "related_field": "rooms"})
+        """GET /sites/<site_pk>/rooms/"""
+        url = reverse("site-related-rooms", kwargs={"site_pk": self.site_pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data["results"]), 1)
 
     def test_unauthorized_create_no_member(self):
         """POST /sites/ for an organization where the user is not a member of."""

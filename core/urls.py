@@ -68,24 +68,59 @@ urlpatterns = [
         name="organization-relationships",
     ),
     path(
-        "organizations/<pk>/<related_field>/",
-        inventory.OrganizationViewSet.as_view({"get": "retrieve_related"}),
-        name="organization-related",
+        "organizations/<organization_pk>/users/",
+        inventory.UserViewSet.as_view({"get": "list"}),
+        name="organization-related-users",
     ),
     path(
+        "organizations/<organization_pk>/memberships/",
+        inventory.MembershipViewSet.as_view({"get": "list"}),
+        name="organization-related-memberships",
+    ),
+    path(
+        "organizations/<organization_pk>/sites/",
+        inventory.SiteViewSet.as_view({"get": "list"}),
+        name="organization-related-sites",
+    ),
+    path(
+        "organizations/<organization_pk>/nodes/",
+        devices.NodeViewSet.as_view({"get": "list"}),
+        name="organization-related-nodes",
+    ),
+    path(
+        "sites/<site_pk>/organization/",
+        inventory.OrganizationViewSet.as_view({"get": "retrieve"}),
+        name="site-related-organization",
+    ),
+    path(
+        "sites/<site_pk>/rooms/",
+        inventory.RoomViewSet.as_view({"get": "list"}),
+        name="site-related-rooms",
+    ),
+    path( # Needed for the address relation only.
         "sites/<pk>/<related_field>/",
         inventory.SiteViewSet.as_view({"get": "retrieve_related"}),
         name="site-related",
     ),
     path(
-        "rooms/<pk>/<related_field>/",
-        inventory.RoomViewSet.as_view({"get": "retrieve_related"}),
-        name="room-related",
+        "rooms/<room_pk>/site/",
+        inventory.SiteViewSet.as_view({"get": "retrieve"}),
+        name="room-related-site",
+    ),
+    path(
+        "rooms/<room_pk>/installations/",
+        inventory.RoomNodeInstallationViewSet.as_view({"get": "list"}),
+        name="room-related-installations",
     ),
     path(
         "installations/<installation_pk>/timeseries/",
         data.InstallationTimeSeriesViewSet.as_view({"get": "retrieve"}),
         name="installation-timeseries",
+    ),
+    path(
+        "installations/<installation_pk>/node/",
+        devices.NodeViewSet.as_view({"get": "retrieve"}),
+        name="installation-related-node",
     ),
     path(
         "installations/<pk>/<related_field>/",

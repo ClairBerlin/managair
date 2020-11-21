@@ -42,7 +42,9 @@ class SiteSerializer(serializers.HyperlinkedModelSerializer):
     )
 
     operator = ResourceRelatedField(
-        queryset=Organization.objects.all(), related_link_view_name="site-related"
+        queryset=Organization.objects.all(),
+        related_link_url_kwarg="site_pk",
+        related_link_view_name="site-related-organization",
     )
 
     #: A Site has zero or more room instances
@@ -52,7 +54,8 @@ class SiteSerializer(serializers.HyperlinkedModelSerializer):
         allow_null=True,
         required=False,
         queryset=Room.objects.all(),
-        related_link_view_name="site-related",
+        related_link_url_kwarg="site_pk",
+        related_link_view_name="site-related-rooms",
     )
 
     class Meta:
@@ -75,20 +78,14 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
     }
 
     node = ResourceRelatedField(
-        queryset=Node.objects.all(), related_link_view_name="installation-related"
+        queryset=Node.objects.all(),
+        related_link_url_kwarg="installation_pk",
+        related_link_view_name="installation-related-node",
     )
 
     room = ResourceRelatedField(
         queryset=Room.objects.all(), related_link_view_name="installation-related"
     )
-
-    # timeseries = HyperlinkedRelatedField(
-    #     source="node",
-    #     many=False,
-    #     read_only=True,
-    #     related_link_url_kwarg="installation_pk",
-    #     related_link_view_name="installation-timeseries",
-    # )
 
     # Additional fields to merge the node installation with its samples.
     timeseries = serializers.ListField(child=SimpleSampleSerializer(), read_only=True)
@@ -155,7 +152,9 @@ class RoomSerializer(serializers.HyperlinkedModelSerializer):
     }
 
     site = ResourceRelatedField(
-        queryset=Site.objects.all(), related_link_view_name="room-related"
+        queryset=Site.objects.all(),
+        related_link_url_kwarg="room_pk",
+        related_link_view_name="room-related-site",
     )
 
     #: A Room contains zero or more node installations.
@@ -165,7 +164,8 @@ class RoomSerializer(serializers.HyperlinkedModelSerializer):
         allow_null=True,
         required=False,
         queryset=RoomNodeInstallation.objects.all(),
-        related_link_view_name="room-related",
+        related_link_url_kwarg="room_pk",
+        related_link_view_name="room-related-installations",
     )
 
     class Meta:
@@ -241,24 +241,26 @@ class OrganizationSerializer(serializers.HyperlinkedModelSerializer):
         allow_null=True,
         required=False,
         queryset=User.objects.all(),
-        self_link_view_name="organization-relationships",
-        related_link_view_name="organization-related",
+        related_link_url_kwarg="organization_pk",
+        related_link_view_name="organization-related-users",
     )
-    # An Organization is related to its members via Memberships.
+    # An Organization operates zero or more sites.
     sites = HyperlinkedRelatedField(
         many=True,
         read_only=True,  # Memberships cannot be detached from their organization.
         allow_null=True,
         required=False,
-        related_link_view_name="organization-related",
+        related_link_url_kwarg="organization_pk",
+        related_link_view_name="organization-related-sites",
     )
-    # An Organization operates zero or more sites.
+    # An Organization is related to its members via Memberships.
     memberships = HyperlinkedRelatedField(
         many=True,
         read_only=True,  # Sites cannot be detached from their organization.
         allow_null=True,
         required=False,
-        related_link_view_name="organization-related",
+        related_link_url_kwarg="organization_pk",
+        related_link_view_name="organization-related-memberships",
     )
     # An Organization operates one or more nodes.
     nodes = HyperlinkedRelatedField(
@@ -266,7 +268,8 @@ class OrganizationSerializer(serializers.HyperlinkedModelSerializer):
         read_only=True,  # Nodes cannot be detached from their organization.
         allow_null=True,
         required=False,
-        related_link_view_name="organization-related",
+        related_link_url_kwarg="organization_pk",
+        related_link_view_name="organization-related-nodes",
     )
 
     class Meta:

@@ -60,7 +60,7 @@ class UsersTestCase(APITestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data["results"]), 1)
 
 
 class MembershipsTestCase(APITestCase):

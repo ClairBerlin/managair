@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import NotFound, PermissionDenied
@@ -65,37 +66,31 @@ class UserViewSet(ReadOnlyModelViewSet):
     def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset()
 
-        if "user_pk" in self.kwargs:
-            # If this viewset is accessed via the 'organization-related' route,
-            # it will have been passed the `user_pk` kwarg, and the queryset
-            # needs to be filtered accordingly;
-            user_pk = self.kwargs["user_pk"]
-            queryset = queryset.filter(pk=user_pk)
+        if "organization_pk" in self.kwargs:
+            # Viewset is accessed via the 'organization-related' route.
+            organization_pk = self.kwargs["organization_pk"]
+            logger.debug("Access Users via the organization #%s.", organization_pk)
+            queryset = queryset.filter(organizations=organization_pk)
+        if "filter[organization]" in self.request.query_params:
+            organization_filter = self.request.query_params["filter[organization]"]
+            logger.debug(
+                "Filter query to members of organization #%s.", organization_filter
+            )
+            queryset = queryset.filter(organizations=organization_filter)
+
+        if self.action == "list":
+            # For the list view, return just the username of all users.
+            # This is not secure because other fields can be loaded on demand.
+            # Rely on the serializer to return no PII for GET requests.
+            queryset = queryset.only("username")
         else:
-            if self.action == "list":
-                # For the list view, return just the username of all users
-                queryset = queryset.only("username")
-                organization_id = self.request.query_params.get(
-                    "filter[organization]", None
-                )
-                if organization_id:
-                    logger.debug(
-                        "Restrict query to members of organization #%s.",
-                        organization_id,
-                    )
-                    queryset = queryset.filter(organizations=organization_id)
-            else:
-                # Otherwise, return those users only that are in an organization
-                # accessible by the logged-in user. Need to make the filter result
-                # distinct because the underlying JOIN might return the same user
-                # multiple times if it is a member of several organizations.
-                logger.debug(
-                    "Restrict query to members of the logged-in users' organizations."
-                )
-                queryset = queryset.filter(
-                    organizations__users=self.request.user.id
-                ).distinct()
-        return queryset
+            # Restrict to users that are in an organization accessible to the
+            # authenticated user.
+            queryset = queryset.filter(organizations__users=self.request.user.id)
+
+        # Need to make the filter result distinct - because the underlying JOIN might
+        # return the same entity multiple times.
+        return queryset.distinct()
 
     def get_serializer_class(self):
         # TODO: Does not work for related fields because of this upstream bug:
@@ -128,26 +123,40 @@ class SiteViewSet(ModelViewSet):
     search_fields = ("name", "description")
 
     def get_queryset(self, *args, **kwargs):
-        """Restrict to logged-in user or to sites that contain node installations marked as public."""
+        """Restrict to the authenticated user or to sites that contain node installations marked as public."""
         queryset = super().get_queryset()
 
         if not self.request.user.is_authenticated:
             # Public API access. Restrict the listed sites to those that contain public
             # node installations.
-            return queryset.filter(rooms__installations__is_public=True)
+            queryset = queryset.filter(rooms__installations__is_public=True)
         else:
             # User is authenticated.
             queryset = queryset.filter(operator__users=self.request.user)
-            if self.action == "list":
-                organization_id = self.request.query_params.get(
-                    "filter[organization]", None
-                )
-                if organization_id:
-                    logger.debug(
-                        "Restrict query to sites of organization #%s.", organization_id
-                    )
-                    queryset = queryset.filter(operator=organization_id)
-            return queryset.distinct()
+
+        if "organization_pk" in self.kwargs:
+            # Viewset is accessed via the 'organization-related' route.
+            organization_pk = self.kwargs["organization_pk"]
+            logger.debug("Access sites view via organization #%s.", organization_pk)
+            queryset = queryset.filter(operator=organization_pk)
+        if "filter[organization]" in self.request.query_params:
+            # Organization is restricted via query parameter.
+            organization_filter = self.request.query_params["filter[organization]"]
+            logger.debug(
+                "Filter query to sites of organization #%s.", organization_filter
+            )
+            queryset = queryset.filter(operator=organization_filter)
+        return queryset.distinct()
+
+    def get_object(self):
+        if "room_pk" in self.kwargs:
+            # ViewSet accessed via a related room.
+            room_pk = self.kwargs["room_pk"]
+            site = get_object_or_404(self.get_queryset(), rooms=room_pk)
+            self.check_object_permissions(self.request, site)
+            return site
+        else:
+            return super().get_object()
 
     def perform_create(self, serializer):
         """Inject permission checking on the validated incoming resource data."""
@@ -166,28 +175,32 @@ class RoomViewSet(ModelViewSet):
     search_fields = ("name", "description")
 
     def get_queryset(self, *args, **kwargs):
-        """Restrict to logged-in user or to rooms that contain node installations marked as public."""
+        """Restrict to the authenticated user or to rooms that contain node installations marked as public."""
         queryset = super().get_queryset()
+
         if not self.request.user.is_authenticated:
             # Public API access. Restrict the listed rooms to those that contain public
             # node installations.
-            return queryset.filter(installations__is_public=True)
+            queryset = queryset.filter(installations__is_public=True)
         else:
             queryset = queryset.filter(site__operator__users=self.request.user)
-            if self.action == "list":
-                organization_id = self.request.query_params.get(
-                    "filter[organization]", None
-                )
-                if organization_id:
-                    logger.debug(
-                        "Restrict query to rooms of organization #%s.", organization_id
-                    )
-                    queryset = queryset.filter(site__operator=organization_id)
-                site_id = self.request.query_params.get("filter[site]", None)
-                if site_id:
-                    logger.debug("Restrict query to rooms of site #%s.", site_id)
-                    queryset = queryset.filter(site=site_id)
-            return queryset.distinct()
+
+        if "site_pk" in self.kwargs:
+            # Viewset is accessed via the 'site-related' route.
+            site_pk = self.kwargs["site_pk"]
+            logger.debug("Access roomes view via site #%s.", site_pk)
+            queryset = queryset.filter(site=site_pk)
+        if "filter[site]" in self.request.query_params:
+            site_filter = self.request.query_params["filter[site]"]
+            logger.debug("Filter query to rooms of site #%s.", site_filter)
+            queryset = queryset.filter(site=site_filter)
+        if "filter[organization]" in self.request.query_params:
+            organization_filter = self.request.query_params["filter[organization]"]
+            logger.debug(
+                "Filter query to rooms of organization #%s.", organization_filter
+            )
+            queryset = queryset.filter(site__operator=organization_filter)
+        return queryset.distinct()
 
     def perform_create(self, serializer):
         """Inject permission checking on the validated incoming resource data."""
@@ -206,40 +219,40 @@ class RoomNodeInstallationViewSet(ModelViewSet):
     filter_backends = [IncludeTimeseriesQPValidator]
 
     def get_queryset(self, *args, **kwargs):
-        """Restrict to logged-in user or to node installations marked as public."""
+        """Restrict to the authenticated user or to node installations marked as public."""
         queryset = super().get_queryset()
+
         if not self.request.user.is_authenticated:
             # Public API access. Restrict to public node installations.
-            return queryset.filter(is_public=True)
+            queryset = queryset.filter(is_public=True)
         else:
+            # User is authenticated.
             queryset = queryset.filter(room__site__operator__users=self.request.user)
-            if self.action == "list":
-                organization_id = self.request.query_params.get(
-                    "filter[organization]", None
-                )
-                if organization_id:
-                    logger.debug(
-                        "Restrict query to installations of organization #%s.",
-                        organization_id,
-                    )
-                    queryset = queryset.filter(room__site__operator=organization_id)
-                site_id = self.request.query_params.get("filter[site]", None)
-                if site_id:
-                    logger.debug(
-                        "Restrict query to installations at site #%s.", site_id
-                    )
-                    queryset = queryset.filter(room__site=site_id)
-                room_id = self.request.query_params.get("filter[room]", None)
-                if room_id:
-                    logger.debug(
-                        "Restrict query to installations in room #%s.", room_id
-                    )
-                    queryset = queryset.filter(room=room_id)
-                node_id = self.request.query_params.get("filter[node]", None)
-                if node_id:
-                    logger.debug("Restrict query to installations of node %s.", node_id)
-                    queryset = queryset.filter(node=node_id)
-            return queryset.distinct()
+
+        if "room_pk" in self.kwargs:
+            # Viewset is accessed via the 'room-related' route.
+            room_pk = self.kwargs["room_pk"]
+            logger.debug("Access installations view via room #%s.", room_pk)
+            queryset = queryset.filter(room=room_pk)
+        if "filter[room]" in self.request.query_params:
+            room_filter = self.request.query_params["filter[room]"]
+            logger.debug("Filter query to installations in room #%s.", room_filter)
+            queryset = queryset.filter(room=room_filter)
+        if "filter[site]" in self.request.query_params:
+            site_filter = self.request.query_params["filter[site]"]
+            logger.debug("Filter query to installations in site #%s.", site_filter)
+            queryset = queryset.filter(room__site=site_filter)
+        if "filter[organization]" in self.request.query_params:
+            organization_filter = self.request.query_params["filter[organization]"]
+            logger.debug(
+                "Filter query to installations in organization #%s.",
+                organization_filter,
+            )
+            queryset = queryset.filter(room__site__operator=organization_filter)
+        if "filter[node]" in self.request.query_params:
+            node_filter = self.request.query_params["filter[node]"]
+            logger.debug("Filter query to installations of node #%s.", node_filter)
+        return queryset.distinct()
 
     def perform_create(self, serializer):
         """Inject permission checking on the validated incoming resource data."""
@@ -254,12 +267,10 @@ class RoomNodeInstallationViewSet(ModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         installations = []
         for installation in queryset:
-            installation.sample_count = (
-                installation.node.samples.filter(
-                    timestamp_s__gte=installation.from_timestamp_s,
-                    timestamp_s__lte=installation.to_timestamp_s,
-                ).count()
-            )
+            installation.sample_count = installation.node.samples.filter(
+                timestamp_s__gte=installation.from_timestamp_s,
+                timestamp_s__lte=installation.to_timestamp_s,
+            ).count()
             installation.query_timestamp_s = round(datetime.now().timestamp())
             installations.append(installation)
         page = self.paginate_queryset(installations)
@@ -278,9 +289,11 @@ class RoomNodeInstallationViewSet(ModelViewSet):
         install_from_s = installation.from_timestamp_s
         install_to_s = installation.to_timestamp_s
         filter_from_s = int(self.request.query_params.get("filter[from]", 0))
-        filter_to_s = int(self.request.query_params.get(
-            "filter[to]", round(datetime.now().timestamp())
-        ))
+        filter_to_s = int(
+            self.request.query_params.get(
+                "filter[to]", round(datetime.now().timestamp())
+            )
+        )
         from_max_s = max(install_from_s, filter_from_s)
         to_min_s = min(install_to_s, filter_to_s)
         logger.debug(
@@ -313,9 +326,21 @@ class OrganizationViewSet(ModelViewSet):
         queryset = super().get_queryset()
         if not self.request.user.is_authenticated:
             # Public API access. Restrict to public node installations.
-            return queryset.filter(sites__rooms__installations__is_public=True)
+            queryset = queryset.filter(sites__rooms__installations__is_public=True)
         else:
-            return queryset.filter(users=self.request.user)
+            queryset = queryset.filter(users=self.request.user)
+
+        return queryset
+
+    def get_object(self):
+        if "site_pk" in self.kwargs:
+            # ViewSet accessed via a related site.
+            site_pk = self.kwargs["site_pk"]
+            organization = get_object_or_404(self.get_queryset(), sites=site_pk)
+            self.check_object_permissions(self.request, organization)
+            return organization
+        else:
+            return super().get_object()
 
     def perform_create(self, serializer):
         """The user adding the present organization automatically is its OWNER."""
@@ -340,27 +365,29 @@ class MembershipViewSet(ModelViewSet):
     def get_queryset(self, *args, **kwargs):
         """Restrict to users in the same organization."""
         queryset = super().get_queryset()
+        # Restrict to memberships of users that are in an organization accessible to the
+        # authenticated user.
         queryset = queryset.filter(organization__users=self.request.user)
-        if self.action == "list":
-            organization_id = self.request.query_params.get(
-                "filter[organization]", None
-            )
-            if organization_id:
-                logger.debug(
-                    "Restrict query to memberships of organization #%s.",
-                    organization_id,
-                )
-                queryset = queryset.filter(organization=organization_id)
-            username = self.request.query_params.get("filter[username]", None)
-            if username:
-                logger.debug("Restrict query to memberships of user %s.", username)
-                queryset = queryset.filter(user__username=username)
-            user_id = self.request.query_params.get("filter[user]", None)
-            if user_id:
-                logger.debug(
-                    "Restrict query to memberships of the user with id %s.", username
-                )
-                queryset = queryset.filter(user=user_id)
+
+        if "organization_pk" in self.kwargs:
+            # Viewset is accessed via the 'organization-related' route.
+            organization_pk = self.kwargs["organization_pk"]
+            logger.debug("Access Users via the organization #%s.", organization_pk)
+            queryset = queryset.filter(organization=organization_pk)
+        if "filter[organization]" in self.request.query_params:
+            organization_filter = self.request.query_params["filter[organization]"]
+            logger.debug("Filter membership to organization #%s.", organization_filter)
+            queryset = queryset.filter(organization=organization_filter)
+        if "filter[username]" in self.request.query_params:
+            username_filter = self.request.query_params["filter[username]"]
+            logger.debug("Filter membership to username #%s.", username_filter)
+            queryset = queryset.filter(user__username=username_filter)
+        if "filter[user]" in self.request.query_params:
+            user_filter = self.request.query_params["filter[user]"]
+            logger.debug("Filter membership to user #%s.", user_filter)
+            queryset = queryset.filter(user=user_filter)
+        # Need to make the filter result distinct because the underlying JOIN might
+        # return the same entity multiple times.
         return queryset.distinct()
 
     def perform_create(self, serializer):
