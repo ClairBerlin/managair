@@ -20,7 +20,7 @@ class OrganizationTestCase(APITestCase):
         """GET /organizations/"""
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data["results"]), 2)
+        self.assertEqual(len(response.data["results"]), 3)
 
     def test_get_organizations_public(self):
         """GET /organizations/ that are publicly visible."""

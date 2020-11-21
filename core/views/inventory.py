@@ -344,7 +344,7 @@ class OrganizationViewSet(ModelViewSet):
         else:
             queryset = queryset.filter(is_public | accessible_if_authenticated)
 
-        return queryset
+        return queryset.distinct()
 
     def get_object(self):
         if "site_pk" in self.kwargs:
