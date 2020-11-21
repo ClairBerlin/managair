@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
@@ -126,13 +127,16 @@ class SiteViewSet(ModelViewSet):
         """Restrict to the authenticated user or to sites that contain node installations marked as public."""
         queryset = super().get_queryset()
 
+        is_public = Q(rooms__installations__is_public=True)
+        accessible_if_authenticated = Q(operator__users=self.request.user)
+
         if not self.request.user.is_authenticated:
             # Public API access. Restrict the listed sites to those that contain public
             # node installations.
-            queryset = queryset.filter(rooms__installations__is_public=True)
+            queryset = queryset.filter(is_public)
         else:
             # User is authenticated.
-            queryset = queryset.filter(operator__users=self.request.user)
+            queryset = queryset.filter(is_public | accessible_if_authenticated)
 
         if "organization_pk" in self.kwargs:
             # Viewset is accessed via the 'organization-related' route.
@@ -178,12 +182,15 @@ class RoomViewSet(ModelViewSet):
         """Restrict to the authenticated user or to rooms that contain node installations marked as public."""
         queryset = super().get_queryset()
 
+        is_public = Q(installations__is_public=True)
+        accessible_if_authenticated = Q(site__operator__users=self.request.user)
+
         if not self.request.user.is_authenticated:
             # Public API access. Restrict the listed rooms to those that contain public
             # node installations.
-            queryset = queryset.filter(installations__is_public=True)
+            queryset = queryset.filter(is_public)
         else:
-            queryset = queryset.filter(site__operator__users=self.request.user)
+            queryset = queryset.filter(is_public | accessible_if_authenticated)
 
         if "site_pk" in self.kwargs:
             # Viewset is accessed via the 'site-related' route.
@@ -222,12 +229,15 @@ class RoomNodeInstallationViewSet(ModelViewSet):
         """Restrict to the authenticated user or to node installations marked as public."""
         queryset = super().get_queryset()
 
+        is_public = Q(is_public=True)
+        accessible_if_authenticated = Q(node__owner__users=self.request.user)
+
         if not self.request.user.is_authenticated:
             # Public API access. Restrict to public node installations.
-            queryset = queryset.filter(is_public=True)
+            queryset = queryset.filter(is_public)
         else:
             # User is authenticated.
-            queryset = queryset.filter(room__site__operator__users=self.request.user)
+            queryset = queryset.filter(is_public | accessible_if_authenticated)
 
         if "room_pk" in self.kwargs:
             # Viewset is accessed via the 'room-related' route.
@@ -324,11 +334,15 @@ class OrganizationViewSet(ModelViewSet):
     def get_queryset(self, *args, **kwargs):
         """Restrict to logged-in user or to organizations that contain node installations marked as public."""
         queryset = super().get_queryset()
+
+        is_public = Q(nodes__installations__is_public=True)
+        accessible_if_authenticated = Q(users=self.request.user)
+
         if not self.request.user.is_authenticated:
             # Public API access. Restrict to public node installations.
-            queryset = queryset.filter(sites__rooms__installations__is_public=True)
+            queryset = queryset.filter(is_public)
         else:
-            queryset = queryset.filter(users=self.request.user)
+            queryset = queryset.filter(is_public | accessible_if_authenticated)
 
         return queryset
 
