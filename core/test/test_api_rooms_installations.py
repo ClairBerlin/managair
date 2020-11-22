@@ -13,8 +13,8 @@ class RoomsTestCase(APITestCase):
         # Prüf-Site has room Prüfstuge (pk=4).
         self.assertTrue(self.client.login(username="veraVersuch", password="versuch"))
         # Versuchsverbund owns Versuchsraum 1 with pk=3
-        self.room_id = 3
-        self.detail_url = reverse("room-detail", kwargs={"pk": self.room_id})
+        self.room_pk = 3
+        self.detail_url = reverse("room-detail", kwargs={"pk": self.room_pk})
         self.collection_url = reverse("room-list")
 
     def tearDown(self):
@@ -52,18 +52,18 @@ class RoomsTestCase(APITestCase):
         self.assertEqual(len(response.data["results"]), 1)
 
     def test_get_room(self):
-        """GET /rooms/<room_id>/"""
+        """GET /rooms/<room_pk>/"""
         response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["name"], "Versuchsraum 1")
         self.assertEqual(response.data["max_occupancy"], 17)
 
     def test_patch_room(self):
-        """PATCH /rooms/<room_id>/"""
+        """PATCH /rooms/<room_pk>/"""
         request_data = {
             "data": {
                 "type": format_resource_type("Room"),
-                "id": self.room_id,
+                "id": self.room_pk,
                 "attributes": {
                     "description": "Ein Raum für Versuche.",
                     "height_m": "2.7",
@@ -88,7 +88,7 @@ class RoomsTestCase(APITestCase):
                     "max_occupancy": 1,
                 },
                 "relationships": {
-                    "site": {"data": {"type": "Site", "id": self.room_id}},
+                    "site": {"data": {"type": "Site", "id": self.room_pk}},
                 },
             }
         }
@@ -103,7 +103,7 @@ class RoomsTestCase(APITestCase):
         self.assertEqual(response1.data["site"]["id"], "3")
         # Fetch the room resource just created.
         response_url = response1.data["url"]
-        # GET /rooms/<room_id/>
+        # GET /rooms/<room_pk/>
         response2 = self.client.get(response_url)
         self.assertEqual(response2.status_code, 200)
         self.assertEqual(response2.data["name"], "Räumchen")
@@ -113,23 +113,20 @@ class RoomsTestCase(APITestCase):
         self.assertEqual(response2.data["max_occupancy"], 1)
         self.assertEqual(response2.data["site"]["id"], "3")
         # Delete the room.
-        # DELETE /room/<room_id>/
+        # DELETE /room/<room_pk>/
         response3 = self.client.delete(response_url)
         self.assertEqual(response3.status_code, 204)
         # Make sure it is gone.
-        # GET /room/<room_id>/
+        # GET /room/<room_pk>/
         response4 = self.client.get(response_url)
         self.assertEqual(response4.status_code, 404)
 
     def test_get_room_installations(self):
-        """GET /rooms/<room_id>/installations/"""
-        url = reverse(
-            "room-related",
-            kwargs={"pk": self.room_id, "related_field": "installations"},
-        )
+        """GET /rooms/<room_pk>/installations/"""
+        url = reverse("room-related-installations", kwargs={"room_pk": self.room_pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data["results"]), 1)
 
     def test_unauthorized_create_no_member(self):
         """POST /rooms/ for an organization the user ist not a member of."""
@@ -181,12 +178,12 @@ class RoomsTestCase(APITestCase):
 
     def test_unauthorized_patch_no_member(self):
         """PATCH /rooms/ of an organization of which the use ist not a member."""
-        room_id = 1  # Testraum 1 belongs to Organization Test-Team.
-        detail_url = reverse("room-detail", kwargs={"pk": room_id})
+        room_pk = 1  # Testraum 1 belongs to Organization Test-Team.
+        detail_url = reverse("room-detail", kwargs={"pk": room_pk})
         request_data = {
             "data": {
                 "type": format_resource_type("Room"),
-                "id": room_id,
+                "id": room_pk,
                 "attributes": {
                     "description": "Ein Raum für Versuche.",
                     "height_m": "2.7",
@@ -207,7 +204,7 @@ class RoomsTestCase(APITestCase):
         request_data = {
             "data": {
                 "type": format_resource_type("Room"),
-                "id": self.room_id,
+                "id": self.room_pk,
                 "attributes": {
                     "description": "Ein Raum für Versuche.",
                     "height_m": "2.7",
@@ -224,7 +221,8 @@ class InstallationsTestCase(APITestCase):
     fixtures = ["user-fixtures.json", "inventory-fixtures.json", "data-fixtures.json"]
     node_id = "3b95a1b2-74e7-9e98-52c4-4acae441f0ae"  # Clairchen Schwarz
     node2_id = "9d02faee-4260-1377-22ec-936428b572ee"  # ERS Test-Node
-    room_id = 4  # Prüfstube
+    room_pk = 4  # Prüfstube
+    inst_pk = 2
 
     def setUp(self):
         # veraVersuch is owner of the organization Versuchsverbund with pk=2.
@@ -235,7 +233,7 @@ class InstallationsTestCase(APITestCase):
         # Versuchsverbund owns
         # Clairchen Schwarz (id=3b95a1b2-74e7-9e98-52c4-4acae441f0ae) and
         # ERS Test-Node (id=9d02faee-4260-1377-22ec-936428b572ee).
-        self.detail_url = reverse("installation-detail", kwargs={"pk": 2})
+        self.detail_url = reverse("installation-detail", kwargs={"pk": self.inst_pk})
         self.collection_url = reverse("installation-list")
 
     def tearDown(self):
@@ -276,7 +274,7 @@ class InstallationsTestCase(APITestCase):
         self.assertEqual(response.data["results"][0]["from_timestamp_s"], 1602720001)
 
     def test_get_installations_per_room(self):
-        """GET /installations/?filter[room]=<room_id>"""
+        """GET /installations/?filter[room]=<room_pk>"""
         response = self.client.get(self.collection_url, {"filter[room]": 3})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 1)
@@ -289,19 +287,19 @@ class InstallationsTestCase(APITestCase):
         self.assertEqual(len(response.data["results"]), 2)
 
     def test_get_installation(self):
-        """GET /installations/<installation_id>/"""
+        """GET /installations/<installation_pk>/"""
         response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["from_timestamp_s"], 1601510400)
 
     def test_get_installation_with_timeseries(self):
-        """GET /installations/<installation_id>/?include_timeseries=true"""
+        """GET /installations/<installation_pk>/?include_timeseries=true"""
         response = self.client.get(self.detail_url, {"include_timeseries": True})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["timeseries"]), 468)
 
     def test_get_installation_with_timeseries_slice(self):
-        """GET /installations/<installation_id>/?include_timeseries=true&filter[from]=1601675365&filter[to]=1601738613"""
+        """GET /installations/<installation_pk>/?include_timeseries=true&filter[from]=1601675365&filter[to]=1601738613"""
         response = self.client.get(
             self.detail_url,
             {
@@ -314,11 +312,11 @@ class InstallationsTestCase(APITestCase):
         self.assertEqual(len(response.data["timeseries"]), 71)
 
     def test_patch_installation(self):
-        """PATCH /installations/<installation_id>/"""
+        """PATCH /installations/<installation_pk>/"""
         request_data = {
             "data": {
                 "type": format_resource_type("Installation"),
-                "id": 2,
+                "id": self.inst_pk,
                 "attributes": {"from_timestamp_s": 1601510000, "is_public": True},
                 "relationships": {
                     # Node and room must always be provided, to make sure owners match.
@@ -365,7 +363,7 @@ class InstallationsTestCase(APITestCase):
                     "room": {
                         "data": {
                             "type": format_resource_type("Room"),
-                            "id": self.room_id,
+                            "id": self.room_pk,
                         }
                     },
                 },
@@ -381,18 +379,18 @@ class InstallationsTestCase(APITestCase):
         self.assertEqual(response1.data["room"]["id"], "4")
         # Fetch the installation resource just created.
         response_url = response1.data["url"]
-        # GET /installations/<installation_id/>
+        # GET /installations/<installation_pk/>
         response2 = self.client.get(response_url)
         self.assertEqual(response2.status_code, 200)
         self.assertEqual(response2.data["from_timestamp_s"], 1601500000)
         self.assertEqual(response2.data["node"]["id"], self.node2_id)
         self.assertEqual(response2.data["room"]["id"], "4")
         # Delete the installation.
-        # DELETE /installations/<installation_id>/
+        # DELETE /installations/<installation_pk>/
         response3 = self.client.delete(response_url)
         self.assertEqual(response3.status_code, 204)
         # Make sure it is gone.
-        # GET /installations/<installation_id>/
+        # GET /installations/<installation_pk>/
         response4 = self.client.get(response_url)
         self.assertEqual(response4.status_code, 404)
 
@@ -420,7 +418,7 @@ class InstallationsTestCase(APITestCase):
                     "room": {
                         "data": {
                             "type": format_resource_type("Room"),
-                            "id": self.room_id,
+                            "id": self.room_pk,
                         }
                     },
                 },
@@ -432,15 +430,19 @@ class InstallationsTestCase(APITestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_get_installation_room(self):
-        """GET /installations/<installations_id>/room/"""
-        url = reverse("installation-related", kwargs={"pk": 2, "related_field": "room"})
+        """GET /installations/<installation_pk>/room/"""
+        url = reverse(
+            "installation-related", kwargs={"pk": self.inst_pk, "related_field": "room"}
+        )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["name"], "Versuchsraum 1")
 
     def test_get_installation_node(self):
-        """GET /installations/<installations_id>/node/"""
-        url = reverse("installation-related", kwargs={"pk": 2, "related_field": "node"})
+        """GET /installations/<installation_pk>/node/"""
+        url = reverse(
+            "installation-related-node", kwargs={"installation_pk": self.inst_pk}
+        )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["id"], self.node_id)
@@ -505,7 +507,7 @@ class InstallationsTestCase(APITestCase):
                     "room": {
                         "data": {
                             "type": format_resource_type("Room"),
-                            "id": self.room_id,
+                            "id": self.room_pk,
                         }
                     },
                 },

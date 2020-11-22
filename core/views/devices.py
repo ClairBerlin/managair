@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
@@ -55,17 +56,35 @@ class NodeViewSet(ModelViewSet):
     search_fields = ("alias", "eui64")
 
     def get_queryset(self, *args, **kwargs):
-        """Restrict to logged-in user"""
         queryset = super().get_queryset()
+        # Restrict to nodes that belong to an organization accessible to the
+        # authenticated user.
         queryset = queryset.filter(owner__users=self.request.user)
-        if self.action == "list":
-            organization_id = self.request.query_params.get(
-                "filter[organization]", None
+
+        if "organization_pk" in self.kwargs:
+            # Viewset is accessed via the 'organization-related' route.
+            organization_pk = self.kwargs["organization_pk"]
+            logger.debug("Access Nodes via the organization #%s.", organization_pk)
+            queryset = queryset.filter(owner=organization_pk)
+        if "filter[organization]" in self.request.query_params:
+            organization_filter = self.request.query_params["filter[organization]"]
+            logger.debug(
+                "Filter query to nodes of organization #%s.", organization_filter
             )
-            if organization_id:
-                logger.debug("Restrict to nodes of organization #%s.", organization_id)
-                queryset = queryset.filter(owner=organization_id)
+            queryset = queryset.filter(owner=organization_filter)
+        # Need to make the filter result distinct because the underlying JOIN might
+        # return the same entity multiple times.
         return queryset.distinct()
+
+    def get_object(self):
+        if "installation_pk" in self.kwargs:
+            # ViewSet accessed via a related installation.
+            installation_pk = self.kwargs["installation_pk"]
+            node = get_object_or_404(self.get_queryset(), installations=installation_pk)
+            self.check_object_permissions(self.request, node)
+            return node
+        else:
+            return super().get_object()
 
     def perform_create(self, serializer):
         """Inject permission checking on the validated incoming resource data."""
