@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import MethodNotAllowed
@@ -15,7 +16,6 @@ from core.data_viewmodels import (
 )
 from core.models import Node, RoomNodeInstallation
 from core.serializers import (
-    SimpleSampleSerializer,
     NodeTimeseriesListSerializer,
     NodeTimeseriesSerializer,
     InstallationTimeseriesListSerializer,
@@ -38,7 +38,7 @@ class NodeTimeSeriesViewSet(ReadOnlyModelViewSet):
 
     def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset()
-        # Restrict to samples from nodes commanded by the currently logged-in user.
+        # Restrict to samples from nodes commanded by the currently authenticated user.
         authorized_nodes = queryset.filter(owner__users=self.request.user)
 
         if self.action == "retrieve":
@@ -121,15 +121,18 @@ class InstallationTimeSeriesViewSet(ReadOnlyModelViewSet):
     def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset()
 
+        is_public = Q(is_public=True)
+        accessible_if_authenticated = Q(node__owner__users=self.request.user)
+
         if not self.request.user.is_authenticated:
             # Public API access. Restrict the listed installations to those that are
             # publicly visible.
-            authorized_installations = queryset.filter(is_public=True)
+            authorized_installations = queryset.filter(is_public)
         else:
             # Otherwise, Restrict to samples from installations commanded by the
             # currently logged-in user.
             authorized_installations = queryset.filter(
-                node__owner__users=self.request.user
+                is_public | accessible_if_authenticated
             )
 
         if self.action == "retrieve":
