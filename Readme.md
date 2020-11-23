@@ -1,5 +1,9 @@
 # Managair - The Clair Management Server
 
+Managair is part of the _Clair Platform_, a system to collect measurements from networked CO2-sensors for indoor air-quality monitoring. It is developed and run by the [Clair Berlin Initiative](https://clair-berlin.de), a non-profit, open-source initiative to help operators of public spaces lower the risk SARS-CoV2-transmission amongst their patrons.
+
+Technically speaking, Managair is a service in the [Clair Stack](https://github.com/ClairBerlin/clair-stack), which is the infrastructure-as-code implementation of the Clair Platform.
+
 ## Functionality
 
 Managair is the key administrative service of the _Clair Stack_. It is a [Django](https://www.djangoproject.com) web application that manages users, their inventory of sensor nodes, and the measurement samples recorded by these nodes.
