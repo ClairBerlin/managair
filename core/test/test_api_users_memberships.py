@@ -1,11 +1,10 @@
-from unittest import skip
-
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework_json_api.utils import format_resource_type
+from .utils import TokenAuthMixin
 
 
-class UsersTestCase(APITestCase):
+class UsersTestCase(TokenAuthMixin, APITestCase):
     fixtures = ["user-fixtures.json", "inventory-fixtures.json"]
 
     def setUp(self):
@@ -14,7 +13,10 @@ class UsersTestCase(APITestCase):
         # pk 4: Horst Hilfsarbeiter
         # pk 6: Ingo Inspekteur
         # pk 7: Priska Prüferin
-        self.assertTrue(self.client.login(username="veraVersuch", password="versuch"))
+        self.auth_response, self.auth_token = self.authenticate(
+            username="veraVersuch", password="versuch"
+        )
+        self.assertIsNotNone(self.auth_token)
         # Versuchsverbund owns
         # Clairchen Schwarz (id=3b95a1b2-74e7-9e98-52c4-4acae441f0ae) and
         # ERS Test-Node (id=9d02faee-4260-1377-22ec-936428b572ee).
@@ -22,85 +24,78 @@ class UsersTestCase(APITestCase):
         self.collection_url = reverse("user-list")
 
     def tearDown(self):
-        self.client.logout()
+        self.logout()
 
     def test_get_users(self):
         """GET /users/"""
-        response = self.client.get(self.collection_url)
+        response = self.auth_get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 7)
 
     def test_get_users_search(self):
         """GET /users/?filter[search]=<search-text>"""
-        response = self.client.get(self.collection_url, {"filter[search]": "tom"})
+        response = self.auth_get(self.collection_url, {"filter[search]": "tom"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["username"], "tomTester")
 
     def test_get_users_in_organization(self):
         """GET /users/?filter[organization]=<organization_id>"""
-        response = self.client.get(self.collection_url, {"filter[organization]": "2"})
+        response = self.auth_get(self.collection_url, {"filter[organization]": "2"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 4)
 
     def test_get_user(self):
         """GET /users/<user_id>/"""
-        response = self.client.get(self.detail_url)
+        response = self.auth_get(self.detail_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["username"], "veraVersuch")
         self.assertEqual(response.data["email"], "vera@versuch.de")
 
-    @skip(
-        "Test fails because of upstream bug: https://github.com/django-json-api/django-rest-framework-json-api/issues/859"
-    )
     def test_get_user_organizations(self):
         """GET /users/<user_id>/organizations/"""
         url = reverse(
             "user-related", kwargs={"pk": 3, "related_field": "organizations"}
         )
-        response = self.client.get(url)
+        response = self.auth_get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["name"], "Versuchsverbund")
 
 
-class MembershipsTestCase(APITestCase):
+class MembershipsTestCase(TokenAuthMixin, APITestCase):
     fixtures = ["user-fixtures.json", "inventory-fixtures.json"]
 
     def setUp(self):
         # priskaPrueferin (pk=7) is OWNER of Versuchsverbund, Membership pk=15;
         # and ASSISTANT in Test-Team, Membership pk=16.
-        self.client.login(username="priskaPrueferin", password="priska")
+        self.auth_response, self.auth_token = self.authenticate(
+            username="priskaPrueferin", password="priska"
+        )
+        self.assertIsNotNone(self.auth_token)
         self.user_id = 7
         self.mid = 15
         self.detail_url = reverse("membership-detail", kwargs={"pk": self.mid})
         self.collection_url = reverse("membership-list")
 
     def tearDown(self):
-        self.client.logout()
+        self.logout()
 
     def test_get_memberships(self):
         """GET /memberships/"""
-        response = self.client.get(self.collection_url)
+        response = self.auth_get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 8)
 
     def test_get_membership_in_organization(self):
         """GET /memberships/?filter[organization]=<organization_id>"""
-        # Need a different user for this test case.
-        self.client.logout()
-        # user priskaPrueferin is member in two organizations
-        self.client.login(username="priskaPrueferin", password="priska")
-        response = self.client.get(self.collection_url, {"filter[organization]": 2})
+        response = self.auth_get(self.collection_url, {"filter[organization]": 2})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 4)
 
     def test_get_membership_per_username(self):
         """GET /memberships/?filter[username]=<username>"""
-        # Need a different user for this test case.
-        self.client.logout()
-        # user priskaPrueferin is member in two organizations
-        self.client.login(username="priskaPrueferin", password="priska")
-        response = self.client.get(
+        response = self.auth_get(
             self.collection_url, {"filter[username]": "ingoInspekteur"}
         )
         self.assertEqual(response.status_code, 200)
@@ -108,17 +103,13 @@ class MembershipsTestCase(APITestCase):
 
     def test_get_membership_per_user(self):
         """GET /memberships/?filter[user]=<user_id>"""
-        # Need a different user for this test case.
-        self.client.logout()
-        # user priskaPrueferin is member in two organizations
-        self.client.login(username="priskaPrueferin", password="priska")
-        response = self.client.get(self.collection_url, {"filter[user]": 6})
+        response = self.auth_get(self.collection_url, {"filter[user]": 6})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
 
     def test_get_membership(self):
         """GET /memberships/<membership_id>/"""
-        response = self.client.get(self.detail_url)
+        response = self.auth_get(self.detail_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["role"], "O")
 
@@ -131,7 +122,7 @@ class MembershipsTestCase(APITestCase):
                 "attributes": {"role": "I"},  # Downgrade to INSPECTOR role.
             }
         }
-        response = self.client.patch(self.detail_url, data=request_data)
+        response = self.auth_patch(self.detail_url, data=request_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["role"], "I")
 
@@ -155,7 +146,7 @@ class MembershipsTestCase(APITestCase):
             }
         }
         # POST /memberships/
-        response1 = self.client.post(self.collection_url, data=request_data)
+        response1 = self.auth_post(self.collection_url, data=request_data)
         self.assertEqual(response1.status_code, 201)
         self.assertEqual(response1.data["role"], "A")
         self.assertEqual(response1.data["user"]["id"], "5")
@@ -163,24 +154,24 @@ class MembershipsTestCase(APITestCase):
         # Fetch the membership resource just created.
         response_url = response1.data["url"]
         # GET /memberships/<membership_id/>
-        response2 = self.client.get(response_url)
+        response2 = self.auth_get(response_url)
         self.assertEqual(response2.status_code, 200)
         self.assertEqual(response2.data["role"], "A")
         self.assertEqual(response2.data["user"]["id"], "5")
         self.assertEqual(response2.data["organization"]["id"], "2")
         # Delete the membership.
         # DELETE /memberships/<membership_id>/
-        response3 = self.client.delete(response_url)
+        response3 = self.auth_delete(response_url)
         self.assertEqual(response3.status_code, 204)
         # Make sure it is gone.
         # GET /memberships/<membership_id>/
-        response4 = self.client.get(response_url)
+        response4 = self.auth_get(response_url)
         self.assertEqual(response4.status_code, 404)
 
     def test_get_membership_user(self):
         """GET /memberships/<membership_id>/user/"""
         url = reverse("membership-related", kwargs={"pk": 15, "related_field": "user"})
-        response = self.client.get(url)
+        response = self.auth_get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["username"], "priskaPrueferin")
 
@@ -189,16 +180,14 @@ class MembershipsTestCase(APITestCase):
         url = reverse(
             "membership-related", kwargs={"pk": 15, "related_field": "organization"}
         )
-        response = self.client.get(url)
+        response = self.auth_get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["name"], "Versuchsverbund")
 
     def test_unauthorized_create_membership_no_member(self):
         """POST /memberships/ where the user is not a member of the organization."""
-        # Need a different user for this test case.
-        self.client.logout()
         # User tomTester (pk=2) is OWNER of Test-Team (pk=1).
-        self.client.login(username="tomTester", password="test")
+        self.authenticate(username="tomTester", password="test")
         request_data = {
             "data": {
                 "type": format_resource_type("Membership"),
@@ -217,16 +206,15 @@ class MembershipsTestCase(APITestCase):
                 },
             }
         }
-        response = self.client.post(self.collection_url, data=request_data)
+        response = self.auth_post(self.collection_url, data=request_data)
         self.assertEqual(response.status_code, 403)
 
     def test_unauthorized_add_membership_no_member(self):
         """POST /memberships/ for a user that is not a member of the organization."""
         # Need a different user for this test case.
-        self.client.logout()
         # User tomTester (pk=2) is OWNER of Test-Team (pk=1).
         user_id = 2
-        self.client.login(username="tomTester", password="test")
+        self.authenticate(username="tomTester", password="test")
         request_data = {
             "data": {
                 "type": format_resource_type("Membership"),
@@ -247,14 +235,14 @@ class MembershipsTestCase(APITestCase):
                 },
             }
         }
-        response = self.client.post(self.collection_url, data=request_data)
+        response = self.auth_post(self.collection_url, data=request_data)
         self.assertEqual(response.status_code, 403)
 
     def test_unauthorized_leave_organization(self):
         """DELETE /membership/ for a member that is not the OWNER of the organizatin."""
         # priskaPrüferin is ASSISTANT in Test-Team (membership pk=16).
         request_url = reverse("membership-detail", kwargs={"pk": 16})
-        response = self.client.delete(request_url)
+        response = self.auth_delete(request_url)
         self.assertEqual(response.status_code, 403)
 
     def test_unauthorized_role_change_no_owner(self):
@@ -269,5 +257,5 @@ class MembershipsTestCase(APITestCase):
                 "attributes": {"role": "O"},  # Attempt to self-upgrade.
             }
         }
-        response = self.client.patch(request_url, data=request_data)
+        response = self.auth_patch(request_url, data=request_data)
         self.assertEqual(response.status_code, 403)

@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from django.urls import reverse
 from django.contrib.auth.models import User
 
 from core.models import (
@@ -12,6 +13,97 @@ from core.models import (
     Site,
     Room,
 )
+
+
+class TokenAuthMixin:
+    """Mixin for APITestCase that provides a token authentication helper."""
+
+    login_url = reverse("rest_login")
+    logout_url = reverse("rest_logout")
+
+    def authenticate(
+        self, password: str, email: str = None, username: str = None, login_url=None
+    ):
+        auth_request = {
+            "data": {"type": "LoginView", "attributes": {"password": password}}
+        }
+        if not login_url:
+            login_url = self.login_url
+        if email:
+            auth_request["data"]["attributes"]["email"] = email
+        if username:
+            auth_request["data"]["attributes"]["username"] = username
+        self.response = self.client.post(login_url, data=auth_request)
+        self.token = self.response.data.get("key", None)
+        return (self.response, self.token)
+
+    def logout(self, token=None):
+        if not token:
+            token = self.token
+        self.response = self.client.post(
+            self.logout_url, HTTP_AUTHORIZATION=("Token " + token)
+        )
+
+    def auth_get(self, path, data=None, follow=False, secure=False, **extra):
+        token = extra.pop("token", None)
+        if not token:
+            token = self.token
+        return self.client.get(
+            path,
+            data=data,
+            follow=follow,
+            secure=secure,
+            HTTP_AUTHORIZATION=("Token " + token),
+            **extra,
+        )
+
+    def auth_patch(
+        self, path, data=None, format=None, content_type=None, follow=False, **extra
+    ):
+        token = extra.pop("token", None)
+        if not token:
+            token = self.token
+        return self.client.patch(
+            path,
+            data=data,
+            format=format,
+            content_type=content_type,
+            follow=follow,
+            HTTP_AUTHORIZATION=("Token " + token),
+            **extra,
+        )
+
+    def auth_post(
+        self, path, data=None, format=None, content_type=None, follow=False, **extra
+    ):
+        token = extra.pop("token", None)
+        if not token:
+            token = self.token
+        return self.client.post(
+            path,
+            data=data,
+            format=format,
+            content_type=content_type,
+            follow=follow,
+            HTTP_AUTHORIZATION=("Token " + token),
+            **extra,
+        )
+
+    def auth_delete(
+        self, path, data=None, format=None, content_type=None, follow=False, **extra
+    ):
+        token = extra.pop("token", None)
+        if not token:
+            token = self.token
+        return self.client.delete(
+            path,
+            data=data,
+            format=format,
+            content_type=content_type,
+            follow=follow,
+            HTTP_AUTHORIZATION=("Token " + token),
+            **extra,
+        )
 
 
 def setup_test_auth():

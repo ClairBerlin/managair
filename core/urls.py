@@ -30,6 +30,8 @@ router.register(
     basename="installation-timeseries",
 )
 
+# Ordering of the following URL patterns from top to bottom matters, because Django 
+# takes the first match.
 urlpatterns = [
     path("", include(router.urls)),
     path(
@@ -38,14 +40,14 @@ urlpatterns = [
         name="user-relationships",
     ),
     path(
-        "memberships/<pk>/<related_field>/",
-        inventory.MembershipViewSet.as_view({"get": "retrieve_related"}),
-        name="membership-related",
-    ),
-    path(
         "users/<pk>/<related_field>/",
         inventory.UserViewSet.as_view({"get": "retrieve_related"}),
         name="user-related",
+    ),
+    path(
+        "memberships/<pk>/<related_field>/",
+        inventory.MembershipViewSet.as_view({"get": "retrieve_related"}),
+        name="membership-related",
     ),
     path(
         "organizations/<pk>/relationships/nodes/",
@@ -101,7 +103,7 @@ urlpatterns = [
         "sites/<pk>/<related_field>/",
         inventory.SiteViewSet.as_view({"get": "retrieve_related"}),
         name="site-related",
-    ),
+    ),   
     path(
         "rooms/<room_pk>/site/",
         inventory.SiteViewSet.as_view({"get": "retrieve"}),

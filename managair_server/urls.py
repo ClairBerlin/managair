@@ -2,20 +2,12 @@
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 import os
 from django.contrib import admin
 from django.urls import include, path
+from dj_rest_auth.views import PasswordResetConfirmView
+from dj_rest_auth.registration.views import VerifyEmailView
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
@@ -23,12 +15,25 @@ from drf_spectacular.views import (
 )
 
 urlpatterns = [
-    path("", include("user_manager.urls")),
+    # The main Clair API for inventory management and data retrievak
     path("api/v1/", include("core.urls")),
+    # Data ingestion API
     path("ingest/v1/", include("ingest.urls")),
+    # Django Admin UI
     path("admin/", admin.site.urls),
+    # Authentication
     path("api/v1/auth/", include("dj_rest_auth.urls")),
+    path(
+        "api/v1/auth/password-reset/confirm/<uidb64>/<token>/",
+        PasswordResetConfirmView.as_view(),
+        name="password_reset_confirm",
+    ),
     path("api/v1/auth/registration/", include("dj_rest_auth.registration.urls")),
+    path(
+        "api/v1/auth/account-confirm-email/",
+        VerifyEmailView.as_view(),
+        name="account_email_verification_sent",
+    ),
     # OpenAPI
     path("api/v1/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(

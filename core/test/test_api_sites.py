@@ -1,16 +1,20 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework_json_api.utils import format_resource_type
+from .utils import TokenAuthMixin
 
 
-class SitesTestCase(APITestCase):
+class SitesTestCase(TokenAuthMixin, APITestCase):
     fixtures = ["user-fixtures.json", "inventory-fixtures.json"]
     node_id = "3b95a1b2-74e7-9e98-52c4-4acae441f0ae"
 
     def setUp(self):
         # veraVersuch is owner of the organization Versuchsverbund with pk=2.
         # Versuchserbund commands the sites Versuchs-Site (pk=2) and Prüf-Site (pk=3).
-        self.assertTrue(self.client.login(username="veraVersuch", password="versuch"))
+        self.auth_response, self.auth_token = self.authenticate(
+            username="veraVersuch", password="versuch"
+        )
+        self.assertIsNotNone(self.auth_token)
         # Versuchsverbund owns
         # Clairchen Schwarz (id=3b95a1b2-74e7-9e98-52c4-4acae441f0ae) and
         # ERS Test-Node (id=9d02faee-4260-1377-22ec-936428b572ee).
@@ -19,18 +23,16 @@ class SitesTestCase(APITestCase):
         self.collection_url = reverse("site-list")
 
     def tearDown(self):
-        self.client.logout()
+        self.logout()
 
     def test_get_sites(self):
         """GET /sites/"""
-        response = self.client.get(self.collection_url)
+        response = self.auth_get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
 
     def test_get_sites_public(self):
         """GET /sites/ available to a non-authenticated user."""
-        # Make sure we are not logged-in.
-        self.client.logout()
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         # There is exactly one site that contains a public node installation in the
@@ -40,16 +42,15 @@ class SitesTestCase(APITestCase):
     def test_get_sites_per_organization(self):
         """GET /sites/?filter[organization]=<organization_id>"""
         # Need a different user for this test case.
-        self.client.logout()
         # user priskaPrueferin is member in two organizations
-        self.client.login(username="priskaPrueferin", password="priska")
-        response = self.client.get(self.collection_url, {"filter[organization]": 1})
+        self.authenticate(username="priskaPrueferin", password="priska")
+        response = self.auth_get(self.collection_url, {"filter[organization]": 1})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 1)
 
     def test_get_site(self):
         """GET /sites/<site_id>/"""
-        response = self.client.get(self.detail_url)
+        response = self.auth_get(self.detail_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["name"], "Versuchs-Site")
 
@@ -65,7 +66,7 @@ class SitesTestCase(APITestCase):
                 },
             }
         }
-        response = self.client.patch(self.detail_url, data=request_data)
+        response = self.auth_patch(self.detail_url, data=request_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["name"], "Versuchsort")
         self.assertEqual(
@@ -86,7 +87,7 @@ class SitesTestCase(APITestCase):
             }
         }
         # POST /sites/
-        response1 = self.client.post(self.collection_url, data=request_data)
+        response1 = self.auth_post(self.collection_url, data=request_data)
         self.assertEqual(response1.status_code, 201)
         self.assertEqual(response1.data["name"], "Versuchsort 2")
         self.assertEqual(response1.data["address"]["id"], "2")
@@ -94,24 +95,24 @@ class SitesTestCase(APITestCase):
         # Fetch the site resource just created.
         response_url = response1.data["url"]
         # GET /sites/<site_id>/
-        response2 = self.client.get(response_url)
+        response2 = self.auth_get(response_url)
         self.assertEqual(response2.status_code, 200)
         self.assertEqual(response2.data["name"], "Versuchsort 2")
         self.assertEqual(response2.data["address"]["id"], "2")
         self.assertEqual(response2.data["operator"]["id"], "2")
         # Delete the site.
         # DELETE /site/<site_id>/
-        response3 = self.client.delete(response_url)
+        response3 = self.auth_delete(response_url)
         self.assertEqual(response3.status_code, 204)
         # Make sure it is gone.
         # GET /site/<site_id>/
-        response4 = self.client.get(response_url)
+        response4 = self.auth_get(response_url)
         self.assertEqual(response4.status_code, 404)
 
     def test_get_site_rooms(self):
         """GET /sites/<site_pk>/rooms/"""
         url = reverse("site-related-rooms", kwargs={"site_pk": self.site_pk})
-        response = self.client.get(url)
+        response = self.auth_get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 1)
 
@@ -131,15 +132,14 @@ class SitesTestCase(APITestCase):
                 },
             }
         }
-        response1 = self.client.post(self.collection_url, data=request_data)
+        response1 = self.auth_post(self.collection_url, data=request_data)
         self.assertEqual(response1.status_code, 403)
 
     def test_unauthorized_create_no_owner(self):
         """POST /sites/ for an organization where the user is not an OWNER."""
         # Need a different user for this test case.
-        self.client.logout()
         # User horstHilfsarbeiter is ASSISTANT in Versuchsverbung (pk=2).
-        self.client.login(username="horstHilfsarbeiter", password="horst")
+        self.authenticate(username="horstHilfsarbeiter", password="horst")
         request_data = {
             "data": {
                 "type": format_resource_type("Site"),
@@ -154,7 +154,7 @@ class SitesTestCase(APITestCase):
                 },
             }
         }
-        response1 = self.client.post(self.collection_url, data=request_data)
+        response1 = self.auth_post(self.collection_url, data=request_data)
         self.assertEqual(response1.status_code, 403)
 
     def test_unauthorized_patch_no_member(self):
@@ -172,7 +172,7 @@ class SitesTestCase(APITestCase):
                 },
             }
         }
-        response = self.client.patch(detail_url, data=request_data)
+        response = self.auth_patch(detail_url, data=request_data)
         # Expect a HTTP 404 error code, because the object to be patched should not be
         # accessible to the logged-in user.
         self.assertEqual(response.status_code, 404)
@@ -180,9 +180,8 @@ class SitesTestCase(APITestCase):
     def test_unauthorized_patch_no_owner(self):
         """PATCH /sites/ of an organization where the user ist not an OWNER."""
         # Need a different user for this test case.
-        self.client.logout()
         # User horstHilfsarbeiter is ASSISTANT in Versuchsverbung (pk=2).
-        self.client.login(username="horstHilfsarbeiter", password="horst")
+        self.authenticate(username="horstHilfsarbeiter", password="horst")
         request_data = {
             "data": {
                 "type": format_resource_type("Site"),
@@ -193,7 +192,7 @@ class SitesTestCase(APITestCase):
                 },
             }
         }
-        response = self.client.patch(self.detail_url, data=request_data)
+        response = self.auth_patch(self.detail_url, data=request_data)
         # Expect a HTTP 403 error code, because the user has access to the Node but is
         # not sufficiently privileged to alter it.
         self.assertEqual(response.status_code, 403)

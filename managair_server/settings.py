@@ -71,7 +71,6 @@ INSTALLED_APPS = [
     "dj_rest_auth.registration",
     "corsheaders",
     "drf_spectacular",
-    "user_manager",
     "core",
     "ingest",
 ]
@@ -79,10 +78,10 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -139,7 +138,6 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_METADATA_CLASS": "rest_framework_json_api.metadata.JSONAPIMetadata",
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ),
     "DEFAULT_FILTER_BACKENDS": (
@@ -155,17 +153,34 @@ REST_FRAMEWORK = {
     "TEST_REQUEST_DEFAULT_FORMAT": "vnd.api+json",
 }
 
+# Email Setup
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_HOST = os.environ.get("EMAIL_HOST")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", default=587))
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = bool(os.environ.get("EMAIL_USE_TLS", default=True))
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
+
 # Registration and Authentication
+AUTHENTICATION_BACKENDS = (
+    # Needed to login by username in Django admin, regardless of `allauth`
+    "django.contrib.auth.backends.ModelBackend",
+    # `allauth` specific authentication methods, such as login by e-mail
+    "allauth.account.auth_backends.AuthenticationBackend"
+)
+
 # See https://dj-rest-auth.readthedocs.io/en/latest/installation.html
 REST_SESSION_LOGIN = True
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 SITE_ID = 1
-ACCOUNT_EMAIL_REQUIRED = False  # For now, do not require email registration.
-ACCOUNT_AUTHENTICATION_METHOD = "username"
-ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_EMAIL_REQUIRED = True # User needs to provide an email address.
+ACCOUNT_AUTHENTICATION_METHOD = "username_email"
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Clair Plattform] "
+
 
 WSGI_APPLICATION = "managair_server.wsgi.application"
-
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases

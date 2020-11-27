@@ -1,9 +1,10 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework_json_api.utils import format_resource_type
+from .utils import TokenAuthMixin
 
 
-class RoomsTestCase(APITestCase):
+class RoomsTestCase(TokenAuthMixin, APITestCase):
     fixtures = ["user-fixtures.json", "inventory-fixtures.json"]
 
     def setUp(self):
@@ -11,25 +12,26 @@ class RoomsTestCase(APITestCase):
         # Versuchserbund commands the sites Versuchs-Site (pk=2) and Prüf-Site (pk=3).
         # Versuchs-Site has room Versuchsraum 1 (pk=3),
         # Prüf-Site has room Prüfstuge (pk=4).
-        self.assertTrue(self.client.login(username="veraVersuch", password="versuch"))
+        self.auth_response, self.auth_token = self.authenticate(
+            username="veraVersuch", password="versuch"
+        )
+        self.assertIsNotNone(self.auth_token)
         # Versuchsverbund owns Versuchsraum 1 with pk=3
         self.room_pk = 3
         self.detail_url = reverse("room-detail", kwargs={"pk": self.room_pk})
         self.collection_url = reverse("room-list")
 
     def tearDown(self):
-        self.client.logout()
+        self.logout()
 
     def test_get_rooms(self):
         """GET /rooms/"""
-        response = self.client.get(self.collection_url)
+        response = self.auth_get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
 
     def test_get_rooms_public(self):
         """GET /rooms/ without being logged-in"""
-        # Ensure that we are logged out.
-        self.client.logout()
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         # There is one room in the test data set that contains a public installation.
@@ -38,22 +40,21 @@ class RoomsTestCase(APITestCase):
     def test_get_rooms_per_organization(self):
         """GET /rooms/?filter[organization]=<organization_id>"""
         # Need a different user for this test case.
-        self.client.logout()
         # user priskaPrueferin is member in two organizations
-        self.client.login(username="priskaPrueferin", password="priska")
-        response = self.client.get(self.collection_url, {"filter[organization]": 1})
+        self.authenticate(username="priskaPrueferin", password="priska")
+        response = self.auth_get(self.collection_url, {"filter[organization]": 1})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
 
     def test_get_rooms_per_site(self):
         """GET /rooms/?filter[site]=<site_id>"""
-        response = self.client.get(self.collection_url, {"filter[site]": 2})
+        response = self.auth_get(self.collection_url, {"filter[site]": 2})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 1)
 
     def test_get_room(self):
         """GET /rooms/<room_pk>/"""
-        response = self.client.get(self.detail_url)
+        response = self.auth_get(self.detail_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["name"], "Versuchsraum 1")
         self.assertEqual(response.data["max_occupancy"], 17)
@@ -70,7 +71,7 @@ class RoomsTestCase(APITestCase):
                 },
             }
         }
-        response = self.client.patch(self.detail_url, data=request_data)
+        response = self.auth_patch(self.detail_url, data=request_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["name"], "Versuchsraum 1")
         self.assertEqual(response.data["description"], "Ein Raum für Versuche.")
@@ -93,7 +94,7 @@ class RoomsTestCase(APITestCase):
             }
         }
         # POST /rooms/
-        response1 = self.client.post(self.collection_url, data=request_data)
+        response1 = self.auth_post(self.collection_url, data=request_data)
         self.assertEqual(response1.status_code, 201)
         self.assertEqual(response1.data["name"], "Räumchen")
         self.assertEqual(response1.data["description"], "Nur zum Test")
@@ -104,7 +105,7 @@ class RoomsTestCase(APITestCase):
         # Fetch the room resource just created.
         response_url = response1.data["url"]
         # GET /rooms/<room_pk/>
-        response2 = self.client.get(response_url)
+        response2 = self.auth_get(response_url)
         self.assertEqual(response2.status_code, 200)
         self.assertEqual(response2.data["name"], "Räumchen")
         self.assertEqual(response2.data["description"], "Nur zum Test")
@@ -114,17 +115,17 @@ class RoomsTestCase(APITestCase):
         self.assertEqual(response2.data["site"]["id"], "3")
         # Delete the room.
         # DELETE /room/<room_pk>/
-        response3 = self.client.delete(response_url)
+        response3 = self.auth_delete(response_url)
         self.assertEqual(response3.status_code, 204)
         # Make sure it is gone.
         # GET /room/<room_pk>/
-        response4 = self.client.get(response_url)
+        response4 = self.auth_get(response_url)
         self.assertEqual(response4.status_code, 404)
 
     def test_get_room_installations(self):
         """GET /rooms/<room_pk>/installations/"""
         url = reverse("room-related-installations", kwargs={"room_pk": self.room_pk})
-        response = self.client.get(url)
+        response = self.auth_get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 1)
 
@@ -147,15 +148,14 @@ class RoomsTestCase(APITestCase):
                 },
             }
         }
-        response = self.client.post(self.collection_url, data=request_data)
+        response = self.auth_post(self.collection_url, data=request_data)
         self.assertEqual(response.status_code, 403)
 
     def test_unauthorized_create_no_owner(self):
         """POST /rooms/ for an organization where the user is not an OWNER."""
         # Need a different user for this test case.
-        self.client.logout()
         # User horstHilfsarbeiter is ASSISTANT in Versuchsverbung (pk=2).
-        self.client.login(username="horstHilfsarbeiter", password="horst")
+        self.authenticate(username="horstHilfsarbeiter", password="horst")
         request_data = {
             "data": {
                 "type": format_resource_type("Room"),
@@ -173,7 +173,7 @@ class RoomsTestCase(APITestCase):
                 },
             }
         }
-        response = self.client.post(self.collection_url, data=request_data)
+        response = self.auth_post(self.collection_url, data=request_data)
         self.assertEqual(response.status_code, 403)
 
     def test_unauthorized_patch_no_member(self):
@@ -190,7 +190,7 @@ class RoomsTestCase(APITestCase):
                 },
             }
         }
-        response = self.client.patch(detail_url, data=request_data)
+        response = self.auth_patch(detail_url, data=request_data)
         # Expect a HTTP 404 error code, because the object to be patched should not be
         # accessible to the logged-in user.
         self.assertEqual(response.status_code, 404)
@@ -198,9 +198,8 @@ class RoomsTestCase(APITestCase):
     def test_unauthorized_patch_no_owner(self):
         """PATCH /rooms/ of an organization where the user ist not an OWNER."""
         # Need a different user for this test case.
-        self.client.logout()
         # User horstHilfsarbeiter is ASSISTANT in Versuchsverbung (pk=2).
-        self.client.login(username="horstHilfsarbeiter", password="horst")
+        self.authenticate(username="horstHilfsarbeiter", password="horst")
         request_data = {
             "data": {
                 "type": format_resource_type("Room"),
@@ -211,13 +210,13 @@ class RoomsTestCase(APITestCase):
                 },
             }
         }
-        response = self.client.patch(self.detail_url, data=request_data)
+        response = self.auth_patch(self.detail_url, data=request_data)
         # Expect a HTTP 403 error code, because the user has access to the Node but is
         # not sufficiently privileged to alter it.
         self.assertEqual(response.status_code, 403)
 
 
-class InstallationsTestCase(APITestCase):
+class InstallationsTestCase(TokenAuthMixin, APITestCase):
     fixtures = ["user-fixtures.json", "inventory-fixtures.json", "data-fixtures.json"]
     node_id = "3b95a1b2-74e7-9e98-52c4-4acae441f0ae"  # Clairchen Schwarz
     node2_id = "9d02faee-4260-1377-22ec-936428b572ee"  # ERS Test-Node
@@ -229,7 +228,10 @@ class InstallationsTestCase(APITestCase):
         # Versuchserbund commands the sites Versuchs-Site (pk=2) and Prüf-Site (pk=3).
         # Versuchs-Site has room Versuchsraum 1 (pk=3),
         # Prüf-Site has room Prüfstuge (pk=4).
-        self.client.login(username="veraVersuch", password="versuch")
+        self.auth_response, self.auth_token = self.authenticate(
+            username="veraVersuch", password="versuch"
+        )
+        self.assertIsNotNone(self.auth_token)
         # Versuchsverbund owns
         # Clairchen Schwarz (id=3b95a1b2-74e7-9e98-52c4-4acae441f0ae) and
         # ERS Test-Node (id=9d02faee-4260-1377-22ec-936428b572ee).
@@ -237,11 +239,11 @@ class InstallationsTestCase(APITestCase):
         self.collection_url = reverse("installation-list")
 
     def tearDown(self):
-        self.client.logout()
+        self.logout()
 
     def test_get_installations(self):
         """GET /installations/"""
-        response = self.client.get(self.collection_url)
+        response = self.auth_get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
         # Ensure that no timeseries is returned if we do not query for it.
@@ -250,7 +252,6 @@ class InstallationsTestCase(APITestCase):
     def test_get_installations_public(self):
         """ GET /installations/ without authentication."""
         # Make sure that we are not logged-in.
-        self.client.logout()
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         # There is exactly one public node installation in the test data.
@@ -259,48 +260,47 @@ class InstallationsTestCase(APITestCase):
     def test_get_installations_per_organization(self):
         """GET /installations/?filter[organization]=<organization_id>"""
         # Need a different user for this test case.
-        self.client.logout()
         # user priskaPrueferin is member in two organizations
-        self.client.login(username="priskaPrueferin", password="priska")
-        response = self.client.get(self.collection_url, {"filter[organization]": 1})
+        self.authenticate(username="priskaPrueferin", password="priska")
+        response = self.auth_get(self.collection_url, {"filter[organization]": 1})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 1)
 
     def test_get_installations_per_site(self):
         """GET /installations/?filter[site]=<site_id>"""
-        response = self.client.get(self.collection_url, {"filter[site]": 3})
+        response = self.auth_get(self.collection_url, {"filter[site]": 3})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["from_timestamp_s"], 1602720001)
 
     def test_get_installations_per_room(self):
         """GET /installations/?filter[room]=<room_pk>"""
-        response = self.client.get(self.collection_url, {"filter[room]": 3})
+        response = self.auth_get(self.collection_url, {"filter[room]": 3})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["from_timestamp_s"], 1601510400)
 
     def test_get_installations_per_node(self):
         """GET /installations/?filter[node]=<node_id>"""
-        response = self.client.get(self.collection_url, {"filter[node]": self.node_id})
+        response = self.auth_get(self.collection_url, {"filter[node]": self.node_id})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
 
     def test_get_installation(self):
         """GET /installations/<installation_pk>/"""
-        response = self.client.get(self.detail_url)
+        response = self.auth_get(self.detail_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["from_timestamp_s"], 1601510400)
 
     def test_get_installation_with_timeseries(self):
         """GET /installations/<installation_pk>/?include_timeseries=true"""
-        response = self.client.get(self.detail_url, {"include_timeseries": True})
+        response = self.auth_get(self.detail_url, {"include_timeseries": True})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["timeseries"]), 468)
 
     def test_get_installation_with_timeseries_slice(self):
         """GET /installations/<installation_pk>/?include_timeseries=true&filter[from]=1601675365&filter[to]=1601738613"""
-        response = self.client.get(
+        response = self.auth_get(
             self.detail_url,
             {
                 "include_timeseries": True,
@@ -335,7 +335,7 @@ class InstallationsTestCase(APITestCase):
                 },
             }
         }
-        response = self.client.patch(self.detail_url, data=request_data)
+        response = self.auth_patch(self.detail_url, data=request_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["from_timestamp_s"], 1601510000)
         self.assertEqual(response.data["is_public"], True)
@@ -370,7 +370,7 @@ class InstallationsTestCase(APITestCase):
             }
         }
         # POST /memberships/
-        response1 = self.client.post(self.collection_url, data=request_data)
+        response1 = self.auth_post(self.collection_url, data=request_data)
         self.assertEqual(response1.status_code, 201)
         self.assertEqual(response1.data["from_timestamp_s"], 1601500000)
         self.assertEqual(
@@ -380,18 +380,18 @@ class InstallationsTestCase(APITestCase):
         # Fetch the installation resource just created.
         response_url = response1.data["url"]
         # GET /installations/<installation_pk/>
-        response2 = self.client.get(response_url)
+        response2 = self.auth_get(response_url)
         self.assertEqual(response2.status_code, 200)
         self.assertEqual(response2.data["from_timestamp_s"], 1601500000)
         self.assertEqual(response2.data["node"]["id"], self.node2_id)
         self.assertEqual(response2.data["room"]["id"], "4")
         # Delete the installation.
         # DELETE /installations/<installation_pk>/
-        response3 = self.client.delete(response_url)
+        response3 = self.auth_delete(response_url)
         self.assertEqual(response3.status_code, 204)
         # Make sure it is gone.
         # GET /installations/<installation_pk>/
-        response4 = self.client.get(response_url)
+        response4 = self.auth_get(response_url)
         self.assertEqual(response4.status_code, 404)
 
     def test_node_room_owner_mismatch(self):
@@ -424,7 +424,7 @@ class InstallationsTestCase(APITestCase):
                 },
             }
         }
-        response = self.client.post(self.collection_url, data=request_data)
+        response = self.auth_post(self.collection_url, data=request_data)
         # Expect a HTTP 400 (Bad Request) error code, because the request data is
         # inconsistent.
         self.assertEqual(response.status_code, 400)
@@ -434,7 +434,7 @@ class InstallationsTestCase(APITestCase):
         url = reverse(
             "installation-related", kwargs={"pk": self.inst_pk, "related_field": "room"}
         )
-        response = self.client.get(url)
+        response = self.auth_get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["name"], "Versuchsraum 1")
 
@@ -443,7 +443,7 @@ class InstallationsTestCase(APITestCase):
         url = reverse(
             "installation-related-node", kwargs={"installation_pk": self.inst_pk}
         )
-        response = self.client.get(url)
+        response = self.auth_get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["id"], self.node_id)
 
@@ -478,15 +478,14 @@ class InstallationsTestCase(APITestCase):
                 },
             }
         }
-        response = self.client.post(self.collection_url, data=request_data)
+        response = self.auth_post(self.collection_url, data=request_data)
         self.assertEqual(response.status_code, 403)
 
     def test_unauthorized_create_no_owner(self):
         """POST /installations/ for an organization where the user is not an OWNER."""
         # Need a different user for this test case.
-        self.client.logout()
         # User horstHilfsarbeiter is ASSISTANT in Versuchsverbung (pk=2).
-        self.client.login(username="horstHilfsarbeiter", password="horst")
+        self.authenticate(username="horstHilfsarbeiter", password="horst")
         request_data = {
             "data": {
                 "type": format_resource_type("Installation"),
@@ -513,7 +512,7 @@ class InstallationsTestCase(APITestCase):
                 },
             }
         }
-        response = self.client.post(self.collection_url, data=request_data)
+        response = self.auth_post(self.collection_url, data=request_data)
         self.assertEqual(response.status_code, 403)
 
     def test_unauthorized_patch_no_member(self):
@@ -527,7 +526,7 @@ class InstallationsTestCase(APITestCase):
                 "attributes": {"from_timestamp_s": 1601510000, "is_public": True},
             }
         }
-        response = self.client.patch(detail_url, data=request_data)
+        response = self.auth_patch(detail_url, data=request_data)
         # Expect a HTTP 404 error code, because the object to be patched should not be
         # accessible to the logged-in user.
         self.assertEqual(response.status_code, 404)
@@ -535,9 +534,8 @@ class InstallationsTestCase(APITestCase):
     def test_unauthorized_patch_no_owner(self):
         """PATCH /installations/ of an organization where the user ist not an OWNER."""
         # Need a different user for this test case.
-        self.client.logout()
         # User horstHilfsarbeiter is ASSISTANT in Versuchsverbung (pk=2).
-        self.client.login(username="horstHilfsarbeiter", password="horst")
+        self.authenticate(username="horstHilfsarbeiter", password="horst")
         request_data = {
             "data": {
                 "type": format_resource_type("Installation"),
@@ -545,7 +543,7 @@ class InstallationsTestCase(APITestCase):
                 "attributes": {"from_timestamp_s": 1601510000, "is_public": False},
             }
         }
-        response = self.client.patch(self.detail_url, data=request_data)
+        response = self.auth_patch(self.detail_url, data=request_data)
         # Expect a HTTP 403 error code, because the user has access to the Node but is
         # not sufficiently privileged to alter it.
         self.assertEqual(response.status_code, 403)
