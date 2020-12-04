@@ -27,12 +27,14 @@ class SitesTestCase(TokenAuthMixin, APITestCase):
 
     def test_get_sites(self):
         """GET /sites/"""
-        response = self.auth_get(self.collection_url)
+        response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
 
     def test_get_sites_public(self):
         """GET /sites/ available to a non-authenticated user."""
+        # Make sure to not pass an authentication token.
+        self.client.defaults.pop("HTTP_AUTHORIZATION")
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         # There is exactly one site that contains a public node installation in the
@@ -44,13 +46,13 @@ class SitesTestCase(TokenAuthMixin, APITestCase):
         # Need a different user for this test case.
         # user priskaPrueferin is member in two organizations
         self.authenticate(username="priskaPrueferin", password="priska")
-        response = self.auth_get(self.collection_url, {"filter[organization]": 1})
+        response = self.client.get(self.collection_url, {"filter[organization]": 1})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 1)
 
     def test_get_site(self):
         """GET /sites/<site_id>/"""
-        response = self.auth_get(self.detail_url)
+        response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["name"], "Versuchs-Site")
 
@@ -66,7 +68,7 @@ class SitesTestCase(TokenAuthMixin, APITestCase):
                 },
             }
         }
-        response = self.auth_patch(self.detail_url, data=request_data)
+        response = self.client.patch(self.detail_url, data=request_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["name"], "Versuchsort")
         self.assertEqual(
@@ -87,7 +89,7 @@ class SitesTestCase(TokenAuthMixin, APITestCase):
             }
         }
         # POST /sites/
-        response1 = self.auth_post(self.collection_url, data=request_data)
+        response1 = self.client.post(self.collection_url, data=request_data)
         self.assertEqual(response1.status_code, 201)
         self.assertEqual(response1.data["name"], "Versuchsort 2")
         self.assertEqual(response1.data["address"]["id"], "2")
@@ -95,24 +97,24 @@ class SitesTestCase(TokenAuthMixin, APITestCase):
         # Fetch the site resource just created.
         response_url = response1.data["url"]
         # GET /sites/<site_id>/
-        response2 = self.auth_get(response_url)
+        response2 = self.client.get(response_url)
         self.assertEqual(response2.status_code, 200)
         self.assertEqual(response2.data["name"], "Versuchsort 2")
         self.assertEqual(response2.data["address"]["id"], "2")
         self.assertEqual(response2.data["operator"]["id"], "2")
         # Delete the site.
         # DELETE /site/<site_id>/
-        response3 = self.auth_delete(response_url)
+        response3 = self.client.delete(response_url)
         self.assertEqual(response3.status_code, 204)
         # Make sure it is gone.
         # GET /site/<site_id>/
-        response4 = self.auth_get(response_url)
+        response4 = self.client.get(response_url)
         self.assertEqual(response4.status_code, 404)
 
     def test_get_site_rooms(self):
         """GET /sites/<site_pk>/rooms/"""
         url = reverse("site-related-rooms", kwargs={"site_pk": self.site_pk})
-        response = self.auth_get(url)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 1)
 
@@ -126,13 +128,13 @@ class SitesTestCase(TokenAuthMixin, APITestCase):
                 },
                 "relationships": {
                     "address": {"data": {"type": "Address", "id": "2"}},
-                    # The currently logged-in user VeraVersuch is not a member of the
-                    # # organization Test-Team with pk=1.
+                    # The currently authenticated user VeraVersuch is not a member of
+                    # the organization Test-Team with pk=1.
                     "operator": {"data": {"type": "Organization", "id": "1"}},
                 },
             }
         }
-        response1 = self.auth_post(self.collection_url, data=request_data)
+        response1 = self.client.post(self.collection_url, data=request_data)
         self.assertEqual(response1.status_code, 403)
 
     def test_unauthorized_create_no_owner(self):
@@ -154,7 +156,7 @@ class SitesTestCase(TokenAuthMixin, APITestCase):
                 },
             }
         }
-        response1 = self.auth_post(self.collection_url, data=request_data)
+        response1 = self.client.post(self.collection_url, data=request_data)
         self.assertEqual(response1.status_code, 403)
 
     def test_unauthorized_patch_no_member(self):
@@ -172,7 +174,7 @@ class SitesTestCase(TokenAuthMixin, APITestCase):
                 },
             }
         }
-        response = self.auth_patch(detail_url, data=request_data)
+        response = self.client.patch(detail_url, data=request_data)
         # Expect a HTTP 404 error code, because the object to be patched should not be
         # accessible to the logged-in user.
         self.assertEqual(response.status_code, 404)
@@ -192,7 +194,7 @@ class SitesTestCase(TokenAuthMixin, APITestCase):
                 },
             }
         }
-        response = self.auth_patch(self.detail_url, data=request_data)
+        response = self.client.patch(self.detail_url, data=request_data)
         # Expect a HTTP 403 error code, because the user has access to the Node but is
         # not sufficiently privileged to alter it.
         self.assertEqual(response.status_code, 403)

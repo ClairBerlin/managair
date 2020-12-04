@@ -25,12 +25,13 @@ class NodeTestCase(TokenAuthMixin, APITestCase):
 
     def test_get_nodes(self):
         """GET /nodes/"""
-        response = self.auth_get(self.collection_url)
+        response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
 
     def test_get_nodes_unauthenticated(self):
         """GET /nodes/ without authentication."""
+        self.client.defaults.pop("HTTP_AUTHORIZATION")
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 401)
 
@@ -39,13 +40,13 @@ class NodeTestCase(TokenAuthMixin, APITestCase):
         # Need a different user for this test case.
         # user priskaPrueferin is member in two organizations
         self.authenticate(username="priskaPrueferin", password="priska")
-        response = self.auth_get(self.collection_url, {"filter[organization]": 2})
+        response = self.client.get(self.collection_url, {"filter[organization]": 2})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
 
     def test_get_node(self):
         """GET /node/<node_id>/"""
-        response = self.auth_get(self.detail_url)
+        response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["alias"], "Clairchen Schwarz")
         # Ensure that no timeseries is returned if we do not query for it.
@@ -53,7 +54,7 @@ class NodeTestCase(TokenAuthMixin, APITestCase):
 
     def test_get_node_with_timeseries(self):
         """GET /node/<node_id>?include_timeseries=True"""
-        response = self.auth_get(self.detail_url, {"include_timeseries": True})
+        response = self.client.get(self.detail_url, {"include_timeseries": True})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["alias"], "Clairchen Schwarz")
         self.assertEqual(len(response.data["timeseries"]), 589)
@@ -67,11 +68,11 @@ class NodeTestCase(TokenAuthMixin, APITestCase):
                 "attributes": {
                     "eui64": "003CB7EA62A7DCBB",
                     "alias": "Clairchen Black",
-                    "description": "This node belongs to the international node testing society."
+                    "description": "This node belongs to the international node testing society.",
                 },
             }
         }
-        response = self.auth_patch(self.detail_url, data=request_data)
+        response = self.client.patch(self.detail_url, data=request_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["alias"], "Clairchen Black")
 
@@ -83,7 +84,7 @@ class NodeTestCase(TokenAuthMixin, APITestCase):
                 "attributes": {
                     "eui64": "fefffffffdff0000",
                     "alias": "Test Node",
-                    "description": "What a node!"
+                    "description": "What a node!",
                 },
                 "relationships": {
                     "protocol": {"data": {"type": "Protocol", "id": "1"}},
@@ -93,24 +94,24 @@ class NodeTestCase(TokenAuthMixin, APITestCase):
             }
         }
         # POST /nodes/
-        response1 = self.auth_post(self.collection_url, data=request_data)
+        response1 = self.client.post(self.collection_url, data=request_data)
         self.assertEqual(response1.status_code, 201)
         self.assertEqual(response1.data["eui64"], "fefffffffdff0000")
         self.assertEqual(response1.data["alias"], "Test Node")
         # Fetch the node resource just created.
         response_url = response1.data["url"]
         # GET /nodes/<node_id>/
-        response2 = self.auth_get(response_url)
+        response2 = self.client.get(response_url)
         self.assertEqual(response2.status_code, 200)
         self.assertEqual(response2.data["eui64"], "fefffffffdff0000")
         self.assertEqual(response2.data["alias"], "Test Node")
         # Delete the node.
         # DELETE /node/<node_id>/
-        response3 = self.auth_delete(response_url)
+        response3 = self.client.delete(response_url)
         self.assertEqual(response3.status_code, 204)
         # Make sure it is gone.
         # GET /node/<node_id>/
-        response4 = self.auth_get(response_url)
+        response4 = self.client.get(response_url)
         self.assertEqual(response4.status_code, 404)
 
     def test_get_node_installations(self):
@@ -119,7 +120,7 @@ class NodeTestCase(TokenAuthMixin, APITestCase):
             "node-related",
             kwargs={"pk": self.node_id, "related_field": "installations"},
         )
-        response = self.auth_get(url)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
 
@@ -136,13 +137,13 @@ class NodeTestCase(TokenAuthMixin, APITestCase):
                 "relationships": {
                     "protocol": {"data": {"type": "Protocol", "id": "1"}},
                     "model": {"data": {"type": "Model", "id": "1"}},
-                    # The currently logged-in user VeraVersuch is not a member of the
-                    # # organization Test-Team with pk=1.
+                    # The currently authenticated user VeraVersuch is not a member of
+                    # the organization Test-Team with pk=1.
                     "owner": {"data": {"type": "Organization", "id": "1"}},
                 },
             }
         }
-        response = self.auth_post(self.collection_url, data=request_data)
+        response = self.client.post(self.collection_url, data=request_data)
         self.assertEqual(response.status_code, 403)
 
     def test_unauthorized_create_no_owner(self):
@@ -167,7 +168,7 @@ class NodeTestCase(TokenAuthMixin, APITestCase):
                 },
             }
         }
-        response = self.auth_post(self.collection_url, data=request_data)
+        response = self.client.post(self.collection_url, data=request_data)
         self.assertEqual(response.status_code, 403)
 
     def test_unauthorized_patch_no_member(self):
@@ -185,7 +186,7 @@ class NodeTestCase(TokenAuthMixin, APITestCase):
                 },
             }
         }
-        response = self.auth_patch(detail_url, data=request_data)
+        response = self.client.patch(detail_url, data=request_data)
         # Expect a HTTP 404 error code, because the object to be patched should not be
         # accessible to the logged-in user.
         self.assertEqual(response.status_code, 404)
@@ -205,7 +206,7 @@ class NodeTestCase(TokenAuthMixin, APITestCase):
                 },
             }
         }
-        response = self.auth_patch(self.detail_url, data=request_data)
+        response = self.client.patch(self.detail_url, data=request_data)
         # Expect a HTTP 403 error code, because the user has access to the Node but is
         # not sufficiently privileged to alter it.
         self.assertEqual(response.status_code, 403)

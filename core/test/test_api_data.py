@@ -27,18 +27,19 @@ class NodeTimeseriesTestCase(TokenAuthMixin, APITestCase):
 
     def test_get_node_timeseries_list(self):
         """GET /node-timeseries/"""
-        response = self.auth_get(self.collection_url)
+        response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
 
     def test_get_node_timeseries_list_unauthenticated(self):
         """GET /node-timeseries/ without authentication."""
+        self.client.defaults.pop("HTTP_AUTHORIZATION")
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 401)
 
     def test_get_node_timeseries(self):
         """GET /node-timeseries/<node_id>"""
-        response = self.auth_get(self.detail_url)
+        response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["sample_count"], 589)
         self.assertEqual(len(response.data["samples"]), 589)
@@ -48,7 +49,7 @@ class NodeTimeseriesTestCase(TokenAuthMixin, APITestCase):
         url = reverse(
             "node-related", kwargs={"pk": self.node_id, "related_field": "timeseries"}
         )
-        response = self.auth_get(url)
+        response = self.client.get(url)
         self.assertEqual(response.data["sample_count"], 589)
         self.assertEqual(len(response.data["samples"]), 589)
 
@@ -57,7 +58,7 @@ class NodeTimeseriesTestCase(TokenAuthMixin, APITestCase):
         url = reverse(
             "node-related", kwargs={"pk": self.node_id, "related_field": "timeseries"}
         )
-        response = self.auth_get(
+        response = self.client.get(
             url, data={"filter[from]": 1601725200, "filter[to]": 1601795400}
         )
         self.assertEqual(response.data["sample_count"], 39)

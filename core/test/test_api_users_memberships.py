@@ -28,26 +28,26 @@ class UsersTestCase(TokenAuthMixin, APITestCase):
 
     def test_get_users(self):
         """GET /users/"""
-        response = self.auth_get(self.collection_url)
+        response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 7)
 
     def test_get_users_search(self):
         """GET /users/?filter[search]=<search-text>"""
-        response = self.auth_get(self.collection_url, {"filter[search]": "tom"})
+        response = self.client.get(self.collection_url, {"filter[search]": "tom"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["username"], "tomTester")
 
     def test_get_users_in_organization(self):
         """GET /users/?filter[organization]=<organization_id>"""
-        response = self.auth_get(self.collection_url, {"filter[organization]": "2"})
+        response = self.client.get(self.collection_url, {"filter[organization]": "2"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 4)
 
     def test_get_user(self):
         """GET /users/<user_id>/"""
-        response = self.auth_get(self.detail_url)
+        response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["username"], "veraVersuch")
         self.assertEqual(response.data["email"], "vera@versuch.de")
@@ -57,7 +57,7 @@ class UsersTestCase(TokenAuthMixin, APITestCase):
         url = reverse(
             "user-related", kwargs={"pk": 3, "related_field": "organizations"}
         )
-        response = self.auth_get(url)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["name"], "Versuchsverbund")
@@ -83,19 +83,19 @@ class MembershipsTestCase(TokenAuthMixin, APITestCase):
 
     def test_get_memberships(self):
         """GET /memberships/"""
-        response = self.auth_get(self.collection_url)
+        response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 8)
 
     def test_get_membership_in_organization(self):
         """GET /memberships/?filter[organization]=<organization_id>"""
-        response = self.auth_get(self.collection_url, {"filter[organization]": 2})
+        response = self.client.get(self.collection_url, {"filter[organization]": 2})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 4)
 
     def test_get_membership_per_username(self):
         """GET /memberships/?filter[username]=<username>"""
-        response = self.auth_get(
+        response = self.client.get(
             self.collection_url, {"filter[username]": "ingoInspekteur"}
         )
         self.assertEqual(response.status_code, 200)
@@ -103,13 +103,13 @@ class MembershipsTestCase(TokenAuthMixin, APITestCase):
 
     def test_get_membership_per_user(self):
         """GET /memberships/?filter[user]=<user_id>"""
-        response = self.auth_get(self.collection_url, {"filter[user]": 6})
+        response = self.client.get(self.collection_url, {"filter[user]": 6})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
 
     def test_get_membership(self):
         """GET /memberships/<membership_id>/"""
-        response = self.auth_get(self.detail_url)
+        response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["role"], "O")
 
@@ -122,7 +122,7 @@ class MembershipsTestCase(TokenAuthMixin, APITestCase):
                 "attributes": {"role": "I"},  # Downgrade to INSPECTOR role.
             }
         }
-        response = self.auth_patch(self.detail_url, data=request_data)
+        response = self.client.patch(self.detail_url, data=request_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["role"], "I")
 
@@ -146,7 +146,7 @@ class MembershipsTestCase(TokenAuthMixin, APITestCase):
             }
         }
         # POST /memberships/
-        response1 = self.auth_post(self.collection_url, data=request_data)
+        response1 = self.client.post(self.collection_url, data=request_data)
         self.assertEqual(response1.status_code, 201)
         self.assertEqual(response1.data["role"], "A")
         self.assertEqual(response1.data["user"]["id"], "5")
@@ -154,24 +154,24 @@ class MembershipsTestCase(TokenAuthMixin, APITestCase):
         # Fetch the membership resource just created.
         response_url = response1.data["url"]
         # GET /memberships/<membership_id/>
-        response2 = self.auth_get(response_url)
+        response2 = self.client.get(response_url)
         self.assertEqual(response2.status_code, 200)
         self.assertEqual(response2.data["role"], "A")
         self.assertEqual(response2.data["user"]["id"], "5")
         self.assertEqual(response2.data["organization"]["id"], "2")
         # Delete the membership.
         # DELETE /memberships/<membership_id>/
-        response3 = self.auth_delete(response_url)
+        response3 = self.client.delete(response_url)
         self.assertEqual(response3.status_code, 204)
         # Make sure it is gone.
         # GET /memberships/<membership_id>/
-        response4 = self.auth_get(response_url)
+        response4 = self.client.get(response_url)
         self.assertEqual(response4.status_code, 404)
 
     def test_get_membership_user(self):
         """GET /memberships/<membership_id>/user/"""
         url = reverse("membership-related", kwargs={"pk": 15, "related_field": "user"})
-        response = self.auth_get(url)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["username"], "priskaPrueferin")
 
@@ -180,7 +180,7 @@ class MembershipsTestCase(TokenAuthMixin, APITestCase):
         url = reverse(
             "membership-related", kwargs={"pk": 15, "related_field": "organization"}
         )
-        response = self.auth_get(url)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["name"], "Versuchsverbund")
 
@@ -206,7 +206,7 @@ class MembershipsTestCase(TokenAuthMixin, APITestCase):
                 },
             }
         }
-        response = self.auth_post(self.collection_url, data=request_data)
+        response = self.client.post(self.collection_url, data=request_data)
         self.assertEqual(response.status_code, 403)
 
     def test_unauthorized_add_membership_no_member(self):
@@ -235,14 +235,14 @@ class MembershipsTestCase(TokenAuthMixin, APITestCase):
                 },
             }
         }
-        response = self.auth_post(self.collection_url, data=request_data)
+        response = self.client.post(self.collection_url, data=request_data)
         self.assertEqual(response.status_code, 403)
 
     def test_unauthorized_leave_organization(self):
         """DELETE /membership/ for a member that is not the OWNER of the organizatin."""
         # priskaPrüferin is ASSISTANT in Test-Team (membership pk=16).
         request_url = reverse("membership-detail", kwargs={"pk": 16})
-        response = self.auth_delete(request_url)
+        response = self.client.delete(request_url)
         self.assertEqual(response.status_code, 403)
 
     def test_unauthorized_role_change_no_owner(self):
@@ -257,5 +257,5 @@ class MembershipsTestCase(TokenAuthMixin, APITestCase):
                 "attributes": {"role": "O"},  # Attempt to self-upgrade.
             }
         }
-        response = self.auth_patch(request_url, data=request_data)
+        response = self.client.patch(request_url, data=request_data)
         self.assertEqual(response.status_code, 403)

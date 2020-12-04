@@ -22,12 +22,14 @@ class OrganizationTestCase(TokenAuthMixin, APITestCase):
 
     def test_get_organizations(self):
         """GET /organizations/"""
-        response = self.auth_get(self.collection_url)
+        response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 3)
 
     def test_get_organizations_public(self):
         """GET /organizations/ that are publicly visible."""
+        # Make sure to not provide an auth token
+        self.client.defaults.pop("HTTP_AUTHORIZATION")
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         # There is exactly one organization that has a public node installation
@@ -37,7 +39,7 @@ class OrganizationTestCase(TokenAuthMixin, APITestCase):
 
     def test_get_organization(self):
         """GET /organizations/<organization_id>/"""
-        response = self.auth_get(self.detail_url)
+        response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["name"], "Test-Team")
 
@@ -50,7 +52,7 @@ class OrganizationTestCase(TokenAuthMixin, APITestCase):
                 "attributes": {"description": "Test-Description"},
             }
         }
-        response = self.auth_patch(self.detail_url, data=request_data)
+        response = self.client.patch(self.detail_url, data=request_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["description"], "Test-Description")
 
@@ -66,7 +68,7 @@ class OrganizationTestCase(TokenAuthMixin, APITestCase):
             }
         }
         # POST /organizations/
-        response1 = self.auth_post(collection_url, data=request_data)
+        response1 = self.client.post(collection_url, data=request_data)
         self.assertEqual(response1.status_code, 201)
         self.assertEqual(response1.data["name"], "Temp-Testers")
         self.assertEqual(
@@ -75,7 +77,7 @@ class OrganizationTestCase(TokenAuthMixin, APITestCase):
         # Fetch the organization resource just created.
         # GET /organizations/<organization_id>/
         response_url = response1.data["url"]
-        response2 = self.auth_get(response_url)
+        response2 = self.client.get(response_url)
         self.assertEqual(response2.status_code, 200)
         self.assertEqual(response2.data["name"], "Temp-Testers")
         self.assertEqual(
@@ -83,11 +85,11 @@ class OrganizationTestCase(TokenAuthMixin, APITestCase):
         )
         # Delete the organization.
         # DELETE /organizations/<organization_id>/
-        response3 = self.auth_delete(response_url)
+        response3 = self.client.delete(response_url)
         self.assertEqual(response3.status_code, 204)
         # Make sure it is gone.
         # GET /organizations/<organization_id>/
-        response4 = self.auth_get(response_url)
+        response4 = self.client.get(response_url)
         self.assertEqual(response4.status_code, 404)
 
     def test_get_organization_users(self):
@@ -95,7 +97,7 @@ class OrganizationTestCase(TokenAuthMixin, APITestCase):
         url = reverse(
             "organization-related-users", kwargs={"organization_pk": self.org_pk}
         )
-        response = self.auth_get(url)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 4)
 
@@ -104,7 +106,7 @@ class OrganizationTestCase(TokenAuthMixin, APITestCase):
         url = reverse(
             "organization-related-memberships", kwargs={"organization_pk": self.org_pk}
         )
-        response = self.auth_get(url)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 4)
 
@@ -114,7 +116,7 @@ class OrganizationTestCase(TokenAuthMixin, APITestCase):
             "organization-relationships",
             kwargs={"pk": self.org_pk, "related_field": "users"},
         )
-        response = self.auth_get(url)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 4)  # Indeed a flat response list.
 
@@ -126,20 +128,20 @@ class OrganizationTestCase(TokenAuthMixin, APITestCase):
         )
         request_data = {"data": [{"type": "User", "id": "4"}]}
         # POST /organizatons/<organization_id>/relationships/users/
-        response1 = self.auth_post(url, data=request_data)
+        response1 = self.client.post(url, data=request_data)
         self.assertEqual(response1.status_code, 200)
         # See if the created relation is there.
         # GET /organizatons/<organization_id>/relationships/users/
-        response2 = self.auth_get(url)
+        response2 = self.client.get(url)
         self.assertEqual(response2.status_code, 200)
         self.assertIn({"type": "User", "id": "4"}, response2.data)
         # Delete the membership again.
         # DELETE /organizatons/<organization_id>/relationships/users/
-        response3 = self.auth_delete(url, data=request_data)
+        response3 = self.client.delete(url, data=request_data)
         self.assertEqual(response3.status_code, 200)
         # Ensure that the user is no longer a member of the organization.
         # GET /organizatons/<organization_id>/relationships/users/
-        response4 = self.auth_get(url)
+        response4 = self.client.get(url)
         self.assertEqual(response2.status_code, 200)
         self.assertNotIn({"type": "User", "id": "4"}, response4.data)
 
@@ -148,7 +150,7 @@ class OrganizationTestCase(TokenAuthMixin, APITestCase):
         url = reverse(
             "organization-related-nodes", kwargs={"organization_pk": self.org_pk}
         )
-        response = self.auth_get(url)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 1)
 
@@ -157,7 +159,7 @@ class OrganizationTestCase(TokenAuthMixin, APITestCase):
         url = reverse(
             "organization-related-sites", kwargs={"organization_pk": self.org_pk}
         )
-        response = self.auth_get(url)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 1)
 
@@ -172,7 +174,7 @@ class OrganizationTestCase(TokenAuthMixin, APITestCase):
                 "attributes": {"description": "Fake Description"},
             }
         }
-        response = self.auth_patch(self.detail_url, data=request_data)
+        response = self.client.patch(self.detail_url, data=request_data)
         # Expect a HTTP 404 error code, because the user should not have access to the
         # organization.
         self.assertEqual(response.status_code, 404)
@@ -188,7 +190,7 @@ class OrganizationTestCase(TokenAuthMixin, APITestCase):
                 "attributes": {"description": "Fake Description"},
             }
         }
-        response = self.auth_patch(self.detail_url, data=request_data)
+        response = self.client.patch(self.detail_url, data=request_data)
         # Expect a HTTP 403 error code, because the user can access the organization
         # but is not authorized to change it.
         self.assertEqual(response.status_code, 403)

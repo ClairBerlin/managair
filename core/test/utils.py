@@ -35,6 +35,7 @@ class TokenAuthMixin:
             auth_request["data"]["attributes"]["username"] = username
         self.response = self.client.post(login_url, data=auth_request)
         self.token = self.response.data.get("key", None)
+        self.client.defaults["HTTP_AUTHORIZATION"] = "Token " + self.token
         return (self.response, self.token)
 
     def logout(self, token=None):
@@ -43,67 +44,8 @@ class TokenAuthMixin:
         self.response = self.client.post(
             self.logout_url, HTTP_AUTHORIZATION=("Token " + token)
         )
-
-    def auth_get(self, path, data=None, follow=False, secure=False, **extra):
-        token = extra.pop("token", None)
-        if not token:
-            token = self.token
-        return self.client.get(
-            path,
-            data=data,
-            follow=follow,
-            secure=secure,
-            HTTP_AUTHORIZATION=("Token " + token),
-            **extra,
-        )
-
-    def auth_patch(
-        self, path, data=None, format=None, content_type=None, follow=False, **extra
-    ):
-        token = extra.pop("token", None)
-        if not token:
-            token = self.token
-        return self.client.patch(
-            path,
-            data=data,
-            format=format,
-            content_type=content_type,
-            follow=follow,
-            HTTP_AUTHORIZATION=("Token " + token),
-            **extra,
-        )
-
-    def auth_post(
-        self, path, data=None, format=None, content_type=None, follow=False, **extra
-    ):
-        token = extra.pop("token", None)
-        if not token:
-            token = self.token
-        return self.client.post(
-            path,
-            data=data,
-            format=format,
-            content_type=content_type,
-            follow=follow,
-            HTTP_AUTHORIZATION=("Token " + token),
-            **extra,
-        )
-
-    def auth_delete(
-        self, path, data=None, format=None, content_type=None, follow=False, **extra
-    ):
-        token = extra.pop("token", None)
-        if not token:
-            token = self.token
-        return self.client.delete(
-            path,
-            data=data,
-            format=format,
-            content_type=content_type,
-            follow=follow,
-            HTTP_AUTHORIZATION=("Token " + token),
-            **extra,
-        )
+        if "HTTP_AUTHORIZATION" in self.client.defaults:
+            self.client.defaults.pop("HTTP_AUTHORIZATION")
 
 
 def setup_test_auth():
