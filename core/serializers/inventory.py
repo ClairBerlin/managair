@@ -87,6 +87,8 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
         queryset=Room.objects.all(), related_link_view_name="installation-related"
     )
 
+    to_timestamp_s = serializers.IntegerField(required=False)
+
     # Additional fields to merge the node installation with its samples.
     timeseries = serializers.ListField(child=SimpleSampleSerializer(), read_only=True)
     query_timestamp_s = serializers.IntegerField(read_only=True)
