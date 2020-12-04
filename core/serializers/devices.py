@@ -80,6 +80,7 @@ class NodeSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "eui64",
             "alias",
+            "description",
             "query_timestamp_s",
             "from_timestamp_s",
             "to_timestamp_s",
