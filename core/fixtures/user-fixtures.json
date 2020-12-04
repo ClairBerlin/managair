@@ -1270,5 +1270,65 @@
             "groups": [],
             "user_permissions": []
         }
+    },
+    {
+        "model": "account.emailaddress",
+        "pk": 6,
+        "fields": {
+            "user": 5,
+            "email": "anna@angestellte.de",
+            "verified": true,
+            "primary": true
+        }
+    },
+    {
+        "model": "account.emailaddress",
+        "pk": 7,
+        "fields": {
+            "user": 4,
+            "email": "horst@hilfsarbeiter.de",
+            "verified": true,
+            "primary": true
+        }
+    },
+    {
+        "model": "account.emailaddress",
+        "pk": 8,
+        "fields": {
+            "user": 6,
+            "email": "ingo@inspekteur.de",
+            "verified": true,
+            "primary": true
+        }
+    },
+    {
+        "model": "account.emailaddress",
+        "pk": 9,
+        "fields": {
+            "user": 7,
+            "email": "priska@prueferin.de",
+            "verified": true,
+            "primary": true
+        }
+    },
+    {
+        "model": "account.emailaddress",
+        "pk": 10,
+        "fields": {
+            "user": 2,
+            "email": "tom.tester@test.de",
+            "verified": true,
+            "primary": true
+        }
+    },
+    {
+        "model": "account.emailaddress",
+        "pk": 11,
+        "fields": {
+            "user": 3,
+            "email": "vera@versuch.de",
+            "verified": true,
+            "primary": true
+        }
     }
 ]

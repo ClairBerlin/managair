@@ -91,6 +91,7 @@ For most resources, there exists at least on API test. Refer to these test cases
   - [GET] List the nodes. Filter to narrow down the list:
     - Get nodes of one specific organization only via the filter `filter[organization]=<organization_id>`.
     - Search for nodes with a specific alias or device-EUI via the filter `filter[search]=<search-text>`.
+    - [POST] Register a new node with an organization for which the authenticated user must be an OWNER.
 - `/api/v1/nodes/<node_id>/` Details-resource of the specified node. Only accessible if the node is visible to the authenticated user.
   - [GET] Retrieve information about the node. Might include fidelity information and time-series data. By default, the node resource does not return its associated time series. To query for the node's time series, use the following query-parameters:
     - `include_timeseries=True` prompts the _Managair_ to add a `timeseries` list to the attributes of the Node resource.

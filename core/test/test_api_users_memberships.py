@@ -1,11 +1,10 @@
-from unittest import skip
-
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework_json_api.utils import format_resource_type
+from .utils import TokenAuthMixin
 
 
-class UsersTestCase(APITestCase):
+class UsersTestCase(TokenAuthMixin, APITestCase):
     fixtures = ["user-fixtures.json", "inventory-fixtures.json"]
 
     def setUp(self):
@@ -14,7 +13,10 @@ class UsersTestCase(APITestCase):
         # pk 4: Horst Hilfsarbeiter
         # pk 6: Ingo Inspekteur
         # pk 7: Priska Prüferin
-        self.assertTrue(self.client.login(username="veraVersuch", password="versuch"))
+        self.auth_response, self.auth_token = self.authenticate(
+            username="veraVersuch", password="versuch"
+        )
+        self.assertIsNotNone(self.auth_token)
         # Versuchsverbund owns
         # Clairchen Schwarz (id=3b95a1b2-74e7-9e98-52c4-4acae441f0ae) and
         # ERS Test-Node (id=9d02faee-4260-1377-22ec-936428b572ee).
@@ -22,7 +24,7 @@ class UsersTestCase(APITestCase):
         self.collection_url = reverse("user-list")
 
     def tearDown(self):
-        self.client.logout()
+        self.logout()
 
     def test_get_users(self):
         """GET /users/"""
@@ -50,9 +52,6 @@ class UsersTestCase(APITestCase):
         self.assertEqual(response.data["username"], "veraVersuch")
         self.assertEqual(response.data["email"], "vera@versuch.de")
 
-    @skip(
-        "Test fails because of upstream bug: https://github.com/django-json-api/django-rest-framework-json-api/issues/859"
-    )
     def test_get_user_organizations(self):
         """GET /users/<user_id>/organizations/"""
         url = reverse(
@@ -60,23 +59,27 @@ class UsersTestCase(APITestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["name"], "Versuchsverbund")
 
 
-class MembershipsTestCase(APITestCase):
+class MembershipsTestCase(TokenAuthMixin, APITestCase):
     fixtures = ["user-fixtures.json", "inventory-fixtures.json"]
 
     def setUp(self):
         # priskaPrueferin (pk=7) is OWNER of Versuchsverbund, Membership pk=15;
         # and ASSISTANT in Test-Team, Membership pk=16.
-        self.client.login(username="priskaPrueferin", password="priska")
+        self.auth_response, self.auth_token = self.authenticate(
+            username="priskaPrueferin", password="priska"
+        )
+        self.assertIsNotNone(self.auth_token)
         self.user_id = 7
         self.mid = 15
         self.detail_url = reverse("membership-detail", kwargs={"pk": self.mid})
         self.collection_url = reverse("membership-list")
 
     def tearDown(self):
-        self.client.logout()
+        self.logout()
 
     def test_get_memberships(self):
         """GET /memberships/"""
@@ -86,20 +89,12 @@ class MembershipsTestCase(APITestCase):
 
     def test_get_membership_in_organization(self):
         """GET /memberships/?filter[organization]=<organization_id>"""
-        # Need a different user for this test case.
-        self.client.logout()
-        # user priskaPrueferin is member in two organizations
-        self.client.login(username="priskaPrueferin", password="priska")
         response = self.client.get(self.collection_url, {"filter[organization]": 2})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 4)
 
     def test_get_membership_per_username(self):
         """GET /memberships/?filter[username]=<username>"""
-        # Need a different user for this test case.
-        self.client.logout()
-        # user priskaPrueferin is member in two organizations
-        self.client.login(username="priskaPrueferin", password="priska")
         response = self.client.get(
             self.collection_url, {"filter[username]": "ingoInspekteur"}
         )
@@ -108,10 +103,6 @@ class MembershipsTestCase(APITestCase):
 
     def test_get_membership_per_user(self):
         """GET /memberships/?filter[user]=<user_id>"""
-        # Need a different user for this test case.
-        self.client.logout()
-        # user priskaPrueferin is member in two organizations
-        self.client.login(username="priskaPrueferin", password="priska")
         response = self.client.get(self.collection_url, {"filter[user]": 6})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
@@ -195,10 +186,8 @@ class MembershipsTestCase(APITestCase):
 
     def test_unauthorized_create_membership_no_member(self):
         """POST /memberships/ where the user is not a member of the organization."""
-        # Need a different user for this test case.
-        self.client.logout()
         # User tomTester (pk=2) is OWNER of Test-Team (pk=1).
-        self.client.login(username="tomTester", password="test")
+        self.authenticate(username="tomTester", password="test")
         request_data = {
             "data": {
                 "type": format_resource_type("Membership"),
@@ -223,10 +212,9 @@ class MembershipsTestCase(APITestCase):
     def test_unauthorized_add_membership_no_member(self):
         """POST /memberships/ for a user that is not a member of the organization."""
         # Need a different user for this test case.
-        self.client.logout()
         # User tomTester (pk=2) is OWNER of Test-Team (pk=1).
         user_id = 2
-        self.client.login(username="tomTester", password="test")
+        self.authenticate(username="tomTester", password="test")
         request_data = {
             "data": {
                 "type": format_resource_type("Membership"),

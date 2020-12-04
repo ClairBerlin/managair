@@ -1,15 +1,19 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework_json_api.utils import format_resource_type
+from .utils import TokenAuthMixin
 
 
-class NodeTestCase(APITestCase):
+class NodeTestCase(TokenAuthMixin, APITestCase):
     fixtures = ["user-fixtures.json", "inventory-fixtures.json", "data-fixtures.json"]
     node_id = "3b95a1b2-74e7-9e98-52c4-4acae441f0ae"
 
     def setUp(self):
         # veraVersuch is owner of the organization Versuchsverbund with pk=2.
-        self.assertTrue(self.client.login(username="veraVersuch", password="versuch"))
+        self.auth_response, self.auth_token = self.authenticate(
+            username="veraVersuch", password="versuch"
+        )
+        self.assertIsNotNone(self.auth_token)
         # Versuchsverbund owns
         # Clairchen Schwarz (id=3b95a1b2-74e7-9e98-52c4-4acae441f0ae) and
         # ERS Test-Node (id=9d02faee-4260-1377-22ec-936428b572ee).
@@ -17,7 +21,7 @@ class NodeTestCase(APITestCase):
         self.collection_url = reverse("node-list")
 
     def tearDown(self):
-        self.client.logout()
+        self.logout()
 
     def test_get_nodes(self):
         """GET /nodes/"""
@@ -27,17 +31,15 @@ class NodeTestCase(APITestCase):
 
     def test_get_nodes_unauthenticated(self):
         """GET /nodes/ without authentication."""
-        # Make sure we are not logged in.
-        self.client.logout()
+        self.client.defaults.pop("HTTP_AUTHORIZATION")
         response = self.client.get(self.collection_url)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
     def test_get_nodes_per_organization(self):
         """GET /nodes/?filter[organization]=<organization_id>"""
         # Need a different user for this test case.
-        self.client.logout()
         # user priskaPrueferin is member in two organizations
-        self.client.login(username="priskaPrueferin", password="priska")
+        self.authenticate(username="priskaPrueferin", password="priska")
         response = self.client.get(self.collection_url, {"filter[organization]": 2})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
@@ -66,7 +68,7 @@ class NodeTestCase(APITestCase):
                 "attributes": {
                     "eui64": "003CB7EA62A7DCBB",
                     "alias": "Clairchen Black",
-                    "description": "This node belongs to the international node testing society."
+                    "description": "This node belongs to the international node testing society.",
                 },
             }
         }
@@ -82,7 +84,7 @@ class NodeTestCase(APITestCase):
                 "attributes": {
                     "eui64": "fefffffffdff0000",
                     "alias": "Test Node",
-                    "description": "What a node!"
+                    "description": "What a node!",
                 },
                 "relationships": {
                     "protocol": {"data": {"type": "Protocol", "id": "1"}},
@@ -135,8 +137,8 @@ class NodeTestCase(APITestCase):
                 "relationships": {
                     "protocol": {"data": {"type": "Protocol", "id": "1"}},
                     "model": {"data": {"type": "Model", "id": "1"}},
-                    # The currently logged-in user VeraVersuch is not a member of the
-                    # # organization Test-Team with pk=1.
+                    # The currently authenticated user VeraVersuch is not a member of
+                    # the organization Test-Team with pk=1.
                     "owner": {"data": {"type": "Organization", "id": "1"}},
                 },
             }
@@ -147,9 +149,8 @@ class NodeTestCase(APITestCase):
     def test_unauthorized_create_no_owner(self):
         """POST /nodes/ for an organization where the user is not an OWNER."""
         # Need a different user for this test case.
-        self.client.logout()
         # User horstHilfsarbeiter is ASSISTANT in Versuchsverbund (pk=2).
-        self.client.login(username="horstHilfsarbeiter", password="horst")
+        self.authenticate(username="horstHilfsarbeiter", password="horst")
         request_data = {
             "data": {
                 "type": format_resource_type("Node"),
@@ -193,9 +194,8 @@ class NodeTestCase(APITestCase):
     def test_unauthorized_patch_no_owner(self):
         """PATCH /nodes/ of an organization where the user ist not an OWNER."""
         # Need a different user for this test case.
-        self.client.logout()
         # User horstHilfsarbeiter is ASSISTANT in Versuchsverbund (pk=2).
-        self.client.login(username="horstHilfsarbeiter", password="horst")
+        self.authenticate(username="horstHilfsarbeiter", password="horst")
         request_data = {
             "data": {
                 "type": format_resource_type("Node"),

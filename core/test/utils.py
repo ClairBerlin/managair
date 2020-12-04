@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from django.urls import reverse
 from django.contrib.auth.models import User
 
 from core.models import (
@@ -12,6 +13,39 @@ from core.models import (
     Site,
     Room,
 )
+
+
+class TokenAuthMixin:
+    """Mixin for APITestCase that provides a token authentication helper."""
+
+    login_url = reverse("rest_login")
+    logout_url = reverse("rest_logout")
+
+    def authenticate(
+        self, password: str, email: str = None, username: str = None, login_url=None
+    ):
+        auth_request = {
+            "data": {"type": "LoginView", "attributes": {"password": password}}
+        }
+        if not login_url:
+            login_url = self.login_url
+        if email:
+            auth_request["data"]["attributes"]["email"] = email
+        if username:
+            auth_request["data"]["attributes"]["username"] = username
+        self.response = self.client.post(login_url, data=auth_request)
+        self.token = self.response.data.get("key", None)
+        self.client.defaults["HTTP_AUTHORIZATION"] = "Token " + self.token
+        return (self.response, self.token)
+
+    def logout(self, token=None):
+        if not token:
+            token = self.token
+        self.response = self.client.post(
+            self.logout_url, HTTP_AUTHORIZATION=("Token " + token)
+        )
+        if "HTTP_AUTHORIZATION" in self.client.defaults:
+            self.client.defaults.pop("HTTP_AUTHORIZATION")
 
 
 def setup_test_auth():

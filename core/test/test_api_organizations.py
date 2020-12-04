@@ -1,20 +1,24 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework_json_api.utils import format_resource_type
+from .utils import TokenAuthMixin
 
 
-class OrganizationTestCase(APITestCase):
+class OrganizationTestCase(TokenAuthMixin, APITestCase):
     fixtures = ["user-fixtures.json", "inventory-fixtures.json"]
 
     def setUp(self):
         # tomTester is owner of the organization Test-Team with pk=1
-        self.assertTrue(self.client.login(username="tomTester", password="test"))
+        self.auth_response, self.auth_token = self.authenticate(
+            username="tomTester", password="test"
+        )
+        self.assertIsNotNone(self.auth_token)
         self.org_pk = 1
         self.detail_url = reverse("organization-detail", kwargs={"pk": self.org_pk})
         self.collection_url = reverse("organization-list")
 
     def tearDown(self):
-        self.client.logout()
+        self.logout()
 
     def test_get_organizations(self):
         """GET /organizations/"""
@@ -24,8 +28,8 @@ class OrganizationTestCase(APITestCase):
 
     def test_get_organizations_public(self):
         """GET /organizations/ that are publicly visible."""
-        # Make sure we are not logged in.
-        self.client.logout()
+        # Make sure to not provide an auth token
+        self.client.defaults.pop("HTTP_AUTHORIZATION")
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         # There is exactly one organization that has a public node installation
@@ -161,10 +165,8 @@ class OrganizationTestCase(APITestCase):
 
     def test_unauthorized_patch_no_member(self):
         """PATCH /organization/ where the user is not a member of."""
-        # Need a different user for this test case.
-        self.client.logout()
         # User horstHilfsarbeiter is ASSISTANT in Versuchsverbund (pk=2).
-        self.client.login(username="horstHilfsarbeiter", password="horst")
+        self.authenticate(username="horstHilfsarbeiter", password="horst")
         request_data = {
             "data": {
                 "type": format_resource_type("Organization"),
@@ -179,10 +181,8 @@ class OrganizationTestCase(APITestCase):
 
     def test_unauthorized_patch_no_owner(self):
         """PATCH /organization/ where the user is not an OWNER."""
-        # Need a different user for this test case.
-        self.client.logout()
         # User ingoInspekteur (pk=6) is INSPECTOR in Test-Team (pk=1).
-        self.client.login(username="ingoInspekteur", password="ingo")
+        self.authenticate(username="ingoInspekteur", password="ingo")
         request_data = {
             "data": {
                 "type": format_resource_type("Organization"),

@@ -1,9 +1,10 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework_json_api.utils import format_resource_type
+from .utils import TokenAuthMixin
 
 
-class RoomsTestCase(APITestCase):
+class RoomsTestCase(TokenAuthMixin, APITestCase):
     fixtures = ["user-fixtures.json", "inventory-fixtures.json"]
 
     def setUp(self):
@@ -11,14 +12,17 @@ class RoomsTestCase(APITestCase):
         # Versuchserbund commands the sites Versuchs-Site (pk=2) and Prüf-Site (pk=3).
         # Versuchs-Site has room Versuchsraum 1 (pk=3),
         # Prüf-Site has room Prüfstuge (pk=4).
-        self.assertTrue(self.client.login(username="veraVersuch", password="versuch"))
+        self.auth_response, self.auth_token = self.authenticate(
+            username="veraVersuch", password="versuch"
+        )
+        self.assertIsNotNone(self.auth_token)
         # Versuchsverbund owns Versuchsraum 1 with pk=3
         self.room_pk = 3
         self.detail_url = reverse("room-detail", kwargs={"pk": self.room_pk})
         self.collection_url = reverse("room-list")
 
     def tearDown(self):
-        self.client.logout()
+        self.logout()
 
     def test_get_rooms(self):
         """GET /rooms/"""
@@ -28,8 +32,8 @@ class RoomsTestCase(APITestCase):
 
     def test_get_rooms_public(self):
         """GET /rooms/ without being logged-in"""
-        # Ensure that we are logged out.
-        self.client.logout()
+        # Make sure to not provide an authentication token.
+        self.client.defaults.pop("HTTP_AUTHORIZATION")
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         # There is one room in the test data set that contains a public installation.
@@ -38,9 +42,8 @@ class RoomsTestCase(APITestCase):
     def test_get_rooms_per_organization(self):
         """GET /rooms/?filter[organization]=<organization_id>"""
         # Need a different user for this test case.
-        self.client.logout()
         # user priskaPrueferin is member in two organizations
-        self.client.login(username="priskaPrueferin", password="priska")
+        self.authenticate(username="priskaPrueferin", password="priska")
         response = self.client.get(self.collection_url, {"filter[organization]": 1})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 2)
@@ -141,8 +144,8 @@ class RoomsTestCase(APITestCase):
                     "max_occupancy": 1,
                 },
                 "relationships": {
-                    # The currently logged-in user VeraVersuch is not a member of the
-                    # organization Test-Team with Site Test-Site (pk=1).
+                    # The currently authenticated user VeraVersuch is not a member of
+                    # the organization Test-Team with Site Test-Site (pk=1).
                     "site": {"data": {"type": "Site", "id": "1"}},
                 },
             }
@@ -153,9 +156,8 @@ class RoomsTestCase(APITestCase):
     def test_unauthorized_create_no_owner(self):
         """POST /rooms/ for an organization where the user is not an OWNER."""
         # Need a different user for this test case.
-        self.client.logout()
         # User horstHilfsarbeiter is ASSISTANT in Versuchsverbung (pk=2).
-        self.client.login(username="horstHilfsarbeiter", password="horst")
+        self.authenticate(username="horstHilfsarbeiter", password="horst")
         request_data = {
             "data": {
                 "type": format_resource_type("Room"),
@@ -167,8 +169,9 @@ class RoomsTestCase(APITestCase):
                     "max_occupancy": 1,
                 },
                 "relationships": {
-                    # The currently logged-in user horstHilfsarbeiter is not an OWNER
-                    # of the organization Versuchsverbund with Versuchs-Site (pk=2).
+                    # The currently authenticated user horstHilfsarbeiter is not an
+                    # OWNER of the organization Versuchsverbund with Versuchs-Site
+                    # (pk=2).
                     "site": {"data": {"type": "Site", "id": "2"}},
                 },
             }
@@ -198,9 +201,8 @@ class RoomsTestCase(APITestCase):
     def test_unauthorized_patch_no_owner(self):
         """PATCH /rooms/ of an organization where the user ist not an OWNER."""
         # Need a different user for this test case.
-        self.client.logout()
         # User horstHilfsarbeiter is ASSISTANT in Versuchsverbung (pk=2).
-        self.client.login(username="horstHilfsarbeiter", password="horst")
+        self.authenticate(username="horstHilfsarbeiter", password="horst")
         request_data = {
             "data": {
                 "type": format_resource_type("Room"),
@@ -217,7 +219,7 @@ class RoomsTestCase(APITestCase):
         self.assertEqual(response.status_code, 403)
 
 
-class InstallationsTestCase(APITestCase):
+class InstallationsTestCase(TokenAuthMixin, APITestCase):
     fixtures = ["user-fixtures.json", "inventory-fixtures.json", "data-fixtures.json"]
     node_id = "3b95a1b2-74e7-9e98-52c4-4acae441f0ae"  # Clairchen Schwarz
     node2_id = "9d02faee-4260-1377-22ec-936428b572ee"  # ERS Test-Node
@@ -229,7 +231,10 @@ class InstallationsTestCase(APITestCase):
         # Versuchserbund commands the sites Versuchs-Site (pk=2) and Prüf-Site (pk=3).
         # Versuchs-Site has room Versuchsraum 1 (pk=3),
         # Prüf-Site has room Prüfstuge (pk=4).
-        self.client.login(username="veraVersuch", password="versuch")
+        self.auth_response, self.auth_token = self.authenticate(
+            username="veraVersuch", password="versuch"
+        )
+        self.assertIsNotNone(self.auth_token)
         # Versuchsverbund owns
         # Clairchen Schwarz (id=3b95a1b2-74e7-9e98-52c4-4acae441f0ae) and
         # ERS Test-Node (id=9d02faee-4260-1377-22ec-936428b572ee).
@@ -237,7 +242,7 @@ class InstallationsTestCase(APITestCase):
         self.collection_url = reverse("installation-list")
 
     def tearDown(self):
-        self.client.logout()
+        self.logout()
 
     def test_get_installations(self):
         """GET /installations/"""
@@ -249,8 +254,8 @@ class InstallationsTestCase(APITestCase):
 
     def test_get_installations_public(self):
         """ GET /installations/ without authentication."""
-        # Make sure that we are not logged-in.
-        self.client.logout()
+        # Make sure to not provide an authentication token.
+        self.client.defaults.pop("HTTP_AUTHORIZATION")
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         # There is exactly one public node installation in the test data.
@@ -259,9 +264,8 @@ class InstallationsTestCase(APITestCase):
     def test_get_installations_per_organization(self):
         """GET /installations/?filter[organization]=<organization_id>"""
         # Need a different user for this test case.
-        self.client.logout()
         # user priskaPrueferin is member in two organizations
-        self.client.login(username="priskaPrueferin", password="priska")
+        self.authenticate(username="priskaPrueferin", password="priska")
         response = self.client.get(self.collection_url, {"filter[organization]": 1})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data["results"]), 1)
@@ -462,8 +466,8 @@ class InstallationsTestCase(APITestCase):
                 },
                 "relationships": {
                     # Install Clairchen Rot in Testraum 1 (pk=1).
-                    # The currently logged-in user VeraVersuch is not a member of the
-                    # organization that owns Testraum 1 and Clairchen Rot.
+                    # The currently authenticated user VeraVersuch is not a member of
+                    # the organization that owns Testraum 1 and Clairchen Rot.
                     "node": {
                         "data": {
                             "type": format_resource_type("Node"),
@@ -485,9 +489,8 @@ class InstallationsTestCase(APITestCase):
     def test_unauthorized_create_no_owner(self):
         """POST /installations/ for an organization where the user is not an OWNER."""
         # Need a different user for this test case.
-        self.client.logout()
         # User horstHilfsarbeiter is ASSISTANT in Versuchsverbung (pk=2).
-        self.client.login(username="horstHilfsarbeiter", password="horst")
+        self.authenticate(username="horstHilfsarbeiter", password="horst")
         request_data = {
             "data": {
                 "type": format_resource_type("Installation"),
@@ -530,15 +533,14 @@ class InstallationsTestCase(APITestCase):
         }
         response = self.client.patch(detail_url, data=request_data)
         # Expect a HTTP 404 error code, because the object to be patched should not be
-        # accessible to the logged-in user.
+        # accessible to the authenticated user.
         self.assertEqual(response.status_code, 404)
 
     def test_unauthorized_patch_no_owner(self):
         """PATCH /installations/ of an organization where the user ist not an OWNER."""
         # Need a different user for this test case.
-        self.client.logout()
         # User horstHilfsarbeiter is ASSISTANT in Versuchsverbung (pk=2).
-        self.client.login(username="horstHilfsarbeiter", password="horst")
+        self.authenticate(username="horstHilfsarbeiter", password="horst")
         request_data = {
             "data": {
                 "type": format_resource_type("Installation"),
