@@ -15,7 +15,6 @@ RUN pip3 install --upgrade pip && pip3 install wheel \
 
 # copy application and support scripts
 COPY ./managair_server /code/managair_server
-COPY ./user_manager /code/user_manager
 COPY ./core /code/core
 COPY ./ingest /code/ingest
 COPY schema.yaml .
