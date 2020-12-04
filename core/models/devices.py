@@ -46,6 +46,7 @@ class Node(models.Model):
     id = models.UUIDField(primary_key=True)
     eui64 = models.CharField(max_length=32, blank=False, unique=True)
     alias = models.CharField(max_length=100)
+    description = models.TextField(null=True, blank=True)
     protocol = models.ForeignKey(
         NodeProtocol, on_delete=models.CASCADE, related_name="nodes"
     )

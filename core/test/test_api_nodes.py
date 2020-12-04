@@ -66,6 +66,7 @@ class NodeTestCase(APITestCase):
                 "attributes": {
                     "eui64": "003CB7EA62A7DCBB",
                     "alias": "Clairchen Black",
+                    "description": "This node belongs to the international node testing society."
                 },
             }
         }
@@ -81,6 +82,7 @@ class NodeTestCase(APITestCase):
                 "attributes": {
                     "eui64": "fefffffffdff0000",
                     "alias": "Test Node",
+                    "description": "What a node!"
                 },
                 "relationships": {
                     "protocol": {"data": {"type": "Protocol", "id": "1"}},
