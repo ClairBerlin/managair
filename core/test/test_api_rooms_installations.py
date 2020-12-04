@@ -352,7 +352,7 @@ class InstallationsTestCase(TokenAuthMixin, APITestCase):
                 "type": format_resource_type("Installation"),
                 "attributes": {
                     "from_timestamp_s": 1601500000,
-                    "to_timestamp_s": 2147483647,
+                    # Leave end timestamp open.
                     "description": "Testinstallation",
                     "is_public": False,
                 },
@@ -377,6 +377,7 @@ class InstallationsTestCase(TokenAuthMixin, APITestCase):
         response1 = self.client.post(self.collection_url, data=request_data)
         self.assertEqual(response1.status_code, 201)
         self.assertEqual(response1.data["from_timestamp_s"], 1601500000)
+        self.assertEqual(response1.data["to_timestamp_s"], 2147483647)
         self.assertEqual(
             response1.data["node"]["id"], "9d02faee-4260-1377-22ec-936428b572ee"
         )

@@ -165,8 +165,9 @@ class RoomNodeInstallation(models.Model):
         Room, null=False, on_delete=models.CASCADE, related_name="installations"
     )
     from_timestamp_s = models.PositiveIntegerField(null=False, blank=False)
-    # An ongoing association does not have an end-timestamp set.
-    to_timestamp_s = models.PositiveIntegerField(null=True)
+    # An ongoing association defaults to the maximum unix epoch, which is the maximum 
+    # 32-bit Integer, 2ˆ31 - 1 = 2147483647. This represents 2038-01-19T03:14:07.
+    to_timestamp_s = models.PositiveIntegerField(blank=True, default=(2**31 - 1))
     description = models.TextField(null=True, blank=True)
     is_public = models.BooleanField(default=False)
 
