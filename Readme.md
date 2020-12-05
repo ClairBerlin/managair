@@ -93,6 +93,11 @@ The following environment variables are available to influence Managair setup. S
 - `DJANGO_DB_LOG_LEVEL=WARNING`. Log level for DBMS messages only.
 - `DJANGO_LOG_LEVEL=WARNING`. Log level for Django-internal messages.
 
+The following environment variables determine how Managair is launched inside its Docker container, via the `entrypoint.sh` script:
+
+- `DB_MIGRATE=False`. Execute new database migrations upon launch, if available.
+- `COLLECT_STATIC_FILES=False`. Collect static files in a central location to be served via [WhiteNoise](http://whitenoise.evans.io/en/stable/).
+
 ## Development Setup
 
 Managair is a [Django](https://www.djangoproject.com/) web application atop a [PostgreSQL](https://www.postgresql.org) DBMS. It is meant to be run as part of the Clair backend stack. To start up your development environment, consult the stack's Readme-file.

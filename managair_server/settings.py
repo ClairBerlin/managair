@@ -25,7 +25,7 @@ def get_secret_from_env_or_file(secret_name: str):
         with open(key_file_name) as f:
             return f.read().strip()
     else:
-        return os.environ.get("SECRET_KEY")
+        return os.environ.get(secret_name)
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
