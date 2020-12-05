@@ -52,6 +52,47 @@ HTML Templates, CSS, and media for the admin-UI and the browsable API are part o
 
 Upon a fresh deployment, or whenever static files have changed, you can force Django to collect all static files from all registered Django apps into a common folder by running `python manage.py collectstatic`. The `entrypoint.sh` script of the Managair docker container automatically performs this task if the environment variable `COLLECT_STATIC_FILES` is set to `true`.
 
+### Secrets
+
+Managair requires several secrets:
+
+- SECRET_KEY: The standard [Django secret key](https://docs.djangoproject.com/en/3.1/ref/settings/#secret-key) that is used for digital signatures and to derive password salts.
+- SQL_PASSWORD: Password to connect to the main database.
+- EMAIL_HOST_PASSWORD: Password for the SMTP server used for sending mails.
+- SENTRY_URL: When using [Sentry.io](https://sentry.io) as a remote-monitoring service, sentry's ingestion URL is a (weak) secret. Sentry remote monitoring is activated setting the environment variable `SENTRY=True`.
+
+These secrets can be passed in either of two ways:
+
+- As value of an environment variable: For each of the secrets listed above, define an environment variable of the same name; e.g., `SECRET_KEY`.
+- As file content: Managair reads the secret value from a file where the filename must be provided via an environment variable `<secret_name>_FILE`; e.g., `SECRET_KEY_FILE`. This mechanism can be used in combination with [Docker secrets](https://docs.docker.com/engine/swarm/secrets/#use-secrets-in-compose), where Docker provides secrets to services as files inside an encrypted RAM-disk mounted at `/run/secrets/<secret>` inside the container.
+
+### Environment
+
+The following environment variables are available to influence Managair setup. Shown are their default settings:
+
+- `SECRET_KEY` or `SECRET_KEY_FILE`. Secret as explained above.
+- `DEBUG=0`. Set to `1` to use [Django's debug mode](https://docs.djangoproject.com/en/3.1/ref/settings/#std:setting-DEBUG) with hot reload. Never use in production!
+- `DEBUG_TOOLBAR=0`. Set to `1` to activate the [Django Debug Toolbar](https://django-debug-toolbar.readthedocs.io/en/latest/). Never use in production.
+- `SENTRY=0`. Set to `1` to activate remote monitoring via [Sentry.io](https://sentry.io).
+- `SENTRY_URL`. Secret ingest URL, as explained above.
+- `NODE_FIDELITY=0`. Set to `1`to activate regular monitoring of node traffic. The status of all nodes can be queried via the [API](./doc/api.md) at `/api/v1/fidelity`.
+- `DJANGO_ALLOWED_HOSTS`. Hosts allowed to connect. See the [Django documentation](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts) for details.
+- `EMAIL_HOST`. Host name of the SMTP server used to send emails. See the [Django email engine](https://docs.djangoproject.com/en/3.1/topics/email/) documentation for details.
+- `EMAIL_PORT=587`. Port of the SMTP server used to send emails.
+- `EMAIL_HOST_USER`. User name to connect to the SMTP server.
+- `EMAIL_HOST_PASSWORD` or `EMAIL_HOST_PASSWORD_FILE`. Secret as explained above.
+- `EMAIL_USE_TLS=True`.
+- `DEFAULT_FROM_EMAIL`. Default Reply-to email address for sent mails.
+- `SQL_ENGINE=django.db.backends.sqlite3`. Default SQL database engine. Do not use SQLite in production. Consult the documentation on [Django database backends](https://docs.djangoproject.com/en/3.1/ref/databases/).
+- `SQL_DATABASE=db.sqlite3`. Name of the main database to connect to.
+- `SQL_USER=user`. Default database user.
+- `SQL_PASSWORD` and `SQL_PASSWORD_FILE`. The database user's password, as explained above.
+- `SQL_HOST=localhost`. Host name on which the DBMS is running.
+- `SQL_PORT=5432`. Port to connect to the DBMS.
+- `LOG_LEVEL=INFO`. Log level for the Managair application. Only messages with log level of the given severity or higher will be logged. Must be one of `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`. See the [Django logging documentation](https://docs.djangoproject.com/en/3.1/topics/logging/) for details.
+- `DJANGO_DB_LOG_LEVEL=WARNING`. Log level for DBMS messages only.
+- `DJANGO_LOG_LEVEL=WARNING`. Log level for Django-internal messages.
+
 ## Development Setup
 
 Managair is a [Django](https://www.djangoproject.com/) web application atop a [PostgreSQL](https://www.postgresql.org) DBMS. It is meant to be run as part of the Clair backend stack. To start up your development environment, consult the stack's Readme-file.
