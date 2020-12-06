@@ -15,14 +15,29 @@ from pathlib import Path
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
+
+def get_secret_from_env_or_file(secret_name: str):
+    """Try to read a secret from a one-line text file, if the file name is provided
+    as environment variable <secret_name>_FILE. Otherwise, read the secret from an
+    environment vairable <secret_name>."""
+    key_file_name = os.environ.get(secret_name + "_FILE", None)
+    if key_file_name:
+        with open(key_file_name) as f:
+            return f.read().strip()
+    else:
+        return os.environ.get(secret_name)
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
+# The SECRET_KEY can be read from a file (for use with Docker secrets) or from the
+# environment.
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = get_secret_from_env_or_file("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.environ.get("DEBUG", default=0))
@@ -43,7 +58,7 @@ ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 # Activate Sentry remote error recording.
 if SENTRY:
     sentry_sdk.init(
-        dsn="https://279c821aafab4487a7a3189ccbcf47a9@o454687.ingest.sentry.io/5460530",
+        dsn=get_secret_from_env_or_file("SENTRY_URL"),
         integrations=[DjangoIntegration()],
         traces_sample_rate=0.0,
         # If you wish to associate users to errors (assuming you are using
@@ -154,12 +169,14 @@ REST_FRAMEWORK = {
 }
 
 # Email Setup
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 EMAIL_HOST = os.environ.get("EMAIL_HOST")
 EMAIL_PORT = int(os.environ.get("EMAIL_PORT", default=587))
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+# The EMAIL_HOST_PASSWORD can be read from a file (for use with Docker secrets) or from
+# the environment.
+EMAIL_HOST_PASSWORD = get_secret_from_env_or_file("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = bool(os.environ.get("EMAIL_USE_TLS", default=True))
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
 
@@ -168,13 +185,13 @@ AUTHENTICATION_BACKENDS = (
     # Needed to login by username in Django admin, regardless of `allauth`
     "django.contrib.auth.backends.ModelBackend",
     # `allauth` specific authentication methods, such as login by e-mail
-    "allauth.account.auth_backends.AuthenticationBackend"
+    "allauth.account.auth_backends.AuthenticationBackend",
 )
 
 # See https://dj-rest-auth.readthedocs.io/en/latest/installation.html
 REST_SESSION_LOGIN = True
 SITE_ID = 1
-ACCOUNT_EMAIL_REQUIRED = True # User needs to provide an email address.
+ACCOUNT_EMAIL_REQUIRED = True  # User needs to provide an email address.
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Clair Plattform] "
@@ -190,7 +207,7 @@ DATABASES = {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
         "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
         "USER": os.environ.get("SQL_USER", "user"),
-        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+        "PASSWORD": get_secret_from_env_or_file("SQL_PASSWORD"),
         "HOST": os.environ.get("SQL_HOST", "localhost"),
         "PORT": os.environ.get("SQL_PORT", "5432"),
     }
