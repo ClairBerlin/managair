@@ -130,6 +130,10 @@ TEMPLATES = [
     },
 ]
 
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "account_login"
+
 REST_FRAMEWORK = {
     # OpenAPI schema (for DRF-Spectaclar)
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
@@ -252,9 +256,6 @@ if not DEBUG:
             "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
         },
     ]
-
-LOGIN_REDIRECT_URL = "dashboard"
-LOGOUT_REDIRECT_URL = "dashboard"
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
