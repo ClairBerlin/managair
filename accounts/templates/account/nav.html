@@ -1,0 +1,37 @@
+<nav
+    class="navbar fixed-top d-flex align-items-center navbar-expand-lg navbar-dark bg-primary justify-content-between"
+    id="mainNav"
+>
+    {% load static %}
+    <div class="container">
+        <a class="d-flex align-items-center navbar-brand logo" href="/">
+            <img class="mr-3" src="{% static '/img/clair-cloud-white.svg' %}" />
+            Clair Accounts
+        </a>
+        <div class="navbar" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+                {% if request.user.is_authenticated %}
+                <li class="nav-item">
+                    <a href="/accounts/profile/">
+                        <span class="header-username"
+                            >{{request.user.get_full_name}}</span
+                        >
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/accounts/logout/">Logout</a>
+                </li>
+                {% else %}
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/accounts/login/">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/accounts/signup/">Signup</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

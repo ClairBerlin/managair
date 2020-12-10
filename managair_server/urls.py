@@ -14,7 +14,7 @@ from drf_spectacular.views import (
 
 urlpatterns = [
     # Allauth account management
-    path('accounts/', include('allauth.urls')),
+    path('accounts/', include('accounts.urls')),
     # The main Clair API for inventory management and data retrievak
     path("api/v1/", include("core.urls")),
     # Data ingestion API

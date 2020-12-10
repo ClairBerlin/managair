@@ -79,6 +79,8 @@ INSTALLED_APPS = [
     "django_q",
     "rest_framework",
     "rest_framework.authtoken",
+    "bootstrap4",
+    "accounts",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
