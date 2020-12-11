@@ -277,6 +277,7 @@ msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll send you "
 "an e-mail  allowing you to reset it."
 msgstr ""
+"Passwort vergessen? Geben Sie Ihre E-Mail-Adresse ein um es zurückzusetzen."
 
 #: templates/account/password_reset.html:29
 msgid "Reset My Password"
@@ -287,12 +288,17 @@ msgid ""
 "Please contact us if you have any trouble resetting your password.\n"
 "                        "
 msgstr ""
+"Bitte kontaktieren Sie uns, wenn es Probleme beim Zurücksetzen Ihres"
+" Passwortes gibt.\n"
+"                        "
 
 #: templates/account/password_reset_done.html:22
 msgid ""
 "We have sent you an e-mail. Please contact us if you do not receive it "
 "within a  few minutes."
 msgstr ""
+"Wir haben Ihnen eine E-Mail geschickt. Bitte kontaktieren Sie uns, wenn Sie "
+"innerhalb einiger Minuten erhalten haben."
 
 #: templates/account/password_reset_from_key.html:16
 msgid "Bad Token"
@@ -305,6 +311,9 @@ msgid ""
 "used.  Please request a <a href=\"%(passwd_reset_url)s\">new password reset</"
 "a>."
 msgstr ""
+"Der Link ist nicht mehr gültig. Vermutlich weil er schon genutzt wurde. "
+"Bitte erfragen Sie einen <a href=\"%(passwd_reset_url)s\">neuen Link</"
+"a>."
 
 #: templates/account/password_reset_from_key.html:26
 msgid "change password"
@@ -365,6 +374,9 @@ msgid ""
 "finalize the signup process. Please contact us if you do not receive it "
 "within a few minutes."
 msgstr ""
+"Wir haben Ihnen eine E-Mail zur Bestätigung geschickt. Folgen Sie dem darin "
+"enthaltenen Link um das Registrieren abzuschließen. Bitte kontaktieren Sie uns "
+"wenn Sie innerhalb einiger Minuten keine E-Mail erhalten."
 
 #: templates/account/verified_email_required.html:19
 msgid ""
@@ -373,6 +385,7 @@ msgid ""
 "require that you\n"
 "                        verify ownership of your e-mail address. "
 msgstr ""
+"Dieser Teil der Webseite erfordert eine Bestätigung über den Besitz Ihrer E-Mail-Adresse."
 
 #: templates/account/verified_email_required.html:23
 msgid ""
@@ -382,6 +395,9 @@ msgid ""
 "                        contact us if you do not receive it within a few "
 "minutes."
 msgstr ""
+"Wir haben Ihnen eine E-Mail zur Bestätigung geschickt. Folgen Sie dem darin "
+"enthaltenen Link. Bitte kontaktieren Sie uns wenn Sie innerhalb einiger "
+"Minuten keine E-Mail erhalten."
 
 #: templates/account/verified_email_required.html:27
 #, python-format
@@ -390,6 +406,7 @@ msgid ""
 "mail\n"
 "                        address</a>."
 msgstr ""
+"<strong>Hinweis:</strong> Sie können Ihre E-Mail-Addresse <a href=\"%(email_url)s\">ändern</a>."
 
 #, fuzzy
 #~| msgid "Sign Out"
