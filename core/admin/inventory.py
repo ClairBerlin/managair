@@ -43,4 +43,4 @@ class MembershipAdmin(admin.ModelAdmin):
 
 @admin.register(RoomNodeInstallation)
 class RoomNodeInstallationAdmin(admin.ModelAdmin):
-    list_display = ["node", "room", "is_public", "from_iso", "to_iso"]
+    list_display = ["node", "room", "is_public", "from_iso", "to_iso", "image"]

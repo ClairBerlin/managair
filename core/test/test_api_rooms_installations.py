@@ -401,6 +401,13 @@ class InstallationsTestCase(TokenAuthMixin, APITestCase):
         response4 = self.client.get(response_url)
         self.assertEqual(response4.status_code, 404)
 
+    def test_upload_image(self):
+        upload_url = reverse("installation-image", args=["2"])
+        image_file = open("/code/core/test/test_data/sensor.jpeg", "rb")
+        data = {"image": image_file}
+        response = self.client.put(upload_url, data, format="multipart")
+        self.assertEqual(response.status_code, 200)
+
     def test_node_room_owner_mismatch(self):
         """POST /installations/ where the owner of the room and the node differ."""
         # Clairchen Rot belongs to Test-Team

@@ -7,6 +7,9 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser
+from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework_json_api import filters
 from rest_framework_json_api.views import (
     ModelViewSet,
@@ -29,6 +32,7 @@ from core.serializers import (
     SiteSerializer,
     RoomSerializer,
     RoomNodeInstallationSerializer,
+    InstallationImageSerializer,
     OrganizationSerializer,
     MembershipSerializer,
     UsernameSerializer,
@@ -220,6 +224,7 @@ class RoomViewSet(ModelViewSet):
 
 
 class RoomNodeInstallationViewSet(ModelViewSet):
+    http_method_names = ["get", "post", "put", "patch", "delete", "head", "options"]
     permission_classes = [IsAuthenticatedOrReadOnly & IsOrganizationOwner]
     queryset = RoomNodeInstallation.objects
     serializer_class = RoomNodeInstallationSerializer
@@ -324,6 +329,24 @@ class RoomNodeInstallationViewSet(ModelViewSet):
         else:
             serializer = self.get_serializer(installation)
         return Response(serializer.data)
+
+    @action(
+        detail=True,
+        methods=["PUT"],
+        serializer_class=InstallationImageSerializer,
+        parser_classes=[MultiPartParser],
+        # url_name="installation-image"
+    )
+    def image(self, request, pk):
+        """Action to upload an installation image via a PUT request.
+        See https://www.trell.se/blog/file-uploads-json-apis-django-rest-framework/
+        """
+        obj = self.get_object()
+        serializer = self.serializer_class(obj, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, HTTP_400_BAD_REQUEST)
 
 
 class OrganizationViewSet(ModelViewSet):

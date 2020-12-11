@@ -88,6 +88,8 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
     )
 
     to_timestamp_s = serializers.IntegerField(required=False)
+    # Image of the installation (optional). Handle upload in a separate serializer.
+    image = serializers.ImageField(required=False, read_only=True)
 
     # Additional fields to merge the node installation with its samples.
     timeseries = serializers.ListField(child=SimpleSampleSerializer(), read_only=True)
@@ -106,6 +108,7 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
             "to_timestamp_s",
             "sample_count",
             "description",
+            "image",
             "is_public",
             "url",
         ]
@@ -145,6 +148,12 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
                 "In an installation, Node and room must belong to the same owner."
             )
         return attrs
+
+
+class InstallationImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RoomNodeInstallation
+        fields = ["image"]
 
 
 class RoomSerializer(serializers.HyperlinkedModelSerializer):

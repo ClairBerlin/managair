@@ -148,6 +148,8 @@ For most resources, there exists at least on API test. Refer to these test cases
     - `filter[to]`: End timestamp of the retrieved time series as Unix epoch. Defaults to the current system time `now()`.
   - [PUT, PATCH] Replace resp. update the association with the room. To end the association with a room, update it with an end timestamp earlier than 2147483647 (2038-01-19T03:14:07Z); this preserves the association history.
   - [DELETE] Removes the association with the room. This removes the association history, as if the node has never been associated with the room.
+- `/api/v1/installations/<installation_id>/image/` Endpoint to upload an image that depicts the installation. The installation detail resource must already exist before addind an image. _Note:_ This is not a REST-like resource.
+  - [PUT] Upload an [image file](https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html) as a multipart content with a single entry named `image`.
 - `/api/v1/installations/<installation_id>/room/` Detail-resource of the room the given installation pertains to.
   - [GET] Details of the room, with link to the related room resource at `/api/v1/rooms/<room_id>`.
 - `/api/v1/installations/<installation_id>/node/` Detail-resource of the node the given installation pertains to.
