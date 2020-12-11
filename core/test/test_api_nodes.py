@@ -31,7 +31,8 @@ class NodeTestCase(TokenAuthMixin, APITestCase):
 
     def test_get_nodes_unauthenticated(self):
         """GET /nodes/ without authentication."""
-        self.client.defaults.pop("HTTP_AUTHORIZATION")
+        # self.client.defaults.pop("HTTP_AUTHORIZATION")
+        self.logout()
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 401)
 

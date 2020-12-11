@@ -133,8 +133,8 @@ TEMPLATES = [
 ]
 
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "/"
-LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "account_login"
+LOGIN_REDIRECT_URL = "/dashboard"
+LOGOUT_REDIRECT_URL = "/"
 
 REST_FRAMEWORK = {
     # OpenAPI schema (for DRF-Spectaclar)
@@ -160,6 +160,7 @@ REST_FRAMEWORK = {
     "DEFAULT_METADATA_CLASS": "rest_framework_json_api.metadata.JSONAPIMetadata",
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_FILTER_BACKENDS": (
         "rest_framework_json_api.filters.QueryParameterValidationFilter",
