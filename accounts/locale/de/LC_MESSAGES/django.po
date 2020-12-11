@@ -147,6 +147,10 @@ msgid ""
 "mail address for user\n"
 "                        %(user_display)s."
 msgstr ""
+"Bitte bestätigen Sie das <a\n"
+"                            href=\"mailto:%(email)s\">%(email)s</a> eine "
+"E-Mail-Adresse für Nutzer\n"
+"                        %(user_display)s ist."
 
 #: templates/account/email_confirm.html:28
 msgid "Confirm"
@@ -159,6 +163,8 @@ msgid ""
 "                            href=\"%(email_url)s\">issue a new e-mail "
 "confirmation request</a>."
 msgstr ""
+"Der Link ist abgelaufen oder ungültig. Bitte erstellen Sie eine <a\n"
+"                            href=\"%(email_url)s\">Bestätigungsanfrage</a>."
 
 #: templates/account/login.html:7 templates/account/login.html:17
 #: templates/account/login.html:64 templates/account/nav.html:29
