@@ -33,7 +33,8 @@ class RoomsTestCase(TokenAuthMixin, APITestCase):
     def test_get_rooms_public(self):
         """GET /rooms/ without being logged-in"""
         # Make sure to not provide an authentication token.
-        self.client.defaults.pop("HTTP_AUTHORIZATION")
+        # self.client.defaults.pop("HTTP_AUTHORIZATION")
+        self.logout()
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         # There is one room in the test data set that contains a public installation.
@@ -255,7 +256,8 @@ class InstallationsTestCase(TokenAuthMixin, APITestCase):
     def test_get_installations_public(self):
         """ GET /installations/ without authentication."""
         # Make sure to not provide an authentication token.
-        self.client.defaults.pop("HTTP_AUTHORIZATION")
+        # self.client.defaults.pop("HTTP_AUTHORIZATION")
+        self.logout()
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 200)
         # There is exactly one public node installation in the test data.

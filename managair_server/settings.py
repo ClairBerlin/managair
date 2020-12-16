@@ -79,6 +79,8 @@ INSTALLED_APPS = [
     "django_q",
     "rest_framework",
     "rest_framework.authtoken",
+    "bootstrap4",
+    "accounts",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -130,6 +132,10 @@ TEMPLATES = [
     },
 ]
 
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "/dashboard"
+LOGOUT_REDIRECT_URL = "/"
+
 REST_FRAMEWORK = {
     # OpenAPI schema (for DRF-Spectaclar)
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
@@ -154,6 +160,7 @@ REST_FRAMEWORK = {
     "DEFAULT_METADATA_CLASS": "rest_framework_json_api.metadata.JSONAPIMetadata",
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_FILTER_BACKENDS": (
         "rest_framework_json_api.filters.QueryParameterValidationFilter",
@@ -253,20 +260,13 @@ if not DEBUG:
         },
     ]
 
-LOGIN_REDIRECT_URL = "dashboard"
-LOGOUT_REDIRECT_URL = "dashboard"
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
-
+LANGUAGE_CODE = "de"
 TIME_ZONE = "UTC"
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)

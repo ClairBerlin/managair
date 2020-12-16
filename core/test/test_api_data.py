@@ -33,7 +33,8 @@ class NodeTimeseriesTestCase(TokenAuthMixin, APITestCase):
 
     def test_get_node_timeseries_list_unauthenticated(self):
         """GET /node-timeseries/ without authentication."""
-        self.client.defaults.pop("HTTP_AUTHORIZATION")
+        # self.client.defaults.pop("HTTP_AUTHORIZATION")
+        self.logout()
         response = self.client.get(self.collection_url)
         self.assertEqual(response.status_code, 401)
 

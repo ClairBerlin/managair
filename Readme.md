@@ -52,6 +52,23 @@ HTML Templates, CSS, and media for the admin-UI and the browsable API are part o
 
 Upon a fresh deployment, or whenever static files have changed, you can force Django to collect all static files from all registered Django apps into a common folder by running `python manage.py collectstatic`. The `entrypoint.sh` script of the Managair docker container automatically performs this task if the environment variable `COLLECT_STATIC_FILES` is set to `true`.
 
+#### Translations
+
+For the accounts templates are used which contain strings which can be translated. This is done for german (`de`). The process was:
+* `cd accounts`
+* `mkdir locale` 
+* `django-admin makemessages -l de`
+* add translations to `locale/de/LC_MESSAGES/django.po`
+* `django-admin compilemessages` to create the `.mo` file which is used for rendering
+
+When changing the templates, run:
+* `django-admin makemessages -a`
+* update translations in `locale/de/LC_MESSAGES/django.po`
+* `django-admin compilemessages`
+
+_NOTE: the default language is determined in `settings.py` via `LANGUAGE_CODE`.
+
+
 ### Secrets
 
 Managair requires several secrets:
