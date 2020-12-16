@@ -1,4 +1,5 @@
 import logging
+from uuid import uuid4
 from datetime import datetime
 
 from django.contrib.auth.models import User
@@ -7,6 +8,11 @@ from django.core.validators import ValidationError
 
 
 logger = logging.getLogger(__name__)
+
+
+def image_filename_to_uuid(instance, filename):
+    extension = filename.split(".")[-1]
+    return "{}.{}".format(uuid4(), extension)
 
 
 class Organization(models.Model):
@@ -165,11 +171,14 @@ class RoomNodeInstallation(models.Model):
         Room, null=False, on_delete=models.CASCADE, related_name="installations"
     )
     from_timestamp_s = models.PositiveIntegerField(null=False, blank=False)
-    # An ongoing association defaults to the maximum unix epoch, which is the maximum 
+    # An ongoing association defaults to the maximum unix epoch, which is the maximum
     # 32-bit Integer, 2ˆ31 - 1 = 2147483647. This represents 2038-01-19T03:14:07.
-    to_timestamp_s = models.PositiveIntegerField(blank=True, default=(2**31 - 1))
+    to_timestamp_s = models.PositiveIntegerField(blank=True, default=(2 ** 31 - 1))
     description = models.TextField(null=True, blank=True)
     is_public = models.BooleanField(default=False)
+    image = models.ImageField(
+        "Installation Photo", null=True, blank=True, upload_to=image_filename_to_uuid
+    )
 
     class Meta:
         constraints = [
@@ -180,7 +189,7 @@ class RoomNodeInstallation(models.Model):
         ]
         ordering = ["-from_timestamp_s"]
         get_latest_by = "from_timestamp_s"
-    
+
     class JSONAPIMeta:
         resource_name = "Installation"
 

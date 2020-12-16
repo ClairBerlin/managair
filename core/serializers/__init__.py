@@ -18,6 +18,7 @@ from .inventory import (
     SiteSerializer,
     RoomSerializer,
     RoomNodeInstallationSerializer,
+    InstallationImageSerializer,
     OrganizationSerializer,
     MembershipSerializer,
     UsernameSerializer,
