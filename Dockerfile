@@ -4,7 +4,7 @@ RUN apt-get update && \
     apt-get -y install apt-utils netcat
 
 # Docker defaults to sh, but the 'source' command is only available in bash.
-SHELL ["/bin/bash", "-c"] 
+SHELL ["/bin/bash", "-c"]
 RUN mkdir /code
 
 WORKDIR /code
@@ -16,6 +16,7 @@ RUN pip3 install --upgrade pip && pip3 install wheel \
 # copy application and support scripts
 COPY ./managair_server /code/managair_server
 COPY ./core /code/core
+COPY ./accounts /code/accounts
 COPY ./ingest /code/ingest
 COPY schema.yaml .
 COPY ./manage.py .
