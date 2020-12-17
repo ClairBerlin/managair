@@ -304,7 +304,7 @@ msgid ""
 "within a  few minutes."
 msgstr ""
 "Wir haben Ihnen eine E-Mail geschickt. Bitte kontaktieren Sie uns, wenn Sie "
-"innerhalb einiger Minuten erhalten haben."
+"innerhalb einiger Minuten keine E-Mail erhalten haben."
 
 #: templates/account/password_reset_from_key.html:16
 msgid "Bad Token"
@@ -381,7 +381,7 @@ msgid ""
 "within a few minutes."
 msgstr ""
 "Wir haben Ihnen eine E-Mail zur Bestätigung geschickt. Folgen Sie dem darin "
-"enthaltenen Link um das Registrieren abzuschließen. Bitte kontaktieren Sie uns "
+"enthaltenen Link um das Registrieren abzuschließen. Bitte kontaktieren Sie uns, "
 "wenn Sie innerhalb einiger Minuten keine E-Mail erhalten."
 
 #: templates/account/verified_email_required.html:19
@@ -402,7 +402,7 @@ msgid ""
 "minutes."
 msgstr ""
 "Wir haben Ihnen eine E-Mail zur Bestätigung geschickt. Folgen Sie dem darin "
-"enthaltenen Link. Bitte kontaktieren Sie uns wenn Sie innerhalb einiger "
+"enthaltenen Link. Bitte kontaktieren Sie uns, wenn Sie innerhalb einiger "
 "Minuten keine E-Mail erhalten."
 
 #: templates/account/verified_email_required.html:27
