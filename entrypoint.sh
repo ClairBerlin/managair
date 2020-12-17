@@ -21,6 +21,7 @@ doCollectStaticFiles=${COLLECT_STATIC_FILES:-false}
 if [ "$doCollectStaticFiles" = true ] ;
 then
   python manage.py collectstatic --noinput
+  python manage.py compilemessages
 fi
 
 exec "$@"
