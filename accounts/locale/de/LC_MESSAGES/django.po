@@ -121,7 +121,7 @@ msgid ""
 "It can be safely ignored if you did not request a password reset. Click the "
 "link below to reset your password."
 msgstr ""
-"Sie erhalten diese E-Mail um Ihr Passwort zurückzusetzen.Sie können diese "
+"Sie erhalten diese E-Mail um Ihr Passwort zurückzusetzen. Sie können diese "
 "Nachricht ignorieren, falls Sie dies nicht tun möchten. Klicken Sie auf den "
 "Link um Ihr Passwort zurückzusetzen."
 
