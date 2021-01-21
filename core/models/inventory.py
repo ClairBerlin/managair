@@ -25,6 +25,12 @@ class Organization(models.Model):
     )
 
     class Meta:
+        constraints = [
+            # Organiyations must have unique names.
+            models.UniqueConstraint(
+                fields=["name"], name="unique_org_name"
+            )
+        ]    
         ordering = ["name"]
         get_latest_by = "name"
 
