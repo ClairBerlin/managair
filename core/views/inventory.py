@@ -93,7 +93,7 @@ class UserViewSet(ReadOnlyModelViewSet):
             # authenticated user.
             queryset = queryset.filter(organizations__users=self.request.user.id)
 
-        # Add the currently authenticated use to the queryset
+        # Add the currently authenticated user to the queryset
         queryset = queryset | User.objects.filter(pk=self.request.user.id)
         # Need to make the filter result distinct - because the underlying JOIN might
         # return the same entity multiple times.
