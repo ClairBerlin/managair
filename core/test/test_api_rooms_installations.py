@@ -325,7 +325,6 @@ class InstallationsTestCase(TokenAuthMixin, APITestCase):
                 "id": self.inst_pk,
                 "attributes": {"from_timestamp_s": 1601510000, "is_public": True},
                 "relationships": {
-                    # Node and room must always be provided, to make sure owners match.
                     "node": {
                         "data": {
                             "type": format_resource_type("Node"),
@@ -345,6 +344,23 @@ class InstallationsTestCase(TokenAuthMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["from_timestamp_s"], 1601510000)
         self.assertEqual(response.data["is_public"], True)
+
+    def test_toggle_installation_publicity(self):
+        """PATCH /installations/<installation_pk>/"""
+        request_data = {
+            "data": {
+                "type": format_resource_type("Installation"),
+                "id": self.inst_pk,
+                "attributes": {"is_public": True},
+            },
+        }
+        response = self.client.patch(self.detail_url, data=request_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["is_public"], True)
+        request_data["data"]["attributes"]["is_public"] = False
+        response = self.client.patch(self.detail_url, data=request_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["is_public"], False)
 
     # TODO: Test illegal time-slice overlaps
 

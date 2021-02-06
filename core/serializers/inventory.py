@@ -136,16 +136,12 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
         logger.debug(
             "For a new or updated installation, validate that node and room belong to the same owner."
         )
-        try:
-            room = attrs["room"]
-            node = attrs["node"]
-        except KeyError:
+        siteOperator = attrs["room"].site.operator if "room" in attrs else None
+        nodeOwner = attrs["node"].owner if "node" in attrs else None
+
+        if siteOperator != nodeOwner:
             raise serializers.ValidationError(
-                "Both the Room reference and the node reference must be provided."
-            )
-        if room.site.operator != node.owner:
-            raise serializers.ValidationError(
-                "In an installation, Node and room must belong to the same owner."
+                "In an installation, node and room must belong to the same owner."
             )
         return attrs
 
