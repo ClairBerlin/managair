@@ -95,6 +95,7 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
     timeseries = serializers.ListField(child=SimpleSampleSerializer(), read_only=True)
     query_timestamp_s = serializers.IntegerField(read_only=True)
     sample_count = serializers.IntegerField(read_only=True)
+    latest_sample = SimpleSampleSerializer(many=False, read_only=True)
     url = serializers.HyperlinkedIdentityField(view_name="installation-detail")
 
     class Meta:
@@ -107,6 +108,7 @@ class RoomNodeInstallationSerializer(serializers.HyperlinkedModelSerializer):
             "from_timestamp_s",
             "to_timestamp_s",
             "sample_count",
+            "latest_sample",
             "description",
             "image",
             "is_public",
