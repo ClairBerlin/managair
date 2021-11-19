@@ -220,13 +220,16 @@ DATABASES = {
         "PORT": os.environ.get("SQL_PORT", "5432"),
     }
 }
+# By default, use 64-bit primary keys. 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 if NODE_FIDELITY:
     # Redis used as broker for the Django_Q task scheduler.
     Q_CLUSTER = {
         "name": "node_check",
         "recycle": 50,
-        "timeout": 300,  # 5 minutes to check all nodes.
+        "retry": 300,
+        "timeout": 180,  # 3 minutes to check all nodes.
         "save_limit": 250,
         "cpu_affinity": 1,
         "label": "Live-Node Check",
