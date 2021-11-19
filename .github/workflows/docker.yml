@@ -32,4 +32,6 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: clairberlin/managair:${{ env.TAG }}
+          tags: 
+            - clairberlin/managair:${{ env.TAG }}
+            - latest
