@@ -98,6 +98,9 @@ class NodeViewSet(ModelViewSet):
         nodes = []
         for node in queryset:
             node.sample_count = node.samples.count()
+            latest_sample = node.samples.last()
+            if latest_sample:
+                node.latest_sample = latest_sample
             nodes.append(node)
         page = self.paginate_queryset(nodes)
         # TODO: Simplify to use the parent list method and simply inject the modified
@@ -129,11 +132,13 @@ class NodeViewSet(ModelViewSet):
         first_sample = sample_queryset.first()
         from_timestamp_s = first_sample.timestamp_s if first_sample else from_limit
         last_sample = sample_queryset.last()
-        to_simtestamp_s = last_sample.timestamp_s if last_sample else to_limit
+        to_timestamp_s = last_sample.timestamp_s if last_sample else to_limit
         instance.sample_count = sample_queryset.count()
         instance.from_timestamp_s = from_timestamp_s
-        instance.to_timestamp_s = to_simtestamp_s
+        instance.to_timestamp_s = to_timestamp_s
         instance.query_timestamp_s = round(datetime.now().timestamp())
+        if last_sample:
+            instance.latest_sample = last_sample
         include_queryparam = self.request.query_params.get("include_timeseries", False)
         if include_queryparam:
             instance.timeseries = sample_queryset

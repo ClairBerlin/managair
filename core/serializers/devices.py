@@ -67,6 +67,8 @@ class NodeSerializer(serializers.HyperlinkedModelSerializer):
         related_link_view_name="node-related",
     )
 
+    latest_sample = SimpleSampleSerializer(many=False, read_only=True)
+
     # Additional fields to merge the node model with its samples.
     timeseries = serializers.ListField(child=SimpleSampleSerializer(), read_only=True)
     query_timestamp_s = serializers.IntegerField(read_only=True)
@@ -85,6 +87,7 @@ class NodeSerializer(serializers.HyperlinkedModelSerializer):
             "from_timestamp_s",
             "to_timestamp_s",
             "sample_count",
+            "latest_sample",
             "timeseries",
             "protocol",
             "model",

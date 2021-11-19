@@ -93,7 +93,7 @@ For most resources, there exists at least on API test. Refer to these test cases
     - Search for nodes with a specific alias or device-EUI via the filter `filter[search]=<search-text>`.
     - [POST] Register a new node with an organization for which the authenticated user must be an OWNER.
 - `/api/v1/nodes/<node_id>/` Details-resource of the specified node. Only accessible if the node is visible to the authenticated user.
-  - [GET] Retrieve information about the node. Might include fidelity information and time-series data. By default, the node resource does not return its associated time series. To query for the node's time series, use the following query-parameters:
+  - [GET] Retrieve information about the node. Always includes the most recent sample reported by the node. Might include fidelity information. By default, the node resource does not return its associated time series. To query for the node's time series, use the following query-parameters:
     - `include_timeseries=True` prompts the _Managair_ to add a `timeseries` list to the attributes of the Node resource.
     - `filter[to]`: End timestamp of the retrieved time series as Unix epoch. Defaults to the current system time `now()`.
     - `filter[from]`: Start timestamp of the retrieved time series as Unix epoch. Defaults to `0`; i.e., 1970-01-01T00:00:00Z.
@@ -142,10 +142,10 @@ For most resources, there exists at least on API test. Refer to these test cases
     - See installations of a specific node via the filter `filter[node]=<node_id>`.
   - [POST] Associate an already-registered node with an already-registered room. A node to be associated with a room must not be associated with another room for an overlapping time period, and the node must belong to the organization that owns the room, too.
 - `/api/v1/installations/<installation_id>/` Details-resource for the installation of the identified node.
-  - [GET] Provide details about the installation. Might include time-series data. By default, the installation resource does not return its associated time series. To query for the installation time-series, use the following query-parameters:
+  - [GET] Provide details about the installation. Always includes the most recent sample reported from the installation. By default, the installation resource does not return its associated time series. To query for the installation time-series, use the following query-parameters:
     - `include_timeseries=True` prompts the _Managair_ to add a `timeseries` list to the attributes of the installation resource. The time series of an installation consists of those samples reported by the installed node over the duration of the installation. If the node is subsequently moved to another installation, the thus resulting samples become part of this other installation time series.
     - `filter[from]`: Start timestamp of the retrieved time series as Unix epoch. Defaults to `0`; i.e., 1970-01-01T00:00:00Z.
-    - `filter[to]`: End timestamp of the retrieved time series as Unix epoch. Defaults to the current system time `now()`.
+    - `filter[to]`: End timestamp of the retrieved time series as Unix epoch. Defaults to the current system time `now()`. If this filter is applied, the latest sample returned is the latest sample within the filtered range.
   - [PUT, PATCH] Replace resp. update the association with the room. To end the association with a room, update it with an end timestamp earlier than 2147483647 (2038-01-19T03:14:07Z); this preserves the association history.
   - [DELETE] Removes the association with the room. This removes the association history, as if the node has never been associated with the room.
 - `/api/v1/installations/<installation_id>/image/` Endpoint to upload an image that depicts the installation. The installation detail resource must already exist before addind an image. _Note:_ This is not a REST-like resource.
@@ -161,7 +161,7 @@ Measurement data is what the Clair network is all about. Therefore, the API endp
 
 Time series consist of samples; yet, samples are not resources in their own right, because they always need context: the node that reported them, or the installation where the sample was taken. Therefore, the preferred way to retrieve a time series is as part of the context resource, as already documented.
 
-- A _node time series_ is entire list of samples ever recorded by the given node, ordered chronologically. Retrieve a node time series via the node resource at `/api/v1/nodes/<node_id>`, and set the query parameter `include-timeseries=True`. Node timeseries are accessible only for authenticated users that are members of the organization owning the node.
+- A _node time series_ is the entire list of samples ever recorded by the given node, ordered chronologically. Retrieve a node time series via the node resource at `/api/v1/nodes/<node_id>`, and set the query parameter `include-timeseries=True`. Node timeseries are accessible only for authenticated users that are members of the organization owning the node.
 - An _installation time series_ is the list of samples taken while a given node was installed at a particular location in a given room. That is, the installation time-series is limited in time by the installation's start and end timestamps. Retrieve an installaton time-series via the installation resource at `/api/v1/installations/<installation_id>/`,and set the query parameter `include-timeseries=True`. Installation time series are publicly accessible if the installation itself is marked as public.
 
 ## Public Resources

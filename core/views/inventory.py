@@ -284,10 +284,14 @@ class RoomNodeInstallationViewSet(ModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         installations = []
         for installation in queryset:
-            installation.sample_count = installation.node.samples.filter(
+            installation_samples = installation.node.samples.filter(
                 timestamp_s__gte=installation.from_timestamp_s,
                 timestamp_s__lte=installation.to_timestamp_s,
-            ).count()
+            )
+            installation.sample_count = installation_samples.count()
+            latest_sample = installation_samples.last()
+            if latest_sample:
+                installation.latest_sample = latest_sample
             installation.query_timestamp_s = round(datetime.now().timestamp())
             installations.append(installation)
         page = self.paginate_queryset(installations)
@@ -324,6 +328,9 @@ class RoomNodeInstallationViewSet(ModelViewSet):
         ).distinct()
         installation.sample_count = sample_queryset.count()
         installation.query_timestamp_s = round(datetime.now().timestamp())
+        latest_sample = sample_queryset.last()
+        if latest_sample:
+            installation.latest_sample = latest_sample
         include_queryparam = self.request.query_params.get("include_timeseries", False)
         if include_queryparam:
             installation.timeseries = sample_queryset
