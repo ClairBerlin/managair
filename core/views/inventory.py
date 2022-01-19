@@ -218,7 +218,6 @@ class RoomViewSet(ModelViewSet):
     def perform_create(self, serializer):
         """Inject permission checking on the validated incoming resource data."""
         # TODO: Refactor into common base class.
-        # TODO: Allow ASSISTANTS to change rooms.
         if IsOrganizationOwner.has_create_permission(self.request, serializer):
             super().perform_create(serializer)
         else:
@@ -274,7 +273,6 @@ class RoomNodeInstallationViewSet(ModelViewSet):
     def perform_create(self, serializer):
         """Inject permission checking on the validated incoming resource data."""
         # TODO: Refactor into common base class.
-        # TODO: Allow ASSISTANTS to change rooms.
         if IsOrganizationOwner.has_create_permission(self.request, serializer):
             super().perform_create(serializer)
         else:
@@ -439,7 +437,6 @@ class MembershipViewSet(ModelViewSet):
     def perform_create(self, serializer):
         """Inject permission checking on the validated incoming resource data."""
         # TODO: Refactor into common base class.
-        # TODO: Allow ASSISTANTS to change rooms.
         if IsOrganizationOwner.has_create_permission(self.request, serializer):
             super().perform_create(serializer)
         else:

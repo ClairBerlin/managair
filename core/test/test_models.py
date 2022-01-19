@@ -80,7 +80,7 @@ class InventoryTestCase(TestCase):
         user = self.test_data["user1"]
         with self.assertRaises(IntegrityError):
             Membership.objects.create(
-                role=Membership.ASSISTANT, user=user, organization=org
+                role=Membership.INSPECTOR, user=user, organization=org
             )
 
     def test_unique_adderss(self):
