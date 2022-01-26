@@ -3,6 +3,13 @@
 from django.db import migrations, models
 
 
+def change_assistant_to_inspector(apps, schema_editor):
+    Membership = apps.get_model('core', 'Membership')
+    for m in Membership.objects.filter(role='A'):
+        m.role = 'I'
+        m.save()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -10,6 +17,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(change_assistant_to_inspector),
         migrations.AlterField(
             model_name='membership',
             name='role',
