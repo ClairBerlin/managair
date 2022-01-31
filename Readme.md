@@ -13,7 +13,7 @@ Managair is the key administrative service of the _Clair Stack_. It is a [Django
 - Administrative access to all entities is possible via the [Django Admin-UI](https://docs.djangoproject.com/en/3.1/ref/contrib/admin/).
 - Managair enforces an access control policy whereby resources and samples are visible to users that are members of a given _organization_ only, but can be made public explicitly.
 - An independent _fidelity service_ checks if data is received regularly from each node.
-  
+
 ## Detailed Documentation
 
 - The [Managair REST API](/doc/api.md)
@@ -25,9 +25,8 @@ At the core of the Managair is a multitenant data model.
 
 - Key entity is the _organization_, which stands for a legal entity like a bar, restaurant, a retail store or a dentist practice. An organization can also stand for large institutions, like a retail chain or a university.
 - A _user_ is a digital identity for a natural person. Each user is identified by a username and authenticated via a password.
-- A user can be a _member_ of one or more organizations. For each organization, the membership can take on one of three _roles_:
+- A user can be a _member_ of one or more organizations. For each organization, the membership can take on one of two _roles_:
   - A user with the _OWNER_ role has full control over all resources that belong to the organization.
-  - A user with the _ASSISTANT_ role has read-access for all resources and extended access rights for a subset of resources. [The ASSISTANT role is not yet implemented].
   - The INSPECTOR has read access only.
 - An organization owns one or more sensor _nodes_. Each node reports measurement _samples_ over time, where each sample is time-stamped and contains at least a CO2 measurement. Depending on the node _model_ and the node _protocol_, a node might report additional measurement _quantities_.
 - Each organization can command one or more _sites_. A site models a physical location with an address and geo-coordinates. Examples for a site might be a restaurant, a pharmacy, a school, or a department store.
@@ -54,20 +53,21 @@ Upon a fresh deployment, or whenever static files have changed, you can force Dj
 
 #### Translations
 
-For the accounts templates are used which contain strings which can be translated. This is done for german (`de`). The process was:
-* `cd accounts`
-* `mkdir locale` 
-* `django-admin makemessages -l de`
-* add translations to `locale/de/LC_MESSAGES/django.po`
-* `django-admin compilemessages` to create the `.mo` file which is used for rendering
+For the accounts, templates are used that contain strings which can be translated. This is done for german (`de`). The process was:
+
+- `cd accounts`
+- `mkdir locale`
+- `django-admin makemessages -l de`
+- add translations to `locale/de/LC_MESSAGES/django.po`
+- `django-admin compilemessages` to create the `.mo` file which is used for rendering
 
 When changing the templates, run:
-* `django-admin makemessages -a`
-* update translations in `locale/de/LC_MESSAGES/django.po`
-* `django-admin compilemessages`
 
-_NOTE: the default language is determined in `settings.py` via `LANGUAGE_CODE`.
+- `django-admin makemessages -a`
+- update translations in `locale/de/LC_MESSAGES/django.po`
+- `django-admin compilemessages`
 
+\_NOTE: the default language is determined in `settings.py` via `LANGUAGE_CODE`.
 
 ### Secrets
 
@@ -162,13 +162,13 @@ Like for the operational API, authentication and registration resources must be 
 
 ```json
 {
-    "data": {
-        "type": "LoginView",
-        "attributes": {
-            "username": "maxMustermann",
-            "password": "mustermann"
-        }
+  "data": {
+    "type": "LoginView",
+    "attributes": {
+      "username": "maxMustermann",
+      "password": "mustermann"
     }
+  }
 }
 ```
 

@@ -131,7 +131,7 @@ class MembershipsTestCase(TokenAuthMixin, APITestCase):
             "data": {
                 "type": format_resource_type("Membership"),
                 "attributes": {
-                    "role": "A",
+                    "role": "I",
                 },
                 "relationships": {
                     # Make annaAngestellte (pk=5) a Versuchsverbund (pk=2) ASSISTANT.
@@ -148,7 +148,7 @@ class MembershipsTestCase(TokenAuthMixin, APITestCase):
         # POST /memberships/
         response1 = self.client.post(self.collection_url, data=request_data)
         self.assertEqual(response1.status_code, 201)
-        self.assertEqual(response1.data["role"], "A")
+        self.assertEqual(response1.data["role"], "I")
         self.assertEqual(response1.data["user"]["id"], "5")
         self.assertEqual(response1.data["organization"]["id"], "2")
         # Fetch the membership resource just created.
@@ -156,7 +156,7 @@ class MembershipsTestCase(TokenAuthMixin, APITestCase):
         # GET /memberships/<membership_id/>
         response2 = self.client.get(response_url)
         self.assertEqual(response2.status_code, 200)
-        self.assertEqual(response2.data["role"], "A")
+        self.assertEqual(response2.data["role"], "I")
         self.assertEqual(response2.data["user"]["id"], "5")
         self.assertEqual(response2.data["organization"]["id"], "2")
         # Delete the membership.
@@ -192,7 +192,7 @@ class MembershipsTestCase(TokenAuthMixin, APITestCase):
             "data": {
                 "type": format_resource_type("Membership"),
                 "attributes": {
-                    "role": "A",
+                    "role": "I",
                 },
                 "relationships": {
                     # Make annaAngestellte (pk=5) a Versuchsverbund (pk=2) ASSISTANT.
@@ -219,7 +219,7 @@ class MembershipsTestCase(TokenAuthMixin, APITestCase):
             "data": {
                 "type": format_resource_type("Membership"),
                 "attributes": {
-                    "role": "A",
+                    "role": "I",
                 },
                 "relationships": {
                     # Make tomTester a Versuchsverbund (pk=2) ASSISTANT.

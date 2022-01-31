@@ -47,11 +47,9 @@ class Membership(models.Model):
     """Models membership of a user in an organization"""
 
     OWNER = "O"
-    ASSISTANT = "A"
     INSPECTOR = "I"
     MEMBERSHIP_ROLE = [
         (OWNER, "User has full control of the organization and its inventory."),
-        (ASSISTANT, "User can perform a restricted set of tasks in the organization."),
         (INSPECTOR, "User can inspect the organization's inventory."),
     ]
     role = models.CharField(

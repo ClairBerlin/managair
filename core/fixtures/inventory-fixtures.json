@@ -45,7 +45,7 @@
         "model": "core.membership",
         "pk": 6,
         "fields": {
-            "role": "A",
+            "role": "I",
             "user": 4,
             "organization": 2
         }
@@ -54,7 +54,7 @@
         "model": "core.membership",
         "pk": 7,
         "fields": {
-            "role": "A",
+            "role": "I",
             "user": 5,
             "organization": 1
         }
@@ -99,7 +99,7 @@
         "model": "core.membership",
         "pk": 16,
         "fields": {
-            "role": "A",
+            "role": "I",
             "user": 7,
             "organization": 1
         }
