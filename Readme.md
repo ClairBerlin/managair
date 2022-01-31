@@ -25,7 +25,7 @@ At the core of the Managair is a multitenant data model.
 
 - Key entity is the _organization_, which stands for a legal entity like a bar, restaurant, a retail store or a dentist practice. An organization can also stand for large institutions, like a retail chain or a university.
 - A _user_ is a digital identity for a natural person. Each user is identified by a username and authenticated via a password.
-- A user can be a _member_ of one or more organizations. For each organization, the membership can take on one of three _roles_:
+- A user can be a _member_ of one or more organizations. For each organization, the membership can take on one of two _roles_:
   - A user with the _OWNER_ role has full control over all resources that belong to the organization.
   - The INSPECTOR has read access only.
 - An organization owns one or more sensor _nodes_. Each node reports measurement _samples_ over time, where each sample is time-stamped and contains at least a CO2 measurement. Depending on the node _model_ and the node _protocol_, a node might report additional measurement _quantities_.
@@ -53,7 +53,7 @@ Upon a fresh deployment, or whenever static files have changed, you can force Dj
 
 #### Translations
 
-For the accounts templates are used which contain strings which can be translated. This is done for german (`de`). The process was:
+For the accounts, templates are used that contain strings which can be translated. This is done for german (`de`). The process was:
 
 - `cd accounts`
 - `mkdir locale`
