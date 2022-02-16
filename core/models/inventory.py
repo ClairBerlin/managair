@@ -96,12 +96,6 @@ class Address(models.Model):
     # TODO: Add geolocation.
 
     class Meta:
-        constraints = [
-            # Addresses must be unique, but local differentiation is admissible.
-            models.UniqueConstraint(
-                fields=["street1", "street2", "zip", "city"], name="unique_address"
-            )
-        ]
         ordering = ["city", "street1"]
         get_latest_by = "city"
 
