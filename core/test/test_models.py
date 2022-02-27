@@ -83,24 +83,6 @@ class InventoryTestCase(TestCase):
                 role=Membership.INSPECTOR, user=user, organization=org
             )
 
-    def test_unique_adderss(self):
-        """An address must be unique throughout the entire address data set."""
-        Address.objects.create(
-            street1="Teststraße 1", street2="Testhütte", zip="12345", city="Testdorf"
-        )
-        # A slightly different address is ok
-        Address.objects.create(
-            street1="Teststraße 1", street2="Vorderhaus", zip="12345", city="Testdorf"
-        )
-        # But exactly the same address cannot be present twice.
-        with self.assertRaises(IntegrityError):
-            Address.objects.create(
-                street1="Teststraße 1",
-                street2="Testhütte",
-                zip="12345",
-                city="Testdorf",
-            )
-
     def test_unique_site(self):
         """Within an organization, sites must have unique names."""
         adr = Address.objects.create(
@@ -156,13 +138,13 @@ class InventoryTestCase(TestCase):
     def test_installation(self):
         """Node and room referenced in a NodeInstallation must pertain to the same owner."""
         installation = RoomNodeInstallation.objects.create(
-                description="A fine installation",
-                from_timestamp_s=1577836800,
-                to_timestamp_s=2147483647,
-                is_public=True,
-                node=self.test_data["node2"],
-                room=self.test_data["room2"],
-            )
+            description="A fine installation",
+            from_timestamp_s=1577836800,
+            to_timestamp_s=2147483647,
+            is_public=True,
+            node=self.test_data["node2"],
+            room=self.test_data["room2"],
+        )
         self.assertEqual(installation.from_timestamp_s, 1577836800)
         self.assertEqual(installation.is_public, True)
 
