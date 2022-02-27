@@ -27,7 +27,7 @@ User = get_user_model()
 class AddressSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Address
-        fields = ("street1", "street2", "zip", "city", "url")
+        fields = ("street1", "street2", "zip", "city", "url", "latitude", "longitude")
 
 
 class SiteSerializer(serializers.HyperlinkedModelSerializer):
