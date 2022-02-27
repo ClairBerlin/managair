@@ -12,7 +12,7 @@ from core.models import (
 
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
-    list_display = ["street1", "street2", "zip", "city"]
+    list_display = ["street1", "street2", "zip", "city", "latitude", "longitude"]
 
 
 @admin.register(Site)

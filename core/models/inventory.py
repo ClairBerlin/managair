@@ -93,7 +93,13 @@ class Address(models.Model):
     street2 = models.CharField(max_length=50, null=True, blank=True)
     zip = models.CharField(max_length=5, null=False, blank=False)
     city = models.CharField(max_length=50, null=False, blank=False)
-    # TODO: Add geolocation.
+    # Default geolocation according to ISO 6709
+    # positive values: north of the equator.
+    latitude = models.DecimalField(
+                max_digits=9, decimal_places=6, null=True, blank=True)
+    # positive values: east of the Prime Meridian 
+    longitude = models.DecimalField(
+                max_digits=9, decimal_places=6, null=True, blank=True)
 
     class Meta:
         ordering = ["city", "street1"]
