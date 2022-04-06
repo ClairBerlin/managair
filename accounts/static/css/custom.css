@@ -1,0 +1,34 @@
+@font-face {
+  font-display: swap;
+  font-family: ClanPro;
+  font-style: normal;
+  font-weight: 400;
+  src: local("ClanPro News"),
+    url(https://www.technologiestiftung-berlin.de/assets/fonts/ClanPro-News.woff2)
+      format("woff");
+}
+@font-face {
+  font-display: swap;
+  font-family: ClanPro;
+  font-style: normal;
+  font-weight: 600;
+  src: local("ClanPro Medium"),
+    url(https://www.technologiestiftung-berlin.de/assets/fonts/ClanPro-Medium.woff2)
+      format("woff");
+}
+@font-face {
+  font-display: swap;
+  font-family: ClanPro;
+  font-style: normal;
+  font-weight: 800;
+  src: local("ClanPro Bold"),
+    url(https://www.technologiestiftung-berlin.de/assets/fonts/ClanPro-Bold.woff2)
+      format("woff");
+}
+
+* {
+  font-family: "ClanPro", sans-serif;
+  color: #3b3b3a;
+  font-weight: normal;
+  line-height: 32px;
+}
