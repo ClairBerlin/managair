@@ -258,8 +258,8 @@ msgid "Your primary e-mail address must be verified."
 msgstr "Ihre vorrangige E-Mail-Adresse muss verifiziert werden."
 
 #: templates/account/nav.html:10
-msgid "My Clair-Berlin Account"
-msgstr "Mein Clair-Berlin Konto"
+msgid "My COMo-Berlin Account"
+msgstr "Mein COMo-Berlin Konto"
 
 #: templates/account/password_change.html:6
 #: templates/account/password_change.html:16
