@@ -90,6 +90,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "core",
     "ingest",
+    "stadtpuls_integration"
 ]
 
 MIDDLEWARE = [
@@ -317,6 +318,11 @@ LOGGING = {
             "propagate": False,
         },
         "core": {
+            "handlers": ["console"],
+            "level": os.environ.get("LOG_LEVEL", default="INFO"),
+            "propagate": False,
+        },
+        "ingest": {
             "handlers": ["console"],
             "level": os.environ.get("LOG_LEVEL", default="INFO"),
             "propagate": False,
