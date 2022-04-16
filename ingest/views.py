@@ -1,5 +1,6 @@
 import logging
 from rest_framework import generics
+from django.conf import settings
 
 from core.models import Sample
 from .serializers import SampleIngestSerializer
@@ -18,7 +19,8 @@ class InternalSampleView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         """Hook to trigger forwarding to external IOT data platforms."""
         sample = serializer.save()
-        self.__publish_sample(sample)
+        if (settings.IOTDP_INTEGRATION):
+            self.__publish_sample(sample)
 
     def __publish_sample(self, sample):
         """Publish a signal for an incoming sample whose installation is public."""
