@@ -4,11 +4,16 @@ from django.db import models
 
 logger = logging.getLogger(__name__)
 
+
 class StadpulsSensor(models.Model):
     installation = models.ForeignKey(
-        "core.RoomNodeInstallation", null=False, on_delete=models.CASCADE, related_name="stadtpuls_sensor"
+        "core.RoomNodeInstallation",
+        null=False,
+        on_delete=models.CASCADE,
+        related_name="stadtpuls_sensor",
     )
     inserted_s = models.PositiveIntegerField(null=False, blank=False)
+    stadtpuls_sensor_id = models.IntegerField(unique=True, null=False)
 
     def __str__(self):
         """String for representing the Model object."""

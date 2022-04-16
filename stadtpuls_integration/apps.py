@@ -6,5 +6,6 @@ class StadtpulsConfig(AppConfig):
     verbose_name = "CityLAB Stadtpuls Integration"
 
     def ready(self):
+        from . import conf
         # Implicitly connect a signal handlers decorated with @receiver.
         from . import publisher

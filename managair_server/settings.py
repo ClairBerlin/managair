@@ -289,6 +289,16 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # See https://docs.djangoproject.com/en/3.1/howto/static-files/
 STATIC_URL = "/static/"
 
+# CityLAB Berlin Stadtpuls Integration
+SP_SUPABASE_URL = os.environ.get("SP_SUPABASE_URL", default="https://porgaqmrgwwrbwahohml.supabase.co")
+SP_LOGIN_ENDPOINT = os.environ.get("SP_LOGIN_ENDPOINT", default="https://porgaqmrgwwrbwahohml.supabase.co/auth/v1/token")
+SP_SENSOR_ENDPOINT = os.environ.get("SP_SENSOR_ENDPOINT", default="https://porgaqmrgwwrbwahohml.supabase.co/rest/v1/sensors")
+SP_RECORDS_ENDPOINT = os.environ.get("SP_RECORDS_ENDPOINT", default="https://stadtpuls-api-v3-staging.onrender.com/api/v3/sensors")
+SP_API_KEY = get_secret_from_env_or_file("SP_API_KEY")
+SP_LOGIN_EMAIL = os.environ.get("SP_LOGIN_EMAIL")
+SP_LOGIN_PWD = get_secret_from_env_or_file("SP_LOGIN_PWD")
+SP_AUTH_TOKEN = get_secret_from_env_or_file("SP_AUTH_TOKEN")
+
 # Logging configuration
 LOGGING = {
     "version": 1,
@@ -323,6 +333,11 @@ LOGGING = {
             "propagate": False,
         },
         "ingest": {
+            "handlers": ["console"],
+            "level": os.environ.get("LOG_LEVEL", default="INFO"),
+            "propagate": False,
+        },
+        "stadtpuls-integration": {
             "handlers": ["console"],
             "level": os.environ.get("LOG_LEVEL", default="INFO"),
             "propagate": False,
