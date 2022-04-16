@@ -21,3 +21,11 @@ class StadpulsSensor(models.Model):
 
     def inserted_iso(self):
         return datetime.fromtimestamp(self.inserted_s)
+
+    class Meta:
+        ordering = ["stadtpuls_sensor_id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["stadtpuls_sensor_id"], name="unique_statpuls_sensor")
+        ]
+
