@@ -72,10 +72,10 @@ def register_sensor(installation):
         # See discussion  https://github.com/supabase/supabase/discussions/4054
         "prefer": "return=representation",
     }
-    # Sensor name is limited to 50 characters.
-    sensor_name = f"{node.id}::{installation.from_timestamp_s}"
+    # sensor_name = f"{node.id}::{installation.from_timestamp_s}"
+    sensor_name = f"{node.alias} in {room.name}"
     req_body = {
-        "name": sensor_name,
+        "name": sensor_name[0:49],  # Stadpuls sensor name is limited to 50 characters.
         "description": installation_to_toml(installation),
         "connection_type": "http",
         "location": site.address.city,
@@ -116,7 +116,12 @@ def installation_to_toml(installation):
     site = room.site
     owner = site.operator
 
-    sp_sensor = {"eui64": node.eui64, "alias": node.alias, "owner": owner.name}
+    sp_sensor = {
+        "id": str(node.id),
+        "eui64": node.eui64,
+        "alias": node.alias,
+        "owner": owner.name,
+    }
     sp_sensor["model"] = {"manufacturer": model.manufacturer, "type": model.trade_name}
     sp_sensor["room"] = {
         "name": room.name,
@@ -139,9 +144,7 @@ def post_sample(sample, stadtpuls_sensor_id):
     timestamp = datetime.fromtimestamp(sample.timestamp_s, timezone.utc)
     timestamp_iso = timestamp.isoformat()
     req_body = {
-        "records": [
-            {"recorded_at": timestamp_iso, "measurements": [sample.co2_ppm]}
-        ]
+        "records": [{"recorded_at": timestamp_iso, "measurements": [sample.co2_ppm]}]
     }
     records_endpoint = f"{settings.SP_RECORDS_ENDPOINT}/{stadtpuls_sensor_id}/records"
     response = requests.post(url=records_endpoint, headers=headers, json=req_body)
