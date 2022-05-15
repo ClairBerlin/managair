@@ -18,6 +18,7 @@ COPY ./managair_server /code/managair_server
 COPY ./core /code/core
 COPY ./accounts /code/accounts
 COPY ./ingest /code/ingest
+COPY ./stadtpuls_integration /code/stadtpuls_integration
 COPY schema.yaml .
 COPY ./manage.py .
 COPY ./entrypoint.sh .
