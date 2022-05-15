@@ -15,7 +15,7 @@ Managair is the key administrative service of the _Clair Stack_. It is a [Django
 - Administrative access to all entities is possible via the [Django Admin-UI](https://docs.djangoproject.com/en/3.1/ref/contrib/admin/).
 - Managair enforces an access control policy whereby resources and samples are visible to users that are members of a given _organization_ only, but can be made public explicitly.
 - An independent _fidelity service_ checks if data is received regularly from each node.
-- Publshers allow to forward samples to other IoT data platforms if the corresponding sensor installation was marked as _public_.
+- Publishers allow to forward samples to other IoT data platforms if the corresponding sensor installation was marked as _public_.
 
 ## The Managair Data Model
 
@@ -165,9 +165,9 @@ Results of the fidelity check are available at the API resource `api/v1/fidelity
 
 ## Integrations
 
-Managair in its sample-inget configuration provides for a means to forward incoing samples to other IoT data platforms (IOTDP). For each incoming sample, the ingester determines if the sample corresponds to an active _installation_ and if this installation has the flag `is_public` set to `true`. If so, the ingester publishes a [Django signal](https://docs.djangoproject.com/en/4.0/topics/signals/) that can be picked up by a custom integration application for use. In this way, it is possible to develop [Django applications](https://docs.djangoproject.com/en/4.0/ref/applications/) that subscribe to this signal. How each application performs the actual integration may differ widely.
+Managair in its sample-ingest configuration provides for a means to forward incoming samples to other IoT data platforms (IOTDP). For each incoming sample, the ingester determines if the sample corresponds to an active _installation_ and if this installation has the flag `is_public` set to `true`. If so, the ingester publishes a [Django signal](https://docs.djangoproject.com/en/4.0/topics/signals/) that can be picked up by a custom integration application for use. In this way, it is possible to develop [Django applications](https://docs.djangoproject.com/en/4.0/ref/applications/) that subscribe to this signal. How each application performs the actual integration may differ.
 
-As a first example, Managair comes with an integration for [Stadtpuls Berlin](https://stadtpuls.com/), implemented as a Django application `stadtpuls_integration`. This application has its own data model in the Django DB to store which installations have already been registered with Stadtpuls. For each signal trigger, the Stadtpuls integration checks if the installation that corresponds to the incoming sample has already been registered with Stadtpuls. If yes, it map the internal installation ID to the corresponding Stadtpuls sensor ID, converts the sample data format, and forwards it to the Stadtpuls ingest API. If not, it first registers a new Stadpuls sensor.
+As a first example, Managair comes with an integration for [Stadtpuls Berlin](https://stadtpuls.com/), implemented as Django application `stadtpuls_integration`. This application has its own data model in the Django DB that stores which installations have already been registered with Stadtpuls. For each signal trigger, the Stadtpuls integration checks if the installation that corresponds to the incoming sample has already been registered with Stadtpuls. If yes, it maps the internal installation ID to the corresponding Stadtpuls sensor ID, converts the sample data format, and forwards it to the Stadtpuls ingest API. If not, it first registers a new Stadpuls sensor and then proceeds as above.
 
 ## Development Setup
 
