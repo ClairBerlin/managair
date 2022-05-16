@@ -1,7 +1,7 @@
 FROM python:slim-buster
 RUN apt-get update && \
     apt-get -y dist-upgrade && \
-    apt-get -y install apt-utils netcat gettext
+    apt-get -y install apt-utils netcat gettext gcc python3-dev libpq-dev
 
 # Docker defaults to sh, but the 'source' command is only available in bash.
 SHELL ["/bin/bash", "-c"]
