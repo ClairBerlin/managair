@@ -19,3 +19,4 @@ toml==0.10.2
 requests==2.27.1
 django-appconf==1.0.4
 simplejson==3.17.6
+pandas==1.4.2

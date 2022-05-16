@@ -134,7 +134,7 @@ For most resources, there exists at least on API test. Refer to these test cases
   - [DELETE] Remove the room resource and the node-installation it might contain. Does not delete the node resources themselves.
 - `/api/v1/rooms/<room_id>/installations/` Collection-resource of all node installations in the given room.
   - [GET] List current and past installations, with individual links to the related detail-resource at `/api/v1/installations/<installation_id>`.
-- `/api/v1/installations/` Collection-resource for the all node installation visible to the authenticated user.
+- `/api/v1/installations/` Collection-resource for all the node-installation visible to the authenticated user.
   - [GET] List the installations. Filter to narrow down the list:
     - See installations of one specific organization with the filter `filter[organization]=<organization_id>`.
     - See installations of one specific site with the filter `filter[site]=<site_id>`.
