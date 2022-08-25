@@ -280,18 +280,6 @@ class RoomNodeInstallationViewSet(ModelViewSet):
         else:
             raise PermissionDenied
 
-    def resample_node_samples(self, timeseries_queryset):
-        timeseries = timeseries_queryset.all()
-        data = [
-            {"timestamp_s": sample.timestamp_s, "co2_ppm": sample.co2_ppm}
-            for sample in timeseries
-        ]
-        samples = pd.DataFrame(data)
-        samples["timestamp_s"] = pd.to_datetime(samples["timestamp_s"], unit="s")
-        logger.debug(samples.info())
-        return samples
-
-
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         installations = []
@@ -300,7 +288,6 @@ class RoomNodeInstallationViewSet(ModelViewSet):
                 timestamp_s__gte=installation.from_timestamp_s,
                 timestamp_s__lte=installation.to_timestamp_s,
             )
-            self.resample_node_samples(installation_samples)
             installation.sample_count = installation_samples.count()
             latest_sample = installation_samples.last()
             if latest_sample:

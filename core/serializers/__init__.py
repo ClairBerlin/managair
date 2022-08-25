@@ -3,7 +3,8 @@ from .data import (
     NodeTimeseriesListSerializer,
     NodeTimeseriesSerializer,
     InstallationTimeseriesListSerializer,
-    InstallationTimeSeriesSerializer
+    InstallationTimeSeriesSerializer,
+    RoomAirQualitySerializer
 )
 from .devices import (
     QuantitySerializer,

@@ -5,6 +5,7 @@ from core.data_viewmodels import (
     NodeTimeseriesViewModel,
     InstallationTimeseriesListViewModel,
     InstallationTimeseriesViewModel,
+    RoomAirQualityViewModel,
 )
 from core.models import Sample
 
@@ -72,3 +73,12 @@ class InstallationTimeSeriesSerializer(InstallationTimeseriesListSerializer):
 
     class JSONAPIMeta:
         resource_name = "Installation-Timeseries"
+
+class RoomAirQualitySerializer(serializers.Serializer):
+    
+    class Meta:
+        model = RoomAirQualityViewModel
+        fields = ["url"]
+
+    class JSONAPIMeta:
+        resource_name = "Room-Air-Quality"

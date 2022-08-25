@@ -1,18 +1,22 @@
 import logging
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.http import Http404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
 from rest_framework_json_api.views import ReadOnlyModelViewSet
+import pandas as pd
 
 from core.data_viewmodels import (
     NodeTimeseriesListViewModel,
     NodeTimeseriesViewModel,
     InstallationTimeseriesListViewModel,
     InstallationTimeseriesViewModel,
+    RoomAirQualityViewModel,
 )
 from core.models import Node, RoomNodeInstallation
 from core.serializers import (
@@ -20,6 +24,13 @@ from core.serializers import (
     NodeTimeseriesSerializer,
     InstallationTimeseriesListSerializer,
     InstallationTimeSeriesSerializer,
+    RoomAirQualitySerializer,
+)
+from core.data_analysis import (
+    prepare_samples,
+    compute_metrics_for_month,
+    weekday_histogram,
+    clean_air_medal,
 )
 
 logger = logging.getLogger(__name__)
@@ -218,3 +229,90 @@ class InstallationTimeSeriesViewSet(ReadOnlyModelViewSet):
             to_timestamp_s=to_min_s,
             samples=samples,
         )
+
+
+class RoomAirQualityViewSet(ReadOnlyModelViewSet):
+    """A read-only view for air quality information of a given room, computed on the fly from the room's installed sensor. Currently, only a single sensor per room is supported."""
+
+    queryset = RoomNodeInstallation.objects.all()
+    serializer_class = RoomAirQualitySerializer
+
+    def get_queryset(self, *args, **kwargs):
+        queryset = super().get_queryset()
+
+        is_public = Q(is_public=True)
+        accessible_if_authenticated = Q(node__owner__users=self.request.user)
+
+        if not self.request.user.is_authenticated:
+            # Public API access. Restrict the listed installations to those that are
+            # publicly visible.
+            authorized_installations = queryset.filter(is_public)
+        else:
+            # Otherwise, Restrict to samples from installations commanded by the
+            # currently logged-in user.
+            authorized_installations = queryset.filter(
+                is_public | accessible_if_authenticated
+            )
+
+        if self.action == "retrieve" and "pk" in self.kwargs:
+            pk = self.kwargs["pk"]
+            return (
+                authorized_installations.filter(room=pk)
+                .distinct()
+                .order_by("from_timestamp_s")
+            )
+        else:
+            raise MethodNotAllowed
+
+    def get_object(self):
+        installations_queryset = self.get_queryset()
+        date_str = self.kwargs.get("month", datetime.today().strftime("%Y-%m"))
+        month = datetime.strptime(date_str, "%Y-%m")
+        start_of_month = month.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        end_of_month = start_of_month  + relativedelta(months=+1)
+        from_s = start_of_month.timestamp()
+        to_s = end_of_month.timestamp()
+        installations_in_slice = installations_queryset.filter(
+            to_timestamp_s__gte=from_s, from_timestamp_s__lte=to_s
+        )
+        sample_set = []
+        if installations_in_slice.count() == 0:
+            raise Http404(
+                f"In the requested time slice, the selected room has no accessible installations to draw measurement samples from."
+            )
+        elif installations_in_slice.count() > 1:
+            for index in range(1, installations_in_slice.count() - 1):
+                # Ensure that there is a single active installation in the room at any
+                # point in time.
+                prev_installation_to = installations_in_slice[index - 1].to_timestamp_s
+                succ_installation_from = installations_in_slice[index].from_timestamp_s
+                if succ_installation_from <= prev_installation_to:
+                    raise Http404(
+                        f"The room has multiple installations active at the same time, which we cannot analyze yet."
+                    )
+            sample_querysets = [
+                installation.node.samples.filter(
+                    timestamp_s__gte=from_s, timestamp_s__lte=to_s
+                )
+                for installation in installations_in_slice
+            ]
+            sample_set = (
+                sample_querysets[0]
+                .union(*sample_querysets[1:])
+                .order_by("timestamp_s")
+            )
+        else:
+            sample_set = installations_in_slice[0].node.samples.filter(
+                timestamp_s__gte=from_s, timestamp_s__lte=to_s
+            ).order_by("timestamp_s")
+
+        values = sample_set.values("timestamp_s", "co2_ppm")
+        samples = pd.DataFrame.from_records(values)
+        samples["timestamp_s"] = pd.to_datetime(samples["timestamp_s"], unit="s")
+        samples.set_index("timestamp_s", inplace=True)
+        prepared_samples = prepare_samples(samples)
+        (daily_metrics, hourly_metrics) = compute_metrics_for_month(prepared_samples, date_str)
+        hist = weekday_histogram(hourly_metrics)
+        print(hist)
+        medal = clean_air_medal(daily_metrics)
+        print(medal)
