@@ -9,10 +9,10 @@ class Hour_Metrics:
 
     SECONDS_PER_HOUR = 3600
     MAX_GAP_S = 600  # For hour statistics, only one sample may be amiss.
-    max_co2_ppm = None
-    mean_co2_ppm = None
-    excess_duration_s = None
-    mean_excess_co2_ppm = None
+    max_co2_ppm = None # maximum CO2 concentration within the hour
+    mean_co2_ppm = None # average CO2 concentration within the hour
+    excess_duration_s = None # duration the CO2 concentration exceeded the threshold
+    mean_excess_co2_ppm = None # average CO2 concentration above the threshold
 
     def __init__(self, hour, gap_duration_s):
         self.hour = hour  # Date-time of the hour of the present instance
@@ -23,10 +23,12 @@ class Hour_Metrics:
 
     @property
     def is_valid(self):
+        """Metric for a given hour is valid if gaps in the samples are small."""
         return self.gap_duration_s < self.MAX_GAP_S
 
     @property
     def excess_rate(self):
+        """Fraction of the hour the CO2 threshold was exceeded."""
         return (
             self.excess_duration_s / (self.SECONDS_PER_HOUR - self.gap_duration_s)
             if self.is_valid
@@ -35,6 +37,7 @@ class Hour_Metrics:
 
     @property
     def excess_score(self):
+        """Score for bad air quality. The longer and the more CO2 the higher."""
         if self.is_valid:
             return self.mean_excess_co2_ppm * self.excess_rate
         else:

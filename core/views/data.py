@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from re import A
 from dateutil.relativedelta import relativedelta
 
 from django.db.models import Q
@@ -232,7 +233,7 @@ class InstallationTimeSeriesViewSet(ReadOnlyModelViewSet):
 
 
 class RoomAirQualityViewSet(ReadOnlyModelViewSet):
-    """A read-only view for air quality information of a given room, computed on the fly from the room's installed sensor. Currently, only a single sensor per room is supported."""
+    """A read-only view for air quality information of a given room, computed on the fly. Currently, only a single sensor per room is supported."""
 
     queryset = RoomNodeInstallation.objects.all()
     serializer_class = RoomAirQualitySerializer
@@ -269,7 +270,7 @@ class RoomAirQualityViewSet(ReadOnlyModelViewSet):
         date_str = self.kwargs.get("month", datetime.today().strftime("%Y-%m"))
         month = datetime.strptime(date_str, "%Y-%m")
         start_of_month = month.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        end_of_month = start_of_month  + relativedelta(months=+1)
+        end_of_month = start_of_month + relativedelta(months=+1)
         from_s = start_of_month.timestamp()
         to_s = end_of_month.timestamp()
         installations_in_slice = installations_queryset.filter(
@@ -297,22 +298,56 @@ class RoomAirQualityViewSet(ReadOnlyModelViewSet):
                 for installation in installations_in_slice
             ]
             sample_set = (
-                sample_querysets[0]
-                .union(*sample_querysets[1:])
-                .order_by("timestamp_s")
+                sample_querysets[0].union(*sample_querysets[1:]).order_by("timestamp_s")
             )
         else:
-            sample_set = installations_in_slice[0].node.samples.filter(
-                timestamp_s__gte=from_s, timestamp_s__lte=to_s
-            ).order_by("timestamp_s")
+            sample_set = (
+                installations_in_slice[0]
+                .node.samples.filter(timestamp_s__gte=from_s, timestamp_s__lte=to_s)
+                .order_by("timestamp_s")
+            )
 
         values = sample_set.values("timestamp_s", "co2_ppm")
         samples = pd.DataFrame.from_records(values)
         samples["timestamp_s"] = pd.to_datetime(samples["timestamp_s"], unit="s")
         samples.set_index("timestamp_s", inplace=True)
         prepared_samples = prepare_samples(samples)
-        (daily_metrics, hourly_metrics) = compute_metrics_for_month(prepared_samples, date_str)
-        hist = weekday_histogram(hourly_metrics)
-        print(hist)
+        (daily_metrics, hourly_metrics) = compute_metrics_for_month(
+            prepared_samples, date_str
+        )
         medal = clean_air_medal(daily_metrics)
-        print(medal)
+
+        airquality = RoomAirQualityViewModel(
+            pk=self.kwargs["pk"],
+            analysis_month=date_str,
+            clean_air_medal=medal,
+            from_timestamp_s=from_s,
+            to_timestamp_s=to_s,
+            airq_hist=None
+        )
+        
+        include_histogram = self.request.query_params.get("include_histogram", False)
+        if include_histogram:
+            hist = weekday_histogram(hourly_metrics)
+            airquality.airq_hist = {
+                "Mo": hist[0]["excess_score"].values.tolist(),
+                "Tu": hist[1]["excess_score"].values.tolist(),
+                "We": hist[2]["excess_score"].values.tolist(),
+                "Th": hist[3]["excess_score"].values.tolist(),
+                "Fr": hist[4]["excess_score"].values.tolist(),
+                "Sa": hist[5]["excess_score"].values.tolist(),
+                "Su": hist[6]["excess_score"].values.tolist()
+            }
+        #     serializer = self.get_serializer(airquality, include_histogram=True)
+        # else:
+        #     serializer = self.get_serializer(airquality)
+        # return Response(serializer.data)
+    
+        return airquality
+        # return RoomAirQualityViewModel(
+        #     pk=self.kwargs["pk"],
+        #     analysis_month=date_str,
+        #     clean_air_medal=medal,
+        #     airq_hist = airq_hist,
+        #     from_timestamp_s=from_s,
+        #     to_timestamp_s=to_s)
