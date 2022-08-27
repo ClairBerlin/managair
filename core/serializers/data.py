@@ -75,7 +75,7 @@ class InstallationTimeSeriesSerializer(InstallationTimeseriesListSerializer):
         resource_name = "Installation-Timeseries"
 
 class RoomAirQualitySerializer(serializers.Serializer):
-    analysis_month = serializers.CharField(read_only=True)
+    year_month = serializers.CharField(read_only=True)
     query_timestamp_s = serializers.IntegerField(read_only=True)
     from_timestamp_s = serializers.IntegerField(read_only=True)
     to_timestamp_s = serializers.IntegerField(read_only=True)

@@ -164,6 +164,20 @@ Time series consist of samples; yet, samples are not resources in their own righ
 - A _node time series_ is the entire list of samples ever recorded by the given node, ordered chronologically. Retrieve a node time series via the node resource at `/api/v1/nodes/<node_id>`, and set the query parameter `include-timeseries=True`. Node timeseries are accessible only for authenticated users that are members of the organization owning the node.
 - An _installation time series_ is the list of samples taken while a given node was installed at a particular location in a given room. That is, the installation time-series is limited in time by the installation's start and end timestamps. Retrieve an installaton time-series via the installation resource at `/api/v1/installations/<installation_id>/`,and set the query parameter `include-timeseries=True`. Installation time series are publicly accessible if the installation itself is marked as public.
 
+### Data Analysis
+
+In addition to raw measurement data, _Managair_ application can perform certain analysis tasks to return the results only. Currently, we provide two types of _air quality information_ for a given room:
+
+- A monthly _air quality indicator_: In retrospect, this indicator says if a given room had sufficiently good air quality during the given month.
+- A histogram the weighted excess CO2-concentration over time for all days of the week in a given month. This histogram says at which days and hours air quality exceeded the threshold of 1000 PPM.
+
+Both analyses are available at the following resource:
+`/api/v1/rooms/<room_id>/airquality/<year_month>` The month of interest must be provided in the form `yyyy-mm`.
+
+By default, only the air quality indication, also called _clean air medal_ is returned as a simple boolean value, where `true` indicates good air quality during the month.
+
+Adding the query parameter `?include_histogram=True` triggers computation of the histogram of excess-CO2-scores. This histogram indicates for each day of the week a score how long the CO2-concentration was above the _clean-air-threshold_ of 1000PPM in a given hour. The 24 values per day correspond to 24 hours, from (0:00 - 0:59) up to (23:00 - 23:59).
+
 ## Public Resources
 
 By default, all resources described above are private by default. This means that a user must be authenticated to access them. In addition, access to most resources is limited to members of the organization that own the resource. Because a user may be a member of multiple organizations, resouerces of all organizations the user is a member of may be returned in one response.

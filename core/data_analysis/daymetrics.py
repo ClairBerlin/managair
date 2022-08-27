@@ -56,7 +56,7 @@ class Day_Metrics:
         )
 
 
-def prepare_daily_metrics(samples, sampling_rate_s, concentration_threshold_ppm):
+def compute_daily_metrics(samples, sampling_rate_s, concentration_threshold_ppm):
     """
     Compute daily metrics for a month's samples; convert metrics into a new data frame.
 

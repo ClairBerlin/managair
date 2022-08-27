@@ -92,7 +92,7 @@ class RoomAirQualityViewModel:
     def __init__(
         self,
         pk,
-        analysis_month: str,
+        year_month: str,
         clean_air_medal,
         airq_hist,
         query_timestamp_s: int = round(datetime.now().timestamp()),
@@ -100,7 +100,7 @@ class RoomAirQualityViewModel:
         to_timestamp_s: int = round(datetime.now().timestamp()),
     ):
         self.pk = pk
-        self.analysis_month = analysis_month
+        self.year_month = year_month
         self.query_timestamp_s = query_timestamp_s
         self.from_timestamp_s = from_timestamp_s
         self.to_timestamp_s = to_timestamp_s

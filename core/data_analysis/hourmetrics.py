@@ -97,7 +97,7 @@ def hourly_key_metrics(hour, samples, sampling_rate_s, concentration_threshold_p
     return metrics
 
 
-def prepare_hourly_metrics(samples, sampling_rate_s, concentration_threshold_ppm):
+def compute_hourly_metrics(samples, sampling_rate_s, concentration_threshold_ppm):
     """
     Compute hourly metrics for a month's samples; convert metrics into a new data frame.
 

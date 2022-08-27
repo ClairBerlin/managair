@@ -6,8 +6,8 @@ from .preprocessing import (
     sliceby_month,
     sliceby_weekday,
 )
-from .daymetrics import prepare_daily_metrics
-from .hourmetrics import prepare_hourly_metrics
+from .daymetrics import compute_daily_metrics
+from .hourmetrics import compute_hourly_metrics
 
 CLEAN_AIR_THRESHOLD_PPM = 1000
 BAD_AIR_THRESHOLD_PPM = 2000
@@ -31,6 +31,12 @@ def prepare_samples(samples):
     return mark_gaps(uniform_samples, gaps)
 
 
+def extract_month_samples(samples, year_month_str):
+    """Take a single month for all day-based analyses, as this is the time slice returned via the API."""
+    monthly_samples = sliceby_month(samples)
+    month = pd.Timestamp(year_month_str).tz_localize(TIMEZONE)
+    return monthly_samples[month]
+
 def compute_metrics_for_month(samples, month):
 
     # Take a single month for all day-based analyses, as this is the time slice
@@ -42,7 +48,7 @@ def compute_metrics_for_month(samples, month):
     # Pandas data frame of daily metrics for the given month; i.e. summary statistics
     # for each day of the selected month. With 10min sampling rate, the statistics are
     # computed over 24*6 = 144 samples a day, except for leap days.
-    daily_metrics = prepare_daily_metrics(
+    daily_metrics = compute_daily_metrics(
         samples=month_samples,
         sampling_rate_s=TARGET_RATE_S,
         concentration_threshold_ppm=CLEAN_AIR_THRESHOLD_PPM,
@@ -51,7 +57,7 @@ def compute_metrics_for_month(samples, month):
     # Pandas data frame of hourly metrics for the given month; i.e., summary statistics
     # for each hour of the selected month. With 10 min sampling rate, the statistics
     # are computed over 6 samples per hour (which is not that much).
-    hourly_metrics = prepare_hourly_metrics(
+    hourly_metrics = compute_hourly_metrics(
         samples=month_samples,
         sampling_rate_s=TARGET_RATE_S,
         concentration_threshold_ppm=CLEAN_AIR_THRESHOLD_PPM,

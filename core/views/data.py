@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from re import A
 from dateutil.relativedelta import relativedelta
 
 from django.db.models import Q
@@ -29,7 +28,11 @@ from core.serializers import (
 )
 from core.data_analysis import (
     prepare_samples,
-    compute_metrics_for_month,
+    TARGET_RATE_S,
+    CLEAN_AIR_THRESHOLD_PPM,
+    extract_month_samples,
+    compute_daily_metrics,
+    compute_hourly_metrics,
     weekday_histogram,
     clean_air_medal,
 )
@@ -265,23 +268,25 @@ class RoomAirQualityViewSet(ReadOnlyModelViewSet):
         else:
             raise MethodNotAllowed
 
-    def get_object(self):
-        installations_queryset = self.get_queryset()
-        date_str = self.kwargs.get("month", datetime.today().strftime("%Y-%m"))
-        month = datetime.strptime(date_str, "%Y-%m")
+    def __month_slice(self, year_month_str):
+        """Determine start and end timestamps of the month under analysis."""
+        month = datetime.strptime(year_month_str, "%Y-%m")
         start_of_month = month.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         end_of_month = start_of_month + relativedelta(months=+1)
         from_s = start_of_month.timestamp()
         to_s = end_of_month.timestamp()
+        return (from_s, to_s)
+
+    def __load_samples(self, installations_queryset, from_s, to_s):
+        """Find all non-overlapping installations in the given room. Construct a query that concatenates the samples of these installations. Fail the request if none or more than one installations are active at the same time."""
         installations_in_slice = installations_queryset.filter(
             to_timestamp_s__gte=from_s, from_timestamp_s__lte=to_s
         )
-        sample_set = []
         if installations_in_slice.count() == 0:
             raise Http404(
-                f"In the requested time slice, the selected room has no accessible installations to draw measurement samples from."
+                "In the requested time slice, the selected room has no accessible installations to draw measurement samples from."
             )
-        elif installations_in_slice.count() > 1:
+        if installations_in_slice.count() > 1:
             for index in range(1, installations_in_slice.count() - 1):
                 # Ensure that there is a single active installation in the room at any
                 # point in time.
@@ -289,7 +294,7 @@ class RoomAirQualityViewSet(ReadOnlyModelViewSet):
                 succ_installation_from = installations_in_slice[index].from_timestamp_s
                 if succ_installation_from <= prev_installation_to:
                     raise Http404(
-                        f"The room has multiple installations active at the same time, which we cannot analyze yet."
+                        "The room has multiple installations active at the same time, which we cannot analyze yet."
                     )
             sample_querysets = [
                 installation.node.samples.filter(
@@ -306,28 +311,49 @@ class RoomAirQualityViewSet(ReadOnlyModelViewSet):
                 .node.samples.filter(timestamp_s__gte=from_s, timestamp_s__lte=to_s)
                 .order_by("timestamp_s")
             )
+        return sample_set
 
+    def __get_samples_for_month(self, sample_set, year_month_str):
+        """Convert the measurement values of interest into a data frame with time-based index. Resample the data frame to obtain a uniform sampling grid and return the samples for the requested month."""
         values = sample_set.values("timestamp_s", "co2_ppm")
         samples = pd.DataFrame.from_records(values)
         samples["timestamp_s"] = pd.to_datetime(samples["timestamp_s"], unit="s")
         samples.set_index("timestamp_s", inplace=True)
         prepared_samples = prepare_samples(samples)
-        (daily_metrics, hourly_metrics) = compute_metrics_for_month(
-            prepared_samples, date_str
+        return extract_month_samples(prepared_samples, year_month_str)
+
+    def get_object(self):
+        installations_queryset = self.get_queryset()
+        year_month_str = self.kwargs.get(
+            "year_month", datetime.today().strftime("%Y-%m")
         )
+        (from_s, to_s) = self.__month_slice(year_month_str)
+        sample_set = self.__load_samples(installations_queryset, from_s, to_s)
+        samples_for_month = self.__get_samples_for_month(sample_set, year_month_str)
+        daily_metrics = compute_daily_metrics(
+            samples=samples_for_month,
+            sampling_rate_s=TARGET_RATE_S,
+            concentration_threshold_ppm=CLEAN_AIR_THRESHOLD_PPM,
+        )
+
         medal = clean_air_medal(daily_metrics)
 
         airquality = RoomAirQualityViewModel(
             pk=self.kwargs["pk"],
-            analysis_month=date_str,
+            year_month=year_month_str,
             clean_air_medal=medal,
             from_timestamp_s=from_s,
             to_timestamp_s=to_s,
-            airq_hist=None
+            airq_hist=None,
         )
-        
+
         include_histogram = self.request.query_params.get("include_histogram", False)
-        if include_histogram:
+        if include_histogram.lower() == "true":
+            hourly_metrics = compute_hourly_metrics(
+                samples=samples_for_month,
+                sampling_rate_s=TARGET_RATE_S,
+                concentration_threshold_ppm=CLEAN_AIR_THRESHOLD_PPM,
+            )
             hist = weekday_histogram(hourly_metrics)
             airquality.airq_hist = {
                 "Mo": hist[0]["excess_score"].values.tolist(),
@@ -336,18 +362,6 @@ class RoomAirQualityViewSet(ReadOnlyModelViewSet):
                 "Th": hist[3]["excess_score"].values.tolist(),
                 "Fr": hist[4]["excess_score"].values.tolist(),
                 "Sa": hist[5]["excess_score"].values.tolist(),
-                "Su": hist[6]["excess_score"].values.tolist()
+                "Su": hist[6]["excess_score"].values.tolist(),
             }
-        #     serializer = self.get_serializer(airquality, include_histogram=True)
-        # else:
-        #     serializer = self.get_serializer(airquality)
-        # return Response(serializer.data)
-    
         return airquality
-        # return RoomAirQualityViewModel(
-        #     pk=self.kwargs["pk"],
-        #     analysis_month=date_str,
-        #     clean_air_medal=medal,
-        #     airq_hist = airq_hist,
-        #     from_timestamp_s=from_s,
-        #     to_timestamp_s=to_s)

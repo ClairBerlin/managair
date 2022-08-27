@@ -115,7 +115,7 @@ urlpatterns = [
         name="room-related-installations",
     ),
     path(
-        "rooms/<pk>/airquality/<month>",
+        "rooms/<pk>/airquality/<year_month>",
         data.RoomAirQualityViewSet.as_view({"get": "retrieve"}),
         name="room-airquality",
     ),
