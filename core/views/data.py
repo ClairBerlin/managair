@@ -347,7 +347,7 @@ class RoomAirQualityViewSet(ReadOnlyModelViewSet):
             airq_hist=None,
         )
 
-        include_histogram = self.request.query_params.get("include_histogram", False)
+        include_histogram = self.request.query_params.get("include_histogram", "false")
         if include_histogram.lower() == "true":
             hourly_metrics = compute_hourly_metrics(
                 samples=samples_for_month,
