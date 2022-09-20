@@ -10,6 +10,7 @@ from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
 from rest_framework_json_api.views import ReadOnlyModelViewSet
 import pandas as pd
+from core.data_analysis.airquality import TIMEZONE
 
 from core.data_viewmodels import (
     NodeTimeseriesListViewModel,
@@ -277,7 +278,15 @@ class RoomAirQualityViewSet(ReadOnlyModelViewSet):
         to_s = end_of_month.timestamp()
         return (from_s, to_s)
 
-    def __load_samples(self, installations_queryset, from_s, to_s):
+    def __past_30_days(self, now):
+        """Determine start and end timestamps for the past 30 days."""
+        range_end = now.floor("D")  # Start of the day
+        range_start = range_end - pd.Timedelta(30, "D")
+        to_s = range_end.timestamp()
+        from_s = range_start.timestamp()
+        return (from_s, to_s)
+
+    def __prepare_sample_query(self, installations_queryset, from_s, to_s):
         """Find all non-overlapping installations in the given room. Construct a query that concatenates the samples of these installations. Fail the request if none or more than one installations are active at the same time."""
         installations_in_slice = installations_queryset.filter(
             to_timestamp_s__gte=from_s, from_timestamp_s__lte=to_s
@@ -313,25 +322,33 @@ class RoomAirQualityViewSet(ReadOnlyModelViewSet):
             )
         return sample_set
 
-    def __get_samples_for_month(self, sample_set, year_month_str):
-        """Convert the measurement values of interest into a data frame with time-based index. Resample the data frame to obtain a uniform sampling grid and return the samples for the requested month."""
+    def __load_samples(self, sample_set):
+        """Trigger the DB query and convert the retrieved samples in a data frame with date/time index."""
         values = sample_set.values("timestamp_s", "co2_ppm")
         samples = pd.DataFrame.from_records(values)
         samples["timestamp_s"] = pd.to_datetime(samples["timestamp_s"], unit="s")
         samples.set_index("timestamp_s", inplace=True)
-        prepared_samples = prepare_samples(samples)
-        return extract_month_samples(prepared_samples, year_month_str)
+        return samples
 
     def get_object(self):
+        now = pd.Timestamp.now().tz_localize(TIMEZONE)
         installations_queryset = self.get_queryset()
-        year_month_str = self.kwargs.get(
-            "year_month", datetime.today().strftime("%Y-%m")
-        )
-        (from_s, to_s) = self.__month_slice(year_month_str)
-        sample_set = self.__load_samples(installations_queryset, from_s, to_s)
-        samples_for_month = self.__get_samples_for_month(sample_set, year_month_str)
+        if "year_month" in self.kwargs:
+            year_month_str = self.kwargs.get("year_month")
+            (from_s, to_s) = self.__month_slice(year_month_str)
+            sample_set = self.__prepare_sample_query(
+                installations_queryset, from_s, to_s
+            )
+        else:
+            (from_s, to_s) = self.__past_30_days(now)
+            sample_set = self.__prepare_sample_query(
+                installations_queryset, from_s, to_s
+            )
+        samples = self.__load_samples(sample_set)
+        working_samples = prepare_samples(samples)
+
         daily_metrics = compute_daily_metrics(
-            samples=samples_for_month,
+            samples=working_samples,
             sampling_rate_s=TARGET_RATE_S,
             concentration_threshold_ppm=CLEAN_AIR_THRESHOLD_PPM,
         )
@@ -340,7 +357,6 @@ class RoomAirQualityViewSet(ReadOnlyModelViewSet):
 
         airquality = RoomAirQualityViewModel(
             pk=self.kwargs["pk"],
-            year_month=year_month_str,
             clean_air_medal=medal,
             from_timestamp_s=from_s,
             to_timestamp_s=to_s,
@@ -350,7 +366,7 @@ class RoomAirQualityViewSet(ReadOnlyModelViewSet):
         include_histogram = self.request.query_params.get("include_histogram", "false")
         if include_histogram.lower() == "true":
             hourly_metrics = compute_hourly_metrics(
-                samples=samples_for_month,
+                samples=working_samples,
                 sampling_rate_s=TARGET_RATE_S,
                 concentration_threshold_ppm=CLEAN_AIR_THRESHOLD_PPM,
             )

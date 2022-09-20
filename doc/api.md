@@ -168,15 +168,20 @@ Time series consist of samples; yet, samples are not resources in their own righ
 
 In addition to raw measurement data, _Managair_ application can perform certain analysis tasks to return the results only. Currently, we provide two types of _air quality information_ for a given room:
 
-- A monthly _air quality indicator_: In retrospect, this indicator says if a given room had sufficiently good air quality during the given month.
-- A histogram the weighted excess CO2-concentration over time for all days of the week in a given month. This histogram says at which days and hours air quality exceeded the threshold of 1000 PPM.
+- A monthly _air quality indicator_: In retrospect, this indicator says if a given room had sufficiently good air quality, either in a selected month or during the past 30 days.
+- A histogram with weighted excess CO2-concentration over time for all days of the week.
+  This histogram says at which days and hours air quality exceeded the threshold of 1000 PPM. 
+  It indicates for each day of the week a score how long the CO2-concentration was above the _clean-air-threshold_ of 1000PPM in a given hour.
+  The 24 values per day correspond to 24 hours, from (0:00 - 0:59) up to (23:00 - 23:59).
+  The histogram is computed either over the past 30 days or from all days of a selected month.
 
 Both analyses are available at the following resource:
-`/api/v1/rooms/<room_id>/airquality/<year_month>` The month of interest must be provided in the form `yyyy-mm`.
+- `/api/v1/rooms/<room_id>/airquality/` dor the past 30 days.
+- `/api/v1/rooms/<room_id>/airquality/<year_month>` dor a given month. The month of interest must be provided in the form `yyyy-mm`.
 
-By default, only the air quality indication, also called _clean air medal_ is returned as a simple boolean value, where `true` indicates good air quality during the month.
+By default, only the air quality indication, also called _clean air medal_, is returned as a simple boolean value, where `true` indicates good air quality during the selected time period.
 
-Adding the query parameter `?include_histogram=True` triggers computation of the histogram of excess-CO2-scores. This histogram indicates for each day of the week a score how long the CO2-concentration was above the _clean-air-threshold_ of 1000PPM in a given hour. The 24 values per day correspond to 24 hours, from (0:00 - 0:59) up to (23:00 - 23:59).
+Adding the query parameter `include_histogram=True` triggers computation of the histogram of excess-CO2-scores.
 
 ## Public Resources
 
