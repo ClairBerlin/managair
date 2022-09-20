@@ -2,10 +2,9 @@ import pandas as pd
 from pandas.tseries.frequencies import to_offset
 import numpy as np
 
-
 def find_gaps(samples, max_gap_s, timezone):
     """
-    Determins gaps in the data frame of nonuniformly spaced samples larger than max_gap
+    Determins gaps in the data frame of nonuniformly-spaced samples larger than max_gap
 
     Args:
         samples (Pandas data frame): date-time index and co2_ppm column
@@ -13,21 +12,26 @@ def find_gaps(samples, max_gap_s, timezone):
         timezone (String): Time zone in which to output the gap markers
 
     Returns:
-        zip-list: list of start and stop times identified successive gaps, in the provided time zone.
+        zip-list: list of start and stop times of identified successive gaps, in the provided time zone.
     """
 
+    # exact start of the first day in range
+    start = samples.index[0].tz_localize(timezone).floor("D").tz_convert("UTC").tz_localize(None) 
+    # exact end of the last day in range
+    end = samples.index[-1].tz_localize(timezone).ceil("D").tz_convert("UTC").tz_localize(None)
+    indices = pd.DatetimeIndex([start, *samples.index, end])
     # compute time difference between subsequent samples
-    sample_timediff = np.diff(samples.index) / np.timedelta64(1, "s")
+    sample_timediff = np.diff(indices) / np.timedelta64(1, "s")
     # identify intervals with gaps between subsequent samples larger than max_gap
     idx = np.where(
         np.greater(sample_timediff, to_offset(max_gap_s).delta.total_seconds())
     )[0]
 
     gap_start_indices = (
-        samples.index[idx].tz_localize("UTC").tz_convert(timezone).tolist()
+        indices[idx].tz_localize("UTC").tz_convert(timezone).tolist()
     )
     gap_stop_indices = (
-        samples.index[idx + 1].tz_localize("UTC").tz_convert(timezone).tolist()
+        indices[idx + 1].tz_localize("UTC").tz_convert(timezone).tolist()
     )
 
     # Store start and stop indices of large intervals
@@ -48,6 +52,16 @@ def resample_to_uniform_grid(samples, target_rate):
 
     See https://towardsdatascience.com/preprocessing-iot-data-linear-resampling-dde750910531
     """
+    # Fake a sample at the start and the end of the time range to get sensible
+    # interpolated values. If enough samples are available, the data repetition won't 
+    # disturb the following analysis. If not enough samples are available, the fake 
+    # samples will be removed by the gap-finder algorithm.
+    start = samples.index[0].floor("D")
+    end = samples.index[-1].ceil("D")
+    samples.loc[start] = samples.iloc[0][0]
+    samples.loc[end] = samples.iloc[-1][0]
+    samples.sort_index(inplace=True)
+
     # First upsample with linear interpolation
     upsampled_samples = samples.resample("1min").mean().interpolate()
     # Then downsample with forward fill.
