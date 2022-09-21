@@ -97,5 +97,5 @@ class RoomAirQualitySerializer(serializers.Serializer):
         # Instantiate the superclass normally
         super().__init__(*args, **kwargs)
 
-        if args[0].airq_hist is None:
+        if len(args) and args[0].airq_hist is None:
             self.fields.pop("airq_hist")
