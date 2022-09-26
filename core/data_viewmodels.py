@@ -87,3 +87,23 @@ class InstallationTimeseriesViewModel(InstallationTimeseriesListViewModel):
             to_timestamp_s=to_timestamp_s,
         )
         self.samples = samples
+
+class RoomAirQualityViewModel:
+    def __init__(
+        self,
+        pk,
+        clean_air_medal,
+        airq_hist,
+        query_timestamp_s: int = round(datetime.now().timestamp()),
+        from_timestamp_s: int = 0,
+        to_timestamp_s: int = round(datetime.now().timestamp()),
+    ):
+        self.pk = pk
+        self.query_timestamp_s = query_timestamp_s
+        self.from_timestamp_s = from_timestamp_s
+        self.to_timestamp_s = to_timestamp_s
+        self.clean_air_medal = clean_air_medal
+        self.airq_hist=airq_hist
+
+    class JSONAPIMeta:
+        resource_name = "room-airquality"

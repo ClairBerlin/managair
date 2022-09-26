@@ -115,6 +115,16 @@ urlpatterns = [
         name="room-related-installations",
     ),
     path(
+        "rooms/<pk>/airquality/",
+        data.RoomAirQualityViewSet.as_view({"get": "retrieve"}),
+        name="room-airquality",
+    ),
+    path(
+        "rooms/<pk>/airquality/<year_month>",
+        data.RoomAirQualityViewSet.as_view({"get": "retrieve"}),
+        name="room-airquality",
+    ),
+    path(
         "installations/<installation_pk>/timeseries/",
         data.InstallationTimeSeriesViewSet.as_view({"get": "retrieve"}),
         name="installation-timeseries",

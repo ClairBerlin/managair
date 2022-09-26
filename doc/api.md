@@ -134,7 +134,7 @@ For most resources, there exists at least on API test. Refer to these test cases
   - [DELETE] Remove the room resource and the node-installation it might contain. Does not delete the node resources themselves.
 - `/api/v1/rooms/<room_id>/installations/` Collection-resource of all node installations in the given room.
   - [GET] List current and past installations, with individual links to the related detail-resource at `/api/v1/installations/<installation_id>`.
-- `/api/v1/installations/` Collection-resource for the all node installation visible to the authenticated user.
+- `/api/v1/installations/` Collection-resource for all the node-installation visible to the authenticated user.
   - [GET] List the installations. Filter to narrow down the list:
     - See installations of one specific organization with the filter `filter[organization]=<organization_id>`.
     - See installations of one specific site with the filter `filter[site]=<site_id>`.
@@ -163,6 +163,25 @@ Time series consist of samples; yet, samples are not resources in their own righ
 
 - A _node time series_ is the entire list of samples ever recorded by the given node, ordered chronologically. Retrieve a node time series via the node resource at `/api/v1/nodes/<node_id>`, and set the query parameter `include-timeseries=True`. Node timeseries are accessible only for authenticated users that are members of the organization owning the node.
 - An _installation time series_ is the list of samples taken while a given node was installed at a particular location in a given room. That is, the installation time-series is limited in time by the installation's start and end timestamps. Retrieve an installaton time-series via the installation resource at `/api/v1/installations/<installation_id>/`,and set the query parameter `include-timeseries=True`. Installation time series are publicly accessible if the installation itself is marked as public.
+
+### Data Analysis
+
+In addition to raw measurement data, _Managair_ application can perform certain analysis tasks to return the results only. Currently, we provide two types of _air quality information_ for a given room:
+
+- A monthly _air quality indicator_: In retrospect, this indicator says if a given room had sufficiently good air quality, either in a selected month or during the past 30 days.
+- A histogram with weighted excess CO2-concentration over time for all days of the week.
+  This histogram says at which days and hours air quality exceeded the threshold of 1000 PPM. 
+  It indicates for each day of the week a score how long the CO2-concentration was above the _clean-air-threshold_ of 1000PPM in a given hour.
+  The 24 values per day correspond to 24 hours, from (0:00 - 0:59) up to (23:00 - 23:59).
+  The histogram is computed either over the past 30 days or from all days of a selected month.
+
+Both analyses are available at the following resource:
+- `/api/v1/rooms/<room_id>/airquality/` dor the past 30 days.
+- `/api/v1/rooms/<room_id>/airquality/<year_month>` dor a given month. The month of interest must be provided in the form `yyyy-mm`.
+
+By default, only the air quality indication, also called _clean air medal_, is returned as a simple boolean value, where `true` indicates good air quality during the selected time period.
+
+Adding the query parameter `include_histogram=True` triggers computation of the histogram of excess-CO2-scores.
 
 ## Public Resources
 
