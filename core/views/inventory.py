@@ -17,8 +17,6 @@ from rest_framework_json_api.views import (
     RelationshipView,
     generics,
 )
-import pandas as pd
-
 
 from core.permissions import IsOrganizationOwner
 from core.models import (

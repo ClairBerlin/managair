@@ -2,6 +2,7 @@ import pandas as pd
 from pandas.tseries.frequencies import to_offset
 import numpy as np
 
+
 def find_gaps(samples, max_gap_s, timezone):
     """
     Determins gaps in the data frame of nonuniformly-spaced samples larger than max_gap
@@ -16,9 +17,21 @@ def find_gaps(samples, max_gap_s, timezone):
     """
 
     # exact start of the first day in range
-    start = samples.index[0].tz_localize(timezone).floor("D").tz_convert("UTC").tz_localize(None) 
+    start = (
+        samples.index[0]
+        .tz_localize(timezone)
+        .floor("D")
+        .tz_convert("UTC")
+        .tz_localize(None)
+    )
     # exact end of the last day in range
-    end = samples.index[-1].tz_localize(timezone).ceil("D").tz_convert("UTC").tz_localize(None)
+    end = (
+        samples.index[-1]
+        .tz_localize(timezone)
+        .ceil("D")
+        .tz_convert("UTC")
+        .tz_localize(None)
+    )
     indices = pd.DatetimeIndex([start, *samples.index, end])
     # compute time difference between subsequent samples
     sample_timediff = np.diff(indices) / np.timedelta64(1, "s")
@@ -27,12 +40,8 @@ def find_gaps(samples, max_gap_s, timezone):
         np.greater(sample_timediff, to_offset(max_gap_s).delta.total_seconds())
     )[0]
 
-    gap_start_indices = (
-        indices[idx].tz_localize("UTC").tz_convert(timezone).tolist()
-    )
-    gap_stop_indices = (
-        indices[idx + 1].tz_localize("UTC").tz_convert(timezone).tolist()
-    )
+    gap_start_indices = indices[idx].tz_localize("UTC").tz_convert(timezone).tolist()
+    gap_stop_indices = indices[idx + 1].tz_localize("UTC").tz_convert(timezone).tolist()
 
     # Store start and stop indices of large intervals
     gaps = list(zip(gap_start_indices, gap_stop_indices))
@@ -53,8 +62,8 @@ def resample_to_uniform_grid(samples, target_rate):
     See https://towardsdatascience.com/preprocessing-iot-data-linear-resampling-dde750910531
     """
     # Fake a sample at the start and the end of the time range to get sensible
-    # interpolated values. If enough samples are available, the data repetition won't 
-    # disturb the following analysis. If not enough samples are available, the fake 
+    # interpolated values. If enough samples are available, the data repetition won't
+    # disturb the following analysis. If not enough samples are available, the fake
     # samples will be removed by the gap-finder algorithm.
     start = samples.index[0].floor("D")
     end = samples.index[-1].ceil("D")

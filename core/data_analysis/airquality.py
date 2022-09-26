@@ -20,6 +20,7 @@ TARGET_RATE = "10min"  # uniform sampling frequency to transform the data to
 TARGET_RATE_S = 600
 TIMEZONE = "Europe/Berlin"
 
+
 def prepare_samples(samples):
     """Most samples are nonuniformly spaced because of transmission delays and clock skew. To simplify processing, resample these samples on a uniform grid at the target_rate. This might lead to some noise amplification for stretches of sparse original samples. If the gaps between subsequent samples are too large, resampling will yield mostly noise; therefore, we exclude these stretches and insert NaN-values instead."""
 
@@ -36,6 +37,7 @@ def extract_month_samples(samples, year_month_str):
     monthly_samples = sliceby_month(samples)
     month = pd.Timestamp(year_month_str).tz_localize(TIMEZONE)
     return monthly_samples[month]
+
 
 def compute_metrics_for_month(samples, month):
 

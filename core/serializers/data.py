@@ -74,6 +74,7 @@ class InstallationTimeSeriesSerializer(InstallationTimeseriesListSerializer):
     class JSONAPIMeta:
         resource_name = "Installation-Timeseries"
 
+
 class RoomAirQualitySerializer(serializers.Serializer):
     year_month = serializers.CharField(read_only=True)
     query_timestamp_s = serializers.IntegerField(read_only=True)
@@ -81,10 +82,8 @@ class RoomAirQualitySerializer(serializers.Serializer):
     to_timestamp_s = serializers.IntegerField(read_only=True)
     clean_air_medal = serializers.BooleanField(read_only=True)
     airq_hist = serializers.DictField(read_only=True)
-    
-    url = serializers.HyperlinkedIdentityField(
-        view_name="room-detail"
-    )
+
+    url = serializers.HyperlinkedIdentityField(view_name="room-detail")
 
     class Meta:
         model = RoomAirQualityViewModel
@@ -97,5 +96,5 @@ class RoomAirQualitySerializer(serializers.Serializer):
         # Instantiate the superclass normally
         super().__init__(*args, **kwargs)
 
-        if len(args) and args[0].airq_hist is None:
+        if (len(args) > 0) and args[0].airq_hist is None:
             self.fields.pop("airq_hist")

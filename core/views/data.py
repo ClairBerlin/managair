@@ -31,7 +31,6 @@ from core.data_analysis import (
     prepare_samples,
     TARGET_RATE_S,
     CLEAN_AIR_THRESHOLD_PPM,
-    extract_month_samples,
     compute_daily_metrics,
     compute_hourly_metrics,
     weekday_histogram,
