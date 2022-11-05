@@ -168,10 +168,8 @@ Time series consist of samples; yet, samples are not resources in their own righ
 
 In addition to raw measurement data, _Managair_ application can perform certain analysis tasks to return the results only. Currently, we provide two types of _air quality information_ for a given room:
 
-- A monthly _air quality indicator_: In retrospect, this indicator says if a given room had sufficiently good air quality, either in a selected month or during the past 30 days.
-- A histogram with weighted excess CO2-concentration over time for all days of the week.
-  This histogram says at which days and hours air quality exceeded the threshold of 1000 PPM. 
-  It indicates for each day of the week a score how long the CO2-concentration was above the _clean-air-threshold_ of 1000PPM in a given hour.
+- A monthly _air quality indicator_: This indicator says if a given room had sufficiently good air quality, either in a selected month or during the past 30 days.
+- A histogram with the mean CO2-concentration over time for all days of the week.
   The 24 values per day correspond to 24 hours, from (0:00 - 0:59) up to (23:00 - 23:59).
   The histogram is computed either over the past 30 days or from all days of a selected month.
 
