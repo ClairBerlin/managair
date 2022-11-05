@@ -284,10 +284,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 # Let White Noise compress static files and make them cacheable.
 # See http://whitenoise.evans.io/en/stable/index.html
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 # Default static files directory
-# See https://docs.djangoproject.com/en/3.1/howto/static-files/
-STATIC_URL = "/static/"
+# See https://docs.djangoproject.com/en/4.1/howto/static-files/
+STATIC_URL = "static/"
 
 # Enable or disable third-party IOT data-platform (IOTDP) integration
 IOTDP_INTEGRATION = int(os.environ.get("IOTDP_INTEGRATION", default=0))
