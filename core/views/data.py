@@ -335,14 +335,10 @@ class RoomAirQualityViewSet(ReadOnlyModelViewSet):
         if "year_month" in self.kwargs:
             year_month_str = self.kwargs.get("year_month")
             (from_s, to_s) = self.__month_slice(year_month_str)
-            sample_set = self.__prepare_sample_query(
-                installations_queryset, from_s, to_s
-            )
         else:
             (from_s, to_s) = self.__past_30_days(now)
-            sample_set = self.__prepare_sample_query(
-                installations_queryset, from_s, to_s
-            )
+        
+        sample_set = self.__prepare_sample_query(installations_queryset, from_s, to_s)
         samples = self.__load_samples(sample_set)
         working_samples = prepare_samples(samples)
 
@@ -371,25 +367,25 @@ class RoomAirQualityViewSet(ReadOnlyModelViewSet):
             )
             hist = weekday_histogram(hourly_metrics)
             airquality.airq_hist = {
-                "Mo": hist[0]["excess_score"].values.tolist()
+                "Mo": hist[0]["mean_co2_ppm"].values.tolist()
                 if 0 in hist.keys() and len(hist[0]) == 24
                 else [],
-                "Tu": hist[1]["excess_score"].values.tolist()
+                "Tu": hist[1]["mean_co2_ppm"].values.tolist()
                 if 1 in hist.keys() and len(hist[1]) == 24
                 else [],
-                "We": hist[2]["excess_score"].values.tolist()
+                "We": hist[2]["mean_co2_ppm"].values.tolist()
                 if 2 in hist.keys() and len(hist[2]) == 24
                 else [],
-                "Th": hist[3]["excess_score"].values.tolist()
+                "Th": hist[3]["mean_co2_ppm"].values.tolist()
                 if 3 in hist.keys() and len(hist[3]) == 24
                 else [],
-                "Fr": hist[4]["excess_score"].values.tolist()
+                "Fr": hist[4]["mean_co2_ppm"].values.tolist()
                 if 4 in hist.keys() and len(hist[4]) == 24
                 else [],
-                "Sa": hist[5]["excess_score"].values.tolist()
+                "Sa": hist[5]["mean_co2_ppm"].values.tolist()
                 if 5 in hist.keys() and len(hist[5]) == 24
                 else [],
-                "Su": hist[6]["excess_score"].values.tolist()
+                "Su": hist[6]["mean_co2_ppm"].values.tolist()
                 if 6 in hist.keys() and len(hist[6]) == 24
                 else [],
             }

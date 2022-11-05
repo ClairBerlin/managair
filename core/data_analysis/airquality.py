@@ -9,7 +9,7 @@ from .preprocessing import (
 from .daymetrics import compute_daily_metrics
 from .hourmetrics import compute_hourly_metrics
 
-CLEAN_AIR_THRESHOLD_PPM = 1000
+CLEAN_AIR_THRESHOLD_PPM = 1500
 BAD_AIR_THRESHOLD_PPM = 2000
 EXCESS_SCORE_THRESHOLD = 150
 EXCESS_RATE = 0.3  # Admissible fraction of days above threshold
@@ -90,14 +90,16 @@ def clean_air_medal(daily_metrics):
     Determines from the daily summary statistics if the clean-air-medal should be awarded for the given month.
 
     Args:
-        daily_metrics (Pandas data frame): Data frame with daily metrics for a given month, for which
+        daily_metrics (Pandas data frame): Data frame with daily metrics for a given month
 
     Returns:
         Boolean: If the clean-air-medal is awarded for the given month or not. None for missing data.
     """
 
-    # Wenn alle Maximalwerte unter 2000 ppm waren, nie eine rote Ampel auftrat (d.h. der Wert lag
-    # auch nicht an einem Tag über 30% der Zeit über dem Referenzwert) und weniger als 30% Gelbe-Ampel-Tagesbewertungen, wird die Frischluft-Medaille vergeben
+    # Wenn alle Maximalwerte unter 2000 ppm waren, nie eine rote Ampel auftrat (d.h.
+    # der Wert lag auch nicht an einem Tag über 30% der Zeit über dem Referenzwert) und
+    #  weniger als 30% Gelbe-Ampel-Tagesbewertungen, wird die Frischluft-Medaille
+    # vergeben
     days_count = daily_metrics["is_valid"].count()
     valid_days = daily_metrics[daily_metrics["is_valid"]]
     valid_days_count = valid_days["is_valid"].count()
